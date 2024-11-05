@@ -1,0 +1,12 @@
+.editor {
+	-fx-padding: 4px 4px 4px 16px;
+}
+
+.editor:hover {
+	-fx-background-color: -fx-outer-border, -fx-inner-border, derive(-fx-base, -10%);
+	-fx-background-insets: 0, 1, 2;
+}
+
+Label {
+	-fx-font-weight: bold;
+}
