@@ -9,8 +9,20 @@
     <file url="file://$PROJECT_DIR$/ezfx-controls/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ezfx-demos/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ezfx-demos/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/ezfz-graalfx/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/ezfz-graalfx/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ezfx-filesystem/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ezfx-filesystem/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ezfx-fxml/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ezfx-fxml/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ezfx-io/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ezfx-io/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ezfx-polyglot/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ezfx-polyglot/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ezfx-settings/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ezfx-settings/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ezfx-spring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ezfx-spring/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ezfx-theme/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ezfx-theme/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
   </component>

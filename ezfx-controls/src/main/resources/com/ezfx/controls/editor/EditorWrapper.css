@@ -1,0 +1,20 @@
+.editor-wrapper {
+	-fx-padding: 8px;
+	-fx-background-color: -fx-outer-border, -fx-inner-border, -fx-base;
+	-fx-background-radius: 0;
+	-fx-background-insets: 0, 1, 2;
+}
+
+.editor-wrapper:hover {
+	-fx-background-color: -fx-outer-border, -fx-inner-border, derive(-fx-base, -10%);
+}
+
+Label {
+	-fx-font-weight: bold;
+}
+
+.icon-button {
+    -fx-padding: 0;
+    -fx-pref-width: 16px;
+    -fx-pref-height: 16px;
+}

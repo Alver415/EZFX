@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import com.sun.javafx.scene.control.IntegerField?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.Scene?>
+<Scene xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+       fx:controller="com.ezfx.spring.test.bidi.BidirectionalBindingTestController">
+    <VBox>
+        <Button fx:id="garbageCollectionButton"
+                text="Request Garbage Collection"
+                onAction="#requestGarbageCollection"/>
+        <TextField fx:id="noBind"/>
+        <TextField fx:id="unidirectionalBind" text="${controller.text}"/>
+        <TextField fx:id="bidirectionalBind" text="#{controller.text}"/>
+
+        <HBox>
+            <IntegerField fx:id="count"/>
+            <Button text="submit" onAction="#submit"></Button>
+        </HBox>
+        <ListView fx:id="listView"/>
+    </VBox>
+</Scene>

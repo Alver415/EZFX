@@ -1,0 +1,14 @@
+open module ezfx.spring {
+	exports com.ezfx.spring;
+
+	requires transitive java.scripting;
+	requires transitive java.xml;
+	requires transitive javafx.base;
+	requires transitive javafx.fxml;
+	requires transitive javafx.graphics;
+	requires transitive org.slf4j;
+	requires transitive spring.beans;
+	requires transitive spring.boot.autoconfigure;
+	requires transitive spring.context;
+	requires transitive spring.core;
+}

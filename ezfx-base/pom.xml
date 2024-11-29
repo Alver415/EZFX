@@ -5,21 +5,35 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>ezfx</groupId>
-        <artifactId>parent</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <artifactId>ezfx</artifactId>
+        <version>${revision}</version>
     </parent>
     <artifactId>ezfx-base</artifactId>
+
+    <properties>
+        <easybind.version>1.0.3</easybind.version>
+        <reflections.version>0.10.2</reflections.version>
+    </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
-            <version>${javafx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>${javafx.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fxmisc.easybind</groupId>
+            <artifactId>easybind</artifactId>
+            <version>${easybind.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>${reflections.version}</version>
         </dependency>
     </dependencies>
 </project>

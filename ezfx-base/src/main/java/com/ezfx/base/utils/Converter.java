@@ -1,10 +1,12 @@
 package com.ezfx.base.utils;
 
-import javafx.beans.property.Property;
-
 import java.util.function.Function;
 
 public interface Converter<A, B> {
+
+	static <T> Converter<T, T> identity() {
+		return Converter.of(Function.identity(), Function.identity());
+	}
 
 	B to(A a);
 

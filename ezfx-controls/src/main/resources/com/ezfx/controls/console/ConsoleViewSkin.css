@@ -1,0 +1,21 @@
+.console-view {
+    -fx-auto-scroll: true;
+}
+.console-view .code-area .lineno .text {
+    -fx-fill: black;
+    -fx-font-posture: italics;
+}
+.console-view .code-area .text {
+    -fx-fill: -fx-text-fill;
+}
+.console-view .code-area .in-stream {
+    -fx-fill: -fx-text-in-fill;
+    -fx-font-posture: italics;
+}
+.console-view .code-area .out-stream {
+    -fx-fill: -fx-text-out-fill;
+}
+.console-view .code-area .err-stream {
+    -fx-fill: -fx-text-err-fill;
+    -fx-font-weight: bold;
+}

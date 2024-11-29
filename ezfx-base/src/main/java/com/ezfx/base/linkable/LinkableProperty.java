@@ -33,6 +33,12 @@ public class LinkableProperty<T> implements Property<T> {
 		this.property = property;
 	}
 
+	/**
+	 * Static Constructor
+	 */
+	public static <T> LinkableProperty<T> wrap(Property<T> property) {
+		return new LinkableProperty<>(property);
+	}
 
 	public void link(LinkableProperty<T> other) {
 		this.linkedTo.set(other);
@@ -224,7 +230,4 @@ public class LinkableProperty<T> implements Property<T> {
 	}
 	//endregion Delegated Methods
 
-	public static <T> LinkableProperty<T> wrap(Property<T> property) {
-		return new LinkableProperty<>(property);
-	}
 }
