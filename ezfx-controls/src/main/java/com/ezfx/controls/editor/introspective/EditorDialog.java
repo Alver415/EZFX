@@ -17,16 +17,19 @@ import javafx.stage.Modality;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
 
-public class BuilderDialog<T> extends Dialog<T> {
+public class EditorDialog<T> extends Dialog<T> {
 
-	public BuilderDialog(Property<T> property, Editor<T> editor) {
+	public EditorDialog(Property<T> property, Editor<T> editor) {
 		T originalValue = property.getValue();
 		initModality(Modality.NONE);
 		DialogPane dialogPane = getDialogPane();
 		setResizable(true);
 		setContentText("Content Text");
 		ImageView graphic = new ImageView();
+		graphic.setFitWidth(32);
+		graphic.setFitHeight(32);
 		BooleanEditor autoApply = new BooleanEditor();
+		autoApply.setValue(true);
 		graphic.setOnMouseClicked(a -> autoApply.setValue(!autoApply.getValue()));
 		graphic.imageProperty().bind(autoApply.property().map(isAutoApply -> isAutoApply ? Icons.LOCKED : Icons.UNLOCKED));
 		setGraphic(graphic);

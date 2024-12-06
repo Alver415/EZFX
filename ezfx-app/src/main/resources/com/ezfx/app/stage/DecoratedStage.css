@@ -1,0 +1,35 @@
+
+.stage-border {
+    -fx-padding: 4px;
+	-fx-background-color: rgba(0,0,0,0.1);
+    -fx-background-radius: 4px;
+}
+
+.stage {
+	-fx-background-color: rgba(236,236,236,0.9);
+    -fx-background-radius: 4px;
+}
+
+.stage-title-bar {
+    -fx-alignment: center;
+    -fx-background-radius: 4;
+    -fx-background-color: rgba(100,150,255,0.5)
+}
+
+.stage-title-bar > .title {
+    -fx-font-weight: bold;
+}
+
+.stage-title-bar > HBox {
+    -fx-padding: 4px;
+    -fx-spacing: 4px;
+}
+
+.stage-button {
+    -fx-min-width: 16px;
+    -fx-min-height: 16px;
+    -fx-pref-width: 16px;
+    -fx-pref-height: 16px;
+    -fx-max-width: 16px;
+    -fx-max-height: 16px;
+}

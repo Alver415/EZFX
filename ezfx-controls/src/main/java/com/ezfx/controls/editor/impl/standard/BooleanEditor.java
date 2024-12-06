@@ -6,6 +6,8 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.Skin;
 
+import java.util.Map;
+
 public class BooleanEditor extends ObjectEditor<Boolean> {
 
 	public BooleanEditor() {
@@ -14,8 +16,9 @@ public class BooleanEditor extends ObjectEditor<Boolean> {
 
 	public BooleanEditor(Property<Boolean> property) {
 		super(property);
-		getKnownValues().add(Boolean.TRUE);
-		getKnownValues().add(Boolean.FALSE);
+		getKnownValues().putAll(Map.of(
+				"True", Boolean.TRUE,
+				"False", Boolean.FALSE));
 	}
 
 	@Override

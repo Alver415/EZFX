@@ -14,6 +14,7 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
@@ -29,10 +30,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.ezfx.controls.editor.EditorFactory.DEFAULT_FACTORY;
@@ -43,6 +41,10 @@ import static java.lang.reflect.Modifier.*;
 public class IntrospectingEditor<T> extends ObjectEditor<T> implements DelegatingEditor<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(IntrospectingEditor.class);
+
+	private final Binding<List<FieldOption<T>>> fieldOptions;
+	private final Binding<List<MethodOption<T>>> methodOptions;
+	private final Binding<List<? extends ConstructorOption<? extends T>>> constructorOptions;
 
 	public IntrospectingEditor(Class<T> type) {
 		this(new SimpleObjectProperty<>(), type);
@@ -58,10 +60,6 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 		this(property, type, DEFAULT_INTROSPECTOR, DEFAULT_FACTORY);
 	}
 
-	private final Binding<List<FieldOption<T>>> fieldOptions;
-	private final Binding<List<MethodOption<T>>> methodOptions;
-	private final Binding<List<? extends ConstructorOption<? extends T>>> constructorOptions;
-
 	public IntrospectingEditor(
 			Property<T> property,
 			Class<T> type,
@@ -73,7 +71,9 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 		setEditorFactory(factory);
 
 		property.subscribe(value -> {
-			if ( value != null && !getIntrospector().getPropertyInfo(value.getClass()).isEmpty()){
+			if (value == null) {
+				setDelegate(null);
+			} else if (!getIntrospector().getPropertyInfo(value.getClass()).isEmpty()) {
 				setDelegate(new IntrospectingPropertiesEditor<>(value));
 			}
 		});
@@ -94,7 +94,7 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 						.map(this::build)
 						.toList());
 
-		MonadicBinding<List<? extends Constructor<? extends T>>> combine =
+		MonadicBinding<List<? extends Constructor<T>>> combine =
 				EasyBind.combine(introspectorProperty(), typeProperty(), Introspector::getConstructors);
 		constructorOptions = combine.map(constructors -> constructors.stream()
 				.sorted(Comparator.comparing(Constructor::getParameterCount))
@@ -117,10 +117,10 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 			return list;
 		}, methodOptions, constructorOptions);
 
-		EditorAction clear = new EditorAction();
-		clear.setName("Set Value");
-		clear.setIcon(Icons.PLUS);
-		clear.setAction(() -> {
+		EditorAction setValue = new EditorAction();
+		setValue.setName("Set Value");
+		setValue.setIcon(Icons.PLUS);
+		setValue.setAction(() -> {
 
 			Menu valueMenu = new Menu("Value");
 			valueOptions.map(list -> list.stream().map(option -> {
@@ -135,13 +135,13 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 				MenuItem menuItem = new MenuItem();
 				menuItem.setText(option.getName());
 				menuItem.setOnAction(_ -> {
-					if (option instanceof ConstructorOption<T> constructorOption){
+					if (option instanceof ConstructorOption<T> constructorOption) {
 						if (constructorOption.getConstructor().getParameterCount() == 0) {
 							property.setValue(option.buildEditor().getValue());
 							return;
 						}
 					}
-					BuilderDialog<T> dialog = new BuilderDialog<>(property, option.buildEditor());
+					EditorDialog<T> dialog = new EditorDialog<>(property, option.buildEditor());
 					dialog.setHeaderText(option.getType().getSimpleName());
 					dialog.show();
 				});
@@ -157,9 +157,20 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 			contextMenu.setAnchorLocation(PopupWindow.AnchorLocation.CONTENT_TOP_LEFT);
 			contextMenu.show(this, x, y);
 		});
-		actionsProperty().add(clear);
-	}
+		actionsProperty().add(setValue);
 
+
+		knownValuesProperty().putAll((Map<String, T>) EasyBind.combine(introspectorProperty(), typeProperty(), Introspector::getFields)
+				.map(fields -> fields.stream()
+						.sorted(Comparator.comparing(Field::getName))
+						.filter(field -> checkModifiers(field.getModifiers(), PUBLIC, STATIC, FINAL))
+						.filter(field -> field.getType().isAssignableFrom(type))
+						.collect(Collectors.toMap(
+								Field::getName,
+								IntrospectingEditor::getStaticFieldValue,
+								(existing, _) -> existing,
+								() -> FXCollections.observableMap(new TreeMap<>())))).get());
+	}
 
 	private FieldOption<T> build(Field field) {
 		String typeName = field.getType().getSimpleName();
@@ -241,7 +252,7 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 	}
 
 
-	private static <T> T getField(Field field) {
+	private static <T> T getStaticFieldValue(Field field) {
 		try {
 			return (T) field.get(null);
 		} catch (IllegalAccessException e) {

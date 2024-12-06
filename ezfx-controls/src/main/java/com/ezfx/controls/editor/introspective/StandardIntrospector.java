@@ -140,13 +140,13 @@ public class StandardIntrospector implements Introspector {
 	}
 
 	@Override
-	public <T> List<? extends Constructor<? extends T>> getConstructors(Class<T> type) {
+	public <T> List<Constructor<T>> getConstructors(Class<T> type) {
 		return Stream.concat(Stream.of(type), reflections.getSubTypesOf(type).stream()
 						.filter(c -> Modifier.isPublic(c.getModifiers()))
 						.filter(c -> !c.isMemberClass() || Modifier.isStatic(c.getModifiers())))
 				.map(Class::getConstructors)
 				.flatMap(Arrays::stream)
-				.map(constructor -> (Constructor<? extends T>) constructor)
+				.map(constructor -> (Constructor<T>) constructor)
 				.toList();
 	}
 

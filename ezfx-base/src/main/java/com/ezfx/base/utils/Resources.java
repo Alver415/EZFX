@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Objects;
 
+// TODO: Cache everything so we don't load each image/css/fxml file multiple times.
 public interface Resources {
 
 	Logger log = LoggerFactory.getLogger(Resources.class);
@@ -26,7 +27,7 @@ public interface Resources {
 
 	static Image image(Class<?> clazz, String resource) {
 		InputStream resourceStream = clazz.getResourceAsStream(resource);
-		if (resourceStream == null){
+		if (resourceStream == null) {
 			log.warn("Failed to find resource: %s %s".formatted(clazz, resource));
 			return null;
 		}

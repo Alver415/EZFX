@@ -61,7 +61,7 @@ public class ViewportSkin extends SkinBase<Viewport> {
 			borderPane.setRight(heightEditor);
 
 			StackPane surface = new StackPane(subScene);
-			surface.setBackground(Backgrounds.checkeredBackground());
+			surface.setBackground(Backgrounds.CHECKERED);
 			surface.setClip(rectangle(surface));
 			borderPane.setCenter(surface);
 

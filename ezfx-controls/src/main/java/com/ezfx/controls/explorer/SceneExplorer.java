@@ -17,7 +17,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.lang.reflect.InvocationTargetException;
@@ -25,8 +24,12 @@ import java.lang.reflect.InvocationTargetException;
 public class SceneExplorer extends Control {
 
 	public static void stage(Scene scene) {
+		stage(scene, 2);
+	}
+
+	public static void stage(Scene scene, int screenIndex) {
 		Stage stage = new Stage();
-		Screens.setScreen(stage, 1);
+		Screens.setScreen(stage, screenIndex);
 
 		SceneExplorer sceneExplorer = new SceneExplorer(scene);
 		sceneExplorer.setPrefSize(1200, 800);
@@ -56,29 +59,26 @@ public class SceneExplorer extends Control {
 
 	@Override
 	protected Skin<?> createDefaultSkin() {
-		return new SceneExplorerTreeTableSkin(this);
+		return new SceneExplorerTreeSkin(this);
 	}
 
 	public static class SceneExplorerTreeSkin extends SkinBase<SceneExplorer> {
 
 		protected SceneExplorerTreeSkin(SceneExplorer sceneExplorer) {
 			super(sceneExplorer);
-			BorderPane borderPane = new BorderPane();
 
 			NodeTreeView treeView = new NodeTreeView();
 			treeView.rootProperty().bind(sceneExplorer.rootProperty().map(NodeTreeItem::new));
-			borderPane.setLeft(treeView);
 
 			Editor<Node> beanEditor = new IntrospectingPropertiesEditor<>();
-
 			treeView.getSelectionModel().select(0);
 			beanEditor.property().bind(treeView.selectionModelProperty().flatMap(SelectionModel::selectedItemProperty).map(TreeItem::getValue));
 			ScrollPane scrollPane = new ScrollPane(beanEditor);
 			scrollPane.setFitToWidth(true);
 			scrollPane.setFitToHeight(true);
-			borderPane.setCenter(scrollPane);
 
-			getChildren().setAll(borderPane);
+			SplitPane splitPane = new SplitPane(treeView, scrollPane);
+			getChildren().setAll(splitPane);
 		}
 	}
 

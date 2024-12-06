@@ -31,17 +31,6 @@ public class NodeTreeCell extends TreeCell<Node> {
 			return;
 		}
 
-		// Tooltip is CSS classes
-		tooltipProperty().bind(Bindings.createObjectBinding(() -> {
-			if (item.getStyleClass().isEmpty()) return null;
-			Tooltip tooltip = new Tooltip();
-			tooltip.textProperty().bind(Bindings.createStringBinding(() ->
-							item.getStyleClass().stream()
-									.map(".%s"::formatted)
-									.collect(Collectors.joining(" ", "Style Classes: ", "")),
-					item.getStyleClass()));
-			return tooltip;
-		}, item.getStyleClass()));
 
 		// Graphic is icon for associated class and the class name
 		graphicProperty().bind(Bindings.createObjectBinding(() -> {
@@ -54,7 +43,7 @@ public class NodeTreeCell extends TreeCell<Node> {
 			name = name.substring(name.lastIndexOf(".") + 1);
 			Image icon = getIcon(item);
 			Label type = new Label(name);
-			if (isAnonymous){
+			if (isAnonymous) {
 				type.setTooltip(new Tooltip(item.getClass().getName()));
 			}
 			type.setStyle("-fx-font-weight:bold;");
@@ -66,8 +55,14 @@ public class NodeTreeCell extends TreeCell<Node> {
 			CheckBox visible = new CheckBox();
 			visible.selectedProperty().bindBidirectional(item.visibleProperty());
 
+			Label styleClasses = new Label();
+			styleClasses.textProperty().bind(
+					Bindings.createStringBinding(() -> item.getStyleClass().stream()
+									.map(".%s"::formatted)
+									.collect(Collectors.joining(", ")),
+							item.getStyleClass()));
 
-			HBox hbox = new HBox(new ImageView(icon), type, id);
+			HBox hbox = new HBox(new ImageView(icon), type, id, styleClasses);
 			BorderPane borderPane = new BorderPane(hbox);
 			borderPane.setRight(visible);
 			return borderPane;

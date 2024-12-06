@@ -10,6 +10,8 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 
+import java.util.List;
+
 public class ShapeEditor extends ObjectEditor<Shape> {
 
 	public ShapeEditor() {
@@ -18,10 +20,10 @@ public class ShapeEditor extends ObjectEditor<Shape> {
 
 	public ShapeEditor(Property<Shape> property) {
 		super(property);
-		getKnownValues().addAll(
+		List.of(
 				new Rectangle(16, 16, Color.RED),
 				new Circle(8, 8, 8, Color.BLUE)
-		);
+		).forEach(e -> getKnownValues().put(e.toString(), e));
 	}
 
 	@Override

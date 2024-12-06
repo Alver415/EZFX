@@ -1,18 +1,15 @@
 package com.ezfx.controls.editor;
 
+import com.ezfx.controls.editor.impl.standard.SelectionEditor;
+import com.ezfx.controls.editor.introspective.EditorDialog;
 import com.ezfx.controls.icons.Icons;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceDialog;
-import javafx.scene.control.Dialog;
+import javafx.collections.ObservableMap;
 
-import static javafx.scene.control.ButtonType.CANCEL;
-import static javafx.scene.control.ButtonType.OK;
+import java.util.Map;
 
 public abstract class ObjectEditor<T> extends Editor<T> {
 
@@ -43,28 +40,48 @@ public abstract class ObjectEditor<T> extends Editor<T> {
 		setAction.setName("Set Value");
 		setAction.setIcon(Icons.PLUS);
 		setAction.setAction(() -> {
-			ChoiceDialog<T> dialog = new ChoiceDialog<>(getValue(), knownValues);
-			dialog.initOwner(getScene().getWindow());
-			dialog.setTitle("Value");
-			dialog.setHeaderText("Choose a value.");
-			dialog.getDialogPane().getButtonTypes().setAll(OK, CANCEL);
-			dialog.showAndWait().ifPresent(this::setValue);
+			ObservableValue<ObservableList<String>> names = knownValues.map(Map::keySet).map(FXCollections::observableArrayList);
+//			ChoiceDialog<String> dialog = new ChoiceDialog<>(null, names.getValue());
+//			dialog.initOwner(getScene().getWindow());
+//			dialog.setTitle("Value");
+//			dialog.setHeaderText("Choose a value.");
+//			dialog.getDialogPane().getButtonTypes().setAll(OK, CANCEL);
+//			dialog.showAndWait().map(knownValues::get).ifPresent(this::setValue);
+			SelectionEditor<String> selectionEditor = new SelectionEditor<>(names.getValue());
+			SimpleStringProperty selectedName = new SimpleStringProperty();
+			EditorDialog<String> bd = new EditorDialog<>(selectedName, selectionEditor);
+			bd.show();
+			selectedName.addListener((_, _, value) -> property().setValue(knownValues.get(value)));
 		});
 
 		getActions().addAll(clearAction, setAction);
 	}
 
-	private final ListProperty<T> knownValues = new SimpleListProperty<>(this, "knownValues", FXCollections.observableArrayList());
+	private final MapProperty<String, T> knownValues = new SimpleMapProperty<>(this, "knownValues", FXCollections.observableHashMap());
 
-	public ListProperty<T> knownValuesProperty() {
+	public MapProperty<String, T> knownValuesProperty() {
 		return this.knownValues;
 	}
 
-	public ObservableList<T> getKnownValues() {
+	public ObservableMap<String, T> getKnownValues() {
 		return this.knownValuesProperty().getValue();
 	}
 
-	public void setKnownValues(ObservableList<T> value) {
+	public void setKnownValues(ObservableMap<String, T> value) {
 		this.knownValuesProperty().setValue(value);
 	}
+
+//	private final ListProperty<T> knownValues = new SimpleListProperty<>(this, "knownValues", FXCollections.observableArrayList());
+//
+//	public ListProperty<T> knownValuesProperty() {
+//		return this.knownValues;
+//	}
+//
+//	public ObservableList<T> getKnownValues() {
+//		return this.knownValuesProperty().getValue();
+//	}
+//
+//	public void setKnownValues(ObservableList<T> value) {
+//		this.knownValuesProperty().setValue(value);
+//	}
 }

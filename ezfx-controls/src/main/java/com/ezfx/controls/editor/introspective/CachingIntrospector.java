@@ -41,9 +41,7 @@ public class CachingIntrospector
 		return methodsCache.computeIfAbsent(type, _ -> delegate.getMethods(type));
 	}
 
-	public <T> List<? extends Constructor<?>> getConstructors(Class<T> type) {
-		return constructorsCache.computeIfAbsent(type, _ -> delegate.getConstructors(type));
+	public <T> List<Constructor<T>> getConstructors(Class<T> type) {
+		return (List<Constructor<T>>) constructorsCache.computeIfAbsent(type, _ -> delegate.getConstructors(type));
 	}
-
-
 }

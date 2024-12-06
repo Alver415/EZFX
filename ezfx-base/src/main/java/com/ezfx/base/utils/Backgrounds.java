@@ -13,10 +13,10 @@ import javafx.scene.paint.ImagePattern;
 
 public interface Backgrounds {
 
-	Color DEFAULT_PRIMARY = Color.TRANSPARENT;
-	Color DEFAULT_SECONDARY = Color.GRAY.interpolate(Color.TRANSPARENT, 0.75);
+	Color DEFAULT_PRIMARY = Color.LIGHTGRAY;
+	Color DEFAULT_SECONDARY = Color.DARKGRAY;
 
-	Background TRANSPARENCY = checkeredBackground();
+	Background CHECKERED = checkeredBackground();
 
 	static ImagePattern checkeredImagePattern() {
 		return checkeredImagePattern(DEFAULT_PRIMARY, DEFAULT_SECONDARY, 10, 10, 2, 2);

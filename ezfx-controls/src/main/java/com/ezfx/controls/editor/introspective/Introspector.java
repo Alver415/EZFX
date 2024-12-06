@@ -13,7 +13,7 @@ public interface Introspector {
 
 	<T> List<Field> getFields(Class<T> type);
 	<T> List<Method> getMethods(Class<T> type);
-	<T> List<? extends Constructor<? extends T>> getConstructors(Class<T> type);
+	<T> List<Constructor<T>> getConstructors(Class<T> type);
 
 	String getParameterName(Parameter parameter);
 	String getParameterTypeName(Parameter parameter);

@@ -1,8 +1,6 @@
 .editor-wrapper {
-	-fx-padding: 8px;
-	-fx-background-color: -fx-outer-border, -fx-inner-border, -fx-base;
-	-fx-background-radius: 0;
-	-fx-background-insets: 0, 1, 2;
+	-fx-padding: 4px;
+
 }
 
 .editor-wrapper:hover {
