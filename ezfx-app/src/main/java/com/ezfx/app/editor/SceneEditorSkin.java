@@ -57,17 +57,15 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 		StackPane center = new StackPane(control.getViewport(), overlay);
 		borderPane.setCenter(center);
 
-		ScrollPane left = new ScrollPane(control.getTreeView());
-		left.setPrefWidth(400);
-		left.setFitToWidth(true);
-		left.setFitToHeight(true);
+		NodeTreeView left = control.getTreeView();
+		left.setPrefWidth(450);
 		borderPane.setLeft(left);
 
 		ScrollPane right = new ScrollPane();
 		control.editorProperty().subscribe(right::setContent);
 		right.setFitToWidth(true);
 		right.setFitToHeight(true);
-		right.setPrefWidth(400);
+		right.setPrefWidth(450);
 		borderPane.setRight(right);
 
 		setup();

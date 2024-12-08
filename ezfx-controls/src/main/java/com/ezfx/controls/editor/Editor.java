@@ -7,8 +7,11 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.control.action.ActionProxy;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -21,14 +24,6 @@ public class Editor<T> extends Control {
 
 	private final Property<T> property;
 
-	public Editor() {
-		this(new SimpleObjectProperty<>());
-	}
-
-	public Editor(T initialValue) {
-		this(new SimpleObjectProperty<>(initialValue));
-	}
-
 	public Editor(Property<T> property) {
 		this.property = property;
 		getStyleClass().add(STYLE_CLASS);
@@ -40,6 +35,7 @@ public class Editor<T> extends Control {
 	public Property<T> property() {
 		return property;
 	}
+
 	public T getValue(){
 		return property().getValue();
 	}
@@ -47,17 +43,17 @@ public class Editor<T> extends Control {
 		property.setValue(value);
 	}
 
-	private final ListProperty<EditorAction> actions = new SimpleListProperty<>(this, "actions", FXCollections.observableArrayList());
+	private final ListProperty<Action> actions = new SimpleListProperty<>(this, "actions", FXCollections.observableArrayList());
 
-	public ListProperty<EditorAction> actionsProperty() {
+	public ListProperty<Action> actionsProperty() {
 		return this.actions;
 	}
 
-	public ObservableList<EditorAction> getActions() {
+	public ObservableList<Action> getActions() {
 		return this.actionsProperty().getValue();
 	}
 
-	public void setActions(ObservableList<EditorAction> value) {
+	public void setActions(ObservableList<Action> value) {
 		this.actionsProperty().setValue(value);
 	}
 

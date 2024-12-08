@@ -25,6 +25,11 @@ public class SelectionEditor<T> extends ObjectEditor<T> {
 		setItems(items);
 	}
 
+	public SelectionEditor(List<T> items) {
+		super(new SimpleObjectProperty<>());
+		getItems().setAll(items);
+	}
+
 	public SelectionEditor(Property<T> property, List<T> items) {
 		super(property);
 		getItems().setAll(items);

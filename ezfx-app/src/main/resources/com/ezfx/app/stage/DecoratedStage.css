@@ -26,10 +26,16 @@
 }
 
 .stage-button {
-    -fx-min-width: 16px;
-    -fx-min-height: 16px;
-    -fx-pref-width: 16px;
-    -fx-pref-height: 16px;
-    -fx-max-width: 16px;
-    -fx-max-height: 16px;
+    -fx-exact-size: 24px;
+    -fx-min-width: -fx-exact-size;
+    -fx-min-height: -fx-exact-size;
+    -fx-pref-width: -fx-exact-size;
+    -fx-pref-height: -fx-exact-size;
+    -fx-max-width: -fx-exact-size;
+    -fx-max-height: -fx-exact-size;
+}
+
+.glyph-icon {
+  -fx-font-size: 36px;
+  -fx-font-family: "FontAwesome";
 }

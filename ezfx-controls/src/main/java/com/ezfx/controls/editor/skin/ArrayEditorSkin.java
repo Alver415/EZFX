@@ -17,6 +17,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Subscription;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.control.action.ActionUtils;
 
 import java.lang.reflect.Array;
 import java.util.List;
@@ -47,36 +49,36 @@ public class ArrayEditorSkin<T> extends EditorSkin<ArrayEditor<T>, ObservableObj
 			rebuild();
 		});
 
-		EditorAction clear = new EditorAction();
-		clear.setName("Clear");
-		clear.setIcon(Icons.X);
-		clear.setAction(() -> property().getValue().clear());
-
-		EditorAction plus = new EditorAction();
-		plus.setName("Add");
-		plus.setIcon(Icons.PLUS);
-		plus.setAction(() -> {
-			T newValue = listEditor.getIntrospector().getDefaultValueForType(listEditor.getGenericType());
-			ObservableObjectArray<T> array = property().getValue();
-			int newSize = array.size() + 1;
-			array.resize(newSize);
-			array.ensureCapacity(newSize);
-			array.set(newSize - 1, newValue);
-		});
-
-		EditorAction minus = new EditorAction();
-		minus.setName("Remove");
-		minus.setIcon(Icons.MINUS);
-		minus.setAction(() -> {
-			ObservableObjectArray<T> array = property().getValue();
-			if (array.size() > 0) {
-				array.resize(array.size() - 1);
-			}
-		});
-
-		List<Button> list = Stream.of(clear, plus, minus).map(this::buildActionButton).toList();
-		HBox actions = new HBox(4, list.toArray(new Node[0]));
-		getChildren().setAll(new VBox(actions, vBox));
+//		EditorAction clear = new EditorAction();
+//		clear.setName("Clear");
+//		clear.setIcon(Icons.X);
+//		clear.setAction(() -> property().getValue().clear());
+//
+//		EditorAction plus = new EditorAction();
+//		plus.setName("Add");
+//		plus.setIcon(Icons.PLUS);
+//		plus.setAction(() -> {
+//			T newValue = listEditor.getIntrospector().getDefaultValueForType(listEditor.getGenericType());
+//			ObservableObjectArray<T> array = property().getValue();
+//			int newSize = array.size() + 1;
+//			array.resize(newSize);
+//			array.ensureCapacity(newSize);
+//			array.set(newSize - 1, newValue);
+//		});
+//
+//		EditorAction minus = new EditorAction();
+//		minus.setName("Remove");
+//		minus.setIcon(Icons.MINUS);
+//		minus.setAction(() -> {
+//			ObservableObjectArray<T> array = property().getValue();
+//			if (array.size() > 0) {
+//				array.resize(array.size() - 1);
+//			}
+//		});
+//
+//		List<Button> list = Stream.of(clear, plus, minus).map(this::buildActionButton).toList();
+//		HBox actions = new HBox(4, list.toArray(new Node[0]));
+		getChildren().setAll(new VBox(vBox));
 
 	}
 
@@ -150,12 +152,13 @@ public class ArrayEditorSkin<T> extends EditorSkin<ArrayEditor<T>, ObservableObj
 		}
 	}
 
-	private Button buildActionButton(EditorAction action) {
-		Button button = new Button();
-		button.getStyleClass().add("icon-button");
-		button.setGraphic(new ImageView(action.getIcon()));
-		button.setTooltip(new Tooltip(action.getName()));
-		button.onActionProperty().bind(action.actionProperty().map(a -> _ -> a.run()));
-		return button;
+	private Button buildActionButton(Action action) {
+		return ActionUtils.createButton(action);
+//		Button button = new Button();
+//		button.getStyleClass().add("icon-button");
+//		button.setGraphic(new ImageView(action.getIcon()));
+//		button.setTooltip(new Tooltip(action.getName()));
+//		button.onActionProperty().bind(action.actionProperty().map(a -> _ -> a.run()));
+//		return button;
 	}
 }

@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import org.controlsfx.control.action.Action;
 
 public class EditorWrapper<T, E extends Editor<T>> extends Control {
 
@@ -64,17 +65,17 @@ public class EditorWrapper<T, E extends Editor<T>> extends Control {
 		this.editorProperty().set(value);
 	}
 
-	private final ListProperty<EditorAction> actions = new SimpleListProperty<>(this, "actions", FXCollections.observableArrayList());
+	private final ListProperty<Action> actions = new SimpleListProperty<>(this, "actions", FXCollections.observableArrayList());
 
-	public ListProperty<EditorAction> actionsProperty() {
+	public ListProperty<Action> actionsProperty() {
 		return this.actions;
 	}
 
-	public ObservableList<EditorAction> getActions() {
+	public ObservableList<Action> getActions() {
 		return this.actionsProperty().get();
 	}
 
-	public void setActions(ObservableList<EditorAction> value) {
+	public void setActions(ObservableList<Action> value) {
 		this.actionsProperty().set(value);
 	}
 

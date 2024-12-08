@@ -1,7 +1,6 @@
 package com.ezfx.controls.editor.introspective;
 
 import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.EditorAction;
 import com.ezfx.controls.editor.EditorFactory;
 import com.ezfx.controls.editor.ObjectEditor;
 import com.ezfx.controls.editor.option.*;
@@ -14,7 +13,6 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
@@ -117,47 +115,47 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 			return list;
 		}, methodOptions, constructorOptions);
 
-		EditorAction setValue = new EditorAction();
-		setValue.setName("Set Value");
-		setValue.setIcon(Icons.PLUS);
-		setValue.setAction(() -> {
-
-			Menu valueMenu = new Menu("Value");
-			valueOptions.map(list -> list.stream().map(option -> {
-				MenuItem menuItem = new MenuItem();
-				menuItem.setText(option.getName());
-				menuItem.setOnAction(_ -> property.setValue(option.getValue()));
-				return menuItem;
-			}).toList()).subscribe(items -> valueMenu.getItems().setAll(items));
-
-			Menu builderMenu = new Menu("Builders");
-			builderOptions.map(list -> list.stream().map(option -> {
-				MenuItem menuItem = new MenuItem();
-				menuItem.setText(option.getName());
-				menuItem.setOnAction(_ -> {
-					if (option instanceof ConstructorOption<T> constructorOption) {
-						if (constructorOption.getConstructor().getParameterCount() == 0) {
-							property.setValue(option.buildEditor().getValue());
-							return;
-						}
-					}
-					EditorDialog<T> dialog = new EditorDialog<>(property, option.buildEditor());
-					dialog.setHeaderText(option.getType().getSimpleName());
-					dialog.show();
-				});
-				return menuItem;
-			}).toList()).subscribe(items -> builderMenu.getItems().setAll(items));
-
-			ContextMenu contextMenu = new ContextMenu();
-			contextMenu.getItems().setAll(valueMenu, builderMenu);
-
-			Bounds bounds = localToScreen(getBoundsInLocal());
-			double x = bounds.getCenterX();
-			double y = bounds.getCenterY();
-			contextMenu.setAnchorLocation(PopupWindow.AnchorLocation.CONTENT_TOP_LEFT);
-			contextMenu.show(this, x, y);
-		});
-		actionsProperty().add(setValue);
+//		EditorAction setValue = new EditorAction();
+//		setValue.setName("Set Value");
+//		setValue.setIcon(Icons.PLUS);
+//		setValue.setAction(() -> {
+//
+//			Menu valueMenu = new Menu("Value");
+//			valueOptions.map(list -> list.stream().map(option -> {
+//				MenuItem menuItem = new MenuItem();
+//				menuItem.setText(option.getName());
+//				menuItem.setOnAction(_ -> property.setValue(option.getValue()));
+//				return menuItem;
+//			}).toList()).subscribe(items -> valueMenu.getItems().setAll(items));
+//
+//			Menu builderMenu = new Menu("Builders");
+//			builderOptions.map(list -> list.stream().map(option -> {
+//				MenuItem menuItem = new MenuItem();
+//				menuItem.setText(option.getName());
+//				menuItem.setOnAction(_ -> {
+//					if (option instanceof ConstructorOption<T> constructorOption) {
+//						if (constructorOption.getConstructor().getParameterCount() == 0) {
+//							property.setValue(option.buildEditor().getValue());
+//							return;
+//						}
+//					}
+//					EditorDialog<T> dialog = new EditorDialog<>(property, option.buildEditor());
+//					dialog.setHeaderText(option.getType().getSimpleName());
+//					dialog.show();
+//				});
+//				return menuItem;
+//			}).toList()).subscribe(items -> builderMenu.getItems().setAll(items));
+//
+//			ContextMenu contextMenu = new ContextMenu();
+//			contextMenu.getItems().setAll(valueMenu, builderMenu);
+//
+//			Bounds bounds = localToScreen(getBoundsInLocal());
+//			double x = bounds.getCenterX();
+//			double y = bounds.getCenterY();
+//			contextMenu.setAnchorLocation(PopupWindow.AnchorLocation.CONTENT_TOP_LEFT);
+//			contextMenu.show(this, x, y);
+//		});
+//		actionsProperty().add(setValue);
 
 
 		knownValuesProperty().putAll((Map<String, T>) EasyBind.combine(introspectorProperty(), typeProperty(), Introspector::getFields)

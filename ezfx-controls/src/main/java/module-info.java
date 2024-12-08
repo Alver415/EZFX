@@ -31,7 +31,12 @@ open module ezfx.controls {
 	requires org.fxmisc.richtext;
 	requires org.fxmisc.flowless;
 
+	// ControlsFX
+	requires transitive org.controlsfx.controls;
+
 	// Logging
 	requires transitive org.slf4j;
+
+	// Reflections
 	requires org.reflections;
 }

@@ -1,17 +1,23 @@
 package com.ezfx.controls.editor.skin;
 
 import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.EditorAction;
 import com.ezfx.controls.editor.EditorWrapper;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.control.action.ActionUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -30,15 +36,19 @@ public class EditorWrapperSkin<T, C extends Editor<T>> extends SkinBase<EditorWr
 
 		BorderPane borderPane = new BorderPane();
 
-		Label name = new Label();
-		name.textProperty().bind(wrapper.nameProperty());
+		Label title = new Label();
+		title.getStyleClass().add("title");
+		title.textProperty().bind(wrapper.nameProperty());
 
 		HBox actionsBar = new HBox();
 		wrapper.actionsProperty()
 				.map(actions -> actions.stream().map(this::buildActionControl).toList())
 				.subscribe(actionControls -> actionsBar.getChildren().setAll(actionControls));
 
-		borderPane.setTop(new HBox(8, name, actionsBar));
+		BorderPane top = new BorderPane();
+		top.setLeft(title);
+		top.setRight(actionsBar);
+		borderPane.setTop(top);
 
 		HBox center = new HBox();
 		wrapper.editorProperty()
@@ -51,14 +61,8 @@ public class EditorWrapperSkin<T, C extends Editor<T>> extends SkinBase<EditorWr
 		getChildren().setAll(borderPane);
 	}
 
-	private Node buildActionControl(EditorAction editorAction) {
-		Button button = new Button();
-		button.getStyleClass().add("icon-button");
-		button.textProperty().bind(editorAction.nameProperty());
-		button.graphicProperty().bind(editorAction.iconProperty().map(ImageView::new));
-		button.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-		button.onActionProperty().bind(editorAction.actionProperty().map(action -> _ -> action.run()));
-		return button;
+	private Node buildActionControl(Action action) {
+		return ActionUtils.createButton(action, ActionUtils.ActionTextBehavior.HIDE);
 	}
 
 	private static <A, B> List<B> mapList(List<A> actions, Function<A, B> function) {

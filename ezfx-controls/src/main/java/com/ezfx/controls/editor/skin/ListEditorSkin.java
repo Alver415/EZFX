@@ -15,6 +15,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Subscription;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.control.action.ActionUtils;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -42,27 +44,29 @@ public class ListEditorSkin<T> extends EditorSkin<ListEditor<T>, ObservableList<
 			rebuild();
 		});
 
-		EditorAction clear = new EditorAction();
-		clear.setName("Clear");
-		clear.setIcon(Icons.X);
-		clear.setAction(() -> property().getValue().clear());
+//		EditorAction clear = new EditorAction();
+//		clear.setName("Clear");
+//		clear.setIcon(Icons.X);
+//		clear.setAction(() -> property().getValue().clear());
+//
+//		EditorAction plus = new EditorAction();
+//		plus.setName("Add");
+//		plus.setIcon(Icons.PLUS);
+//		plus.setAction(() -> property().getValue().add(listEditor.getIntrospector().getDefaultValueForType(listEditor.getGenericType())));
+//
+//		EditorAction minus = new EditorAction();
+//		minus.setName("Remove");
+//		minus.setIcon(Icons.MINUS);
+//		minus.setAction(() -> {
+//			ObservableList<T> list = property().getValue();
+//			if (!list.isEmpty()) list.removeLast();
+//		});
 
-		EditorAction plus = new EditorAction();
-		plus.setName("Add");
-		plus.setIcon(Icons.PLUS);
-		plus.setAction(() -> property().getValue().add(listEditor.getIntrospector().getDefaultValueForType(listEditor.getGenericType())));
+//		List<Button> list = Stream.of(clear, plus, minus).map(this::buildActionButton).toList();
+//		HBox actions = new HBox(4, list.toArray(new Node[0]));
+//		getChildren().setAll(new VBox(actions, vBox));
 
-		EditorAction minus = new EditorAction();
-		minus.setName("Remove");
-		minus.setIcon(Icons.MINUS);
-		minus.setAction(() -> {
-			ObservableList<T> list = property().getValue();
-			if (!list.isEmpty()) list.removeLast();
-		});
-
-		List<Button> list = Stream.of(clear, plus, minus).map(this::buildActionButton).toList();
-		HBox actions = new HBox(4, list.toArray(new Node[0]));
-		getChildren().setAll(new VBox(actions, vBox));
+		getChildren().setAll(new VBox(vBox));
 
 	}
 
@@ -118,12 +122,13 @@ public class ListEditorSkin<T> extends EditorSkin<ListEditor<T>, ObservableList<
 		}
 	}
 
-	private Button buildActionButton(EditorAction action) {
-		Button button = new Button();
-		button.getStyleClass().add("icon-button");
-		button.setGraphic(new ImageView(action.getIcon()));
-		button.setTooltip(new Tooltip(action.getName()));
-		button.onActionProperty().bind(action.actionProperty().map(a -> _ -> a.run()));
-		return button;
+	private Button buildActionButton(Action action) {
+		return ActionUtils.createButton(action);
+//		Button button = new Button();
+//		button.getStyleClass().add("icon-button");
+//		button.setGraphic(new ImageView(action.getIcon()));
+//		button.setTooltip(new Tooltip(action.getName()));
+//		button.onActionProperty().bind(action.actionProperty().map(a -> _ -> a.run()));
+//		return button;
 	}
 }

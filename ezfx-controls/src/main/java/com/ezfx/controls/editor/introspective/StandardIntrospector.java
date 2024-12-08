@@ -94,25 +94,10 @@ public class StandardIntrospector implements Introspector {
 				log.debug("Ignoring {} because there is neither a get method or a set method.", name);
 				continue;
 			}
-//			Class<?> setterParameterType = setter == null ? null : setter.getParameterTypes()[0];
-//			Class<?> getterReturnType = getter == null ? null : getter.getReturnType();
-//			if (setterParameterType != null && getterReturnType != null &&
-//					!getterReturnType.isAssignableFrom(setterParameterType)) {
-//				log.debug("Ignoring {} because the get method return type ({}) doesn't match the set method parameter type ({})",
-//						name, getterReturnType, setterParameterType);
-//				continue;
-//			}
-//			Class<?> returnType = setterParameterType != null ? setterParameterType : getterReturnType;
-			PropertyInfo propertyInfo = new PropertyInfo(
-//					returnType,
-					name,
-					displayName,
-					category,
-					order,
-					property,
-					setter,
-					getter);
-			propertyInfoList.add(propertyInfo);
+
+			propertyInfoList.add(new PropertyInfo(
+					name, displayName, category, order,
+					property, setter, getter));
 		}
 
 		return propertyInfoList;
