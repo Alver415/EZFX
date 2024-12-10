@@ -5,6 +5,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.SubScene;
 import javafx.scene.control.TreeItem;
 
 import java.util.function.Function;
@@ -14,7 +15,9 @@ public class NodeTreeItem extends TreeItem<Node> {
 	public static final Function<Node, ObservableList<Node>> DEFAULT_CHILDREN_PROVIDER =
 			node -> node instanceof Parent parent ?
 					parent.getChildrenUnmodifiable() :
-					FXCollections.emptyObservableList();
+					node instanceof SubScene subScene ?
+							FXCollections.observableArrayList(subScene.getRoot()) :
+							FXCollections.emptyObservableList();
 
 	private final Function<Node, ObservableList<Node>> childrenProvider;
 

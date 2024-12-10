@@ -3,6 +3,7 @@ package com.ezfx.app.editor;
 import com.ezfx.app.stage.DecoratedStage;
 import com.ezfx.base.utils.Screens;
 import com.ezfx.controls.explorer.SceneExplorer;
+import com.ezfx.controls.icons.Icons;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -27,7 +28,7 @@ public class FXMLEditorApplication extends Application {
 		Scene scene = new Scene(root);
 		stage.setScene(scene);
 		stage.setTitle("FXML Editor");
-		stage.setDescription("Scene Editor that saves to FXML File");
+		stage.getIcons().add(Icons.X);
 		stage.centerOnScreen();
 		stage.setMaximized(true);
 		stage.show();

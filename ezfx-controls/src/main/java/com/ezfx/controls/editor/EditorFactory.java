@@ -98,9 +98,9 @@ public class EditorFactory {
 		return editor;
 	}
 	public <T> Editor<T> buildEditor(Type rawType, Type genericType, Property<T> property) {
-		if (rawType instanceof Class clazz && List.class.isAssignableFrom(clazz)) {
+		if (rawType instanceof Class clazz && genericType instanceof Class genericClazz && List.class.isAssignableFrom(clazz)) {
 			ListEditor<T> listEditor = new ListEditor<>((Property<ObservableList<T>>) property);
-			listEditor.setGenericType((Class<T>)genericType);
+			listEditor.setGenericType(genericClazz);
 			return (Editor<T>) listEditor;
 		}
 		return buildEditor((Class<T>)rawType, property);

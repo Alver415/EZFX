@@ -1,0 +1,50 @@
+
+.stage-decoration{
+    -fx-background-color: transparent;
+	-fx-scene-fill: rgba(236,236,236,0.5);
+}
+
+.boundary {
+    -fx-padding: 2px;
+    -fx-background-radius: 2px;
+	-fx-background-color: rgba(0,0,0,0.5);
+}
+
+.title-bar {
+    -fx-background-radius: 4px;
+    -fx-background-color: rgba(100,150,255,0.5)
+}
+
+.title-bar .title-header {
+    -fx-alignment: center;
+    -fx-padding: 4px;
+    -fx-spacing: 4px;
+}
+
+
+.title-bar .title {
+    -fx-font-color: ladder;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.button-bar {
+    -fx-padding: 4px;
+}
+
+.button-bar .button {
+    -fx-padding: 0px;
+    -fx-exact-size: 24px;
+    -fx-min-width: -fx-exact-size;
+    -fx-min-height: -fx-exact-size;
+    -fx-pref-width: -fx-exact-size;
+    -fx-pref-height: -fx-exact-size;
+    -fx-max-width: -fx-exact-size;
+    -fx-max-height: -fx-exact-size;
+}
+
+.button-bar .button .glyph-font {
+    -fx-text-overrun: clip;
+    -fx-font-size: 16px;
+    -fx-font-family: "FontAwesome";
+}

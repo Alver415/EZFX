@@ -21,4 +21,5 @@ open module ezfx.app {
 
 	// Logging
 	requires transitive org.slf4j;
+	requires org.apache.logging.log4j;
 }

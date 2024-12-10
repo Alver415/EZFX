@@ -1,5 +1,6 @@
 package com.ezfx.app.demo;
 
+import com.ezfx.app.stage.DecoratedStage;
 import com.ezfx.base.io.IOConsole;
 import com.ezfx.base.io.SystemIO;
 import com.ezfx.controls.console.ConsoleView;
@@ -25,28 +26,29 @@ import static com.ezfx.base.utils.EZFX.runFX;
 import static com.ezfx.base.utils.EZFX.runOnNewThread;
 import static java.lang.Thread.sleep;
 
-public class DemoApplication extends Application {
+public class ConsoleDemoApplication extends Application {
 
 	private final List<IOConsole> consoles = new ArrayList<>();
 
 	public static void main(String[] args) {
 		//Replaces System in/out/err with read/write capable IOStreams.
 		SystemIO.overrideSystemDefaults();
-		Application.launch(DemoApplication.class, args);
+		Application.launch(ConsoleDemoApplication.class, args);
 	}
 
 	private final TabPane tabPane = new TabPane();
 
 	@Override
 	public void start(Stage primaryStage) {
+		Stage stage = new DecoratedStage();
 		Scene scene = new Scene(tabPane);
-		primaryStage.setScene(scene);
-		primaryStage.setTitle("Demo Application");
-		primaryStage.setWidth(600);
-		primaryStage.setHeight(400);
-		primaryStage.show();
+		stage.setScene(scene);
+		stage.setTitle("Demo Application");
+		stage.setWidth(600);
+		stage.setHeight(400);
+		stage.show();
 
-		primaryStage.setOnCloseRequest(_ -> this.close());
+		stage.setOnCloseRequest(_ -> this.close());
 
 		runOnNewThread(() -> {
 			runFX(() -> {
@@ -84,7 +86,7 @@ public class DemoApplication extends Application {
 					"PolyglotPane - " + lang,
 					new PolyglotView(console, lang, managedContext)));
 			Stream.of("cmd", "powershell")
-					.map(DemoApplication::startProcess)
+					.map(ConsoleDemoApplication::startProcess)
 					.map(ProcessView::new)
 					.forEach(program -> createTab(
 							"ProcessPane - " + program.getProcess().info().command().orElse(""),

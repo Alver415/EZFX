@@ -21,4 +21,5 @@ open module ezfx.app.test {
 	requires org.junit.jupiter.api;
 	requires org.reflections;
 	requires javafx.fxml;
+	requires org.graalvm.nativebridge;
 }

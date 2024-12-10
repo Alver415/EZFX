@@ -5,26 +5,28 @@ import javafx.application.Application;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
+import javafx.collections.transformation.FilteredList;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.effect.Effect;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
-import org.controlsfx.control.cell.ColorGridCell;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
-
-import java.util.List;
-import java.util.stream.Stream;
+import org.graalvm.nativebridge.In;
 
 public class FontAwesomeApplication extends Application {
 
@@ -37,40 +39,47 @@ public class FontAwesomeApplication extends Application {
 	public void start(Stage stage) {
 		Screens.setScreen(stage, 1);
 
-		BorderPane borderPane = new BorderPane();
+		TextField filterField = new TextField();
+		ObservableList<FontAwesome.Glyph> glyphs = FXCollections.observableArrayList(FontAwesome.Glyph.values());
+		FilteredList<FontAwesome.Glyph> filteredGlyphs = new FilteredList<>(glyphs);
+		filteredGlyphs.predicateProperty().bind(filterField.textProperty().map(filterText -> glyph -> {
+			String glyphName = glyph.name().toLowerCase();
+			String filter = filterText.toLowerCase();
+			return glyphName.contains(filter);
+		}));
 
-		GridView<Node> gridView = new GridView<>();
-		List<Button> actions = Stream.of(FontAwesome.Glyph.values())
-				.map(glyph -> {
-					Action action = new Action("");
-					action.setLongText(glyph.name());
-					Glyph glyphNode = Glyph.create("FontAwesome|%s".formatted(glyph));
-					//FIXME: Can't adjust font size via css for some reason.
-//					glyphNode.setStyle("-fx-font-size: 36px");
-					glyphNode = glyphNode.sizeFactor(6);
-					action.setGraphic(glyphNode);
-					return action;
-				})
-				.map(ActionUtils::createButton)
-				.peek(button -> button.setMinSize(128,128))
-				.peek(button -> button.setMaxSize(128,128))
-				.toList();
+		BorderPane borderPane = new BorderPane();
+		HBox top = new HBox(new Label("Filter: "), filterField);
+		HBox.setHgrow(filterField, Priority.ALWAYS);
+		top.setAlignment(Pos.CENTER);
+		top.setPadding(new Insets(32));
+		borderPane.setTop(top);
+
+		GridView<FontAwesome.Glyph> gridView = new GridView<>();
 		gridView.setCellWidth(128);
 		gridView.setCellHeight(128);
-		gridView.setCellFactory(_ -> new GridCell<>(){
+		gridView.setCellFactory(_ -> new GridCell<>() {
 			@Override
-			protected void updateItem(Node item, boolean empty) {
+			protected void updateItem(FontAwesome.Glyph item, boolean empty) {
 				super.updateItem(item, empty);
-				if (empty || item == null){
+				if (empty || item == null) {
 					setText(null);
 					setGraphic(null);
 				} else {
-					setGraphic(item);
+					Action action = new Action(item.name());
+					action.setLongText(item.name());
+					Glyph glyphNode = Glyph.create("FontAwesome|%s".formatted(item));
+					glyphNode = glyphNode.sizeFactor(6);
+					action.setGraphic(glyphNode);
+					Button button = ActionUtils.createButton(action, ActionUtils.ActionTextBehavior.HIDE);
+					button.setMinSize(128, 128);
+					button.setMaxSize(128, 128);
+					setGraphic(button);
 				}
 			}
 		});
 
-		gridView.getItems().setAll(actions);
+		gridView.setItems(filteredGlyphs);
 		borderPane.setCenter(gridView);
 
 		Scene scene = new Scene(borderPane);
