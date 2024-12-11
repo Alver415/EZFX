@@ -1,0 +1,13 @@
+.selector {
+    -fx-fill: blue;
+}
+.property {
+    -fx-fill: darkorange;
+}
+.value {
+    -fx-fill: green;
+}
+.comment {
+    -fx-fill: gray;
+    -fx-font-style: italic;
+}

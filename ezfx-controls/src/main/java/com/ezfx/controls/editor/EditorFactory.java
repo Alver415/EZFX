@@ -1,6 +1,7 @@
 package com.ezfx.controls.editor;
 
 import com.ezfx.base.observable.ObservableObjectArray;
+import com.ezfx.controls.editor.code.CSSEditorSkin;
 import com.ezfx.controls.editor.impl.javafx.BlendModeEditor;
 import com.ezfx.controls.editor.impl.javafx.FontEditor;
 import com.ezfx.controls.editor.impl.javafx.ImageSelectionEditor;
@@ -47,6 +48,19 @@ public class EditorFactory {
 	public <T> Editor<T> buildEditor(Class<T> type, Property<T> property) {
 		Objects.requireNonNull(property);
 		Editor<T> editor;
+
+
+		//TODO: REMOVE ME
+		if (property.getName().equals("style")){
+			StringEditor stringEditor = new StringEditor((Property<String>) property);
+			stringEditor.setSkin(new CSSEditorSkin(stringEditor));
+			stringEditor.setMinHeight(300);
+			stringEditor.setPrefHeight(300);
+			return (Editor<T>) stringEditor;
+		}
+
+
+
 		if (String.class.equals(type)) {
 			editor = (Editor<T>) new StringEditor((Property<String>) property);
 		} else if (boolean.class.equals(type) || Boolean.class.equals(type)) {

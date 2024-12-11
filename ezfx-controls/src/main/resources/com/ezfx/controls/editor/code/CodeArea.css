@@ -1,0 +1,4 @@
+.lineno {
+     -fx-fill: lightgrey;
+     -fx-background-color: -fx-fill;
+ }

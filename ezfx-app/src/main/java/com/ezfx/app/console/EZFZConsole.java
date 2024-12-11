@@ -13,9 +13,10 @@ public class EZFZConsole extends Application {
 		stage = new DecoratedStage();
 		String cmd = "cmd";
 		ProcessView processView = new ProcessView(new ProcessBuilder(cmd).start());
-		processView.setPrefSize(600, 400);
 
 		Scene scene = new Scene(processView);
+		stage.setWidth(600);
+		stage.setHeight(400);
 		stage.setScene(scene);
 		stage.centerOnScreen();
 		stage.setTitle("EZFX Console");

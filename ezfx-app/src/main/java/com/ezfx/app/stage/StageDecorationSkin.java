@@ -44,11 +44,6 @@ public class StageDecorationSkin extends SkinBase<StageDecoration> {
 
 	private static final ObservableList<Image> EMPTY_LIST = FXCollections.emptyObservableList();
 
-	private static final Image ICON_CLOSE = Resources.image(Icons.class, "close.png");
-	private static final Image ICON_RESTORE = Resources.image(Icons.class, "restore.png");
-	private static final Image ICON_MINIMIZE = Resources.image(Icons.class, "minimize.png");
-	private static final Image ICON_MAXIMIZE = Resources.image(Icons.class, "maximize.png");
-
 	private final StackPane boundary;
 	private final BorderPane borderPane;
 	private final ContextMenu contextMenu;

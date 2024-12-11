@@ -2,6 +2,8 @@ package com.ezfx.controls.console;
 
 import com.ezfx.base.io.IOStream;
 import com.ezfx.base.io.StringConsumingOutputStream;
+import com.ezfx.base.utils.Resources;
+import com.ezfx.controls.editor.code.CodeArea;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -13,13 +15,12 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.CodeArea;
+
 import org.fxmisc.richtext.LineNumberFactory;
 import org.fxmisc.richtext.model.StyledDocument;
 import org.fxmisc.richtext.util.UndoUtils;
 
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.ezfx.base.io.FileSystemIO.transfer;
@@ -28,8 +29,7 @@ import static com.ezfx.base.utils.EZFX.runFX;
 
 public class ConsoleViewSkin extends SkinBase<ConsoleView> {
 
-	public static final String CSS = Objects.requireNonNull(ConsoleViewSkin.class.getResource("ConsoleViewSkin.css"))
-			.toExternalForm();
+	public static final String STYLE_SHEET = Resources.css(ConsoleViewSkin.class, "ConsoleViewSkin.css");
 
 	protected final VirtualizedScrollPane<CodeArea> scrollPane;
 	protected final CodeArea codeArea;
@@ -98,7 +98,7 @@ public class ConsoleViewSkin extends SkinBase<ConsoleView> {
 		super.install();
 		ConsoleView control = getSkinnable();
 
-		control.getStylesheets().add(CSS);
+		control.getStylesheets().add(STYLE_SHEET);
 		control.addEventFilter(KeyEvent.KEY_PRESSED, this::keyPressedFilter);
 	}
 
@@ -107,7 +107,7 @@ public class ConsoleViewSkin extends SkinBase<ConsoleView> {
 		super.dispose();
 		ConsoleView control = getSkinnable();
 
-		control.getStylesheets().remove(CSS);
+		control.getStylesheets().remove(STYLE_SHEET);
 		control.removeEventFilter(KeyEvent.KEY_PRESSED, this::keyPressedFilter);
 	}
 
