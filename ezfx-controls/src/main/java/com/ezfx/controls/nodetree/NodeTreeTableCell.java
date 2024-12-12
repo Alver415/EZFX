@@ -32,7 +32,7 @@ public class NodeTreeTableCell extends TreeTableCell<Node, Node> {
 
 		// Text is id
 		textProperty().bind(Bindings.createStringBinding(() ->
-				item.getId() == null ? "" :
+				item.getId() == null || item.getId().isEmpty() ? "" :
 						", #%s".formatted(item.getId()), item.idProperty()));
 
 		// Tooltip is CSS classes

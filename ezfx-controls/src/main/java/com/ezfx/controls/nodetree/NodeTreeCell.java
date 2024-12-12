@@ -45,19 +45,22 @@ public class NodeTreeCell extends TreeCell<Node> {
 		name = name.substring(name.lastIndexOf(".") + 1);
 		Image icon = getIcon(item);
 		Label type = new Label(name);
+		type.getStyleClass().add("java-type");
 		if (isAnonymous) {
 			type.setTooltip(new Tooltip(item.getClass().getName()));
 		}
-		type.setStyle("-fx-font-weight:bold;");
 
 		Label id = new Label();
-		id.textProperty().bind(Bindings.createStringBinding(() -> item.getId() == null ?
-				"" : " #%s".formatted(item.getId()), item.idProperty()));
+		id.getStyleClass().add("fx-id");
+		id.textProperty().bind(Bindings.createStringBinding(() ->
+				item.getId() == null || item.getId().isEmpty() ?
+						"" : " #%s".formatted(item.getId()), item.idProperty()));
 
 		CheckBox visible = new CheckBox();
 		visible.selectedProperty().bindBidirectional(item.visibleProperty());
 
 		Label styleClasses = new Label();
+		styleClasses.getStyleClass().add("style-class");
 		styleClasses.textProperty().bind(
 				Bindings.createStringBinding(() -> item.getStyleClass().stream()
 								.map(".%s"::formatted)
@@ -70,9 +73,9 @@ public class NodeTreeCell extends TreeCell<Node> {
 
 		setGraphic(borderPane);
 
-		if (getTreeItem() instanceof FilterableTreeItem<Node> filterableTreeItem){
+		if (getTreeItem() instanceof FilterableTreeItem<Node> filterableTreeItem) {
 			filterableTreeItem.predicateProperty().subscribe(predicate -> {
-				boolean matched = predicate.test(item);
+				boolean matched = predicate == null || predicate.test(item);
 				pseudoClassStateChanged(FILTERED, !matched);
 			});
 		}

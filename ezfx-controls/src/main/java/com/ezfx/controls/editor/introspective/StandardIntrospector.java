@@ -18,7 +18,7 @@ public class StandardIntrospector implements Introspector {
 
 	private static final Logger log = LoggerFactory.getLogger(StandardIntrospector.class);
 
-	Reflections reflections = new Reflections(new ConfigurationBuilder()
+	private static final Reflections reflections = new Reflections(new ConfigurationBuilder()
 			.forPackages("com") // Scan the root of the classpath
 			.addScanners(Scanners.values()));
 

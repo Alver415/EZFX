@@ -1,3 +1,23 @@
+* {
+  -fx-color-primary: #0096c9;
+  -fx-color-secondary: #c90d00;
+  -fx-color-tertiary: #c97200;
+}
+
+.java-type {
+    -fx-text-fill: derive(-fx-color-primary, -0.5);
+    -fx-font-weight: bold;
+}
+
+.fx-id {
+    -fx-text-fill: -fx-color-secondary;
+}
+
+.style-class {
+    -fx-text-fill: -fx-color-tertiary;
+    -fx-font-style: oblique;
+}
+
 *:filtered {
     -fx-opacity: 0.5;
 }

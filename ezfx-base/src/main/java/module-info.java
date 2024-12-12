@@ -11,4 +11,6 @@ open module ezfx.base {
 
 	// Logging
 	requires transitive org.slf4j;
+	requires javassist;
+	requires jdk.jfr;
 }

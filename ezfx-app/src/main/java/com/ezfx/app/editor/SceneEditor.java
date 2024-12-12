@@ -8,31 +8,38 @@ import com.ezfx.controls.nodetree.NodeTreeView;
 import com.ezfx.controls.viewport.Viewport;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.StackPane;
+import org.reactfx.EventStream;
+import org.reactfx.EventStreams;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SceneEditor extends ObjectEditor<Node> {
 
 	private final NodeTreeView treeView = new NodeTreeView();
 	private final Viewport viewport = new Viewport();
 
-	private final Map<Node, Editor<Node>> editorCache = new HashMap<>();
-
 	public SceneEditor() {
 		treeView.rootProperty().bind(target.map(NodeTreeItem::new));
 		viewport.contentProperty().bind(target.map(t -> t instanceof Parent p ? p : new StackPane(t)).orElse(new StackPane()));
 
-		editorProperty().bind(treeView.getSelectionModel()
-				.selectedItemProperty()
+		ExecutorService targetThreadExecutor = Executors.newSingleThreadExecutor();
+		EventStreams.valuesOf(treeView.getSelectionModel().selectedItemProperty())
+				.threadBridgeFromFx(targetThreadExecutor)
 				.map(TreeItem::getValue)
-//				.map(node -> editorCache.computeIfAbsent(node, IntrospectingPropertiesEditor::new)));
-				.map(IntrospectingPropertiesEditor::new));
+				.map(IntrospectingPropertiesEditor::new)
+				.threadBridgeToFx(targetThreadExecutor)
+				.subscribe(this::setEditor);
+
 		treeView.rootProperty().subscribe(treeView.getSelectionModel()::select);
 	}
 
