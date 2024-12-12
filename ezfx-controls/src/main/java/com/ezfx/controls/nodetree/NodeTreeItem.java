@@ -1,16 +1,17 @@
 package com.ezfx.controls.nodetree;
 
+import com.ezfx.controls.misc.FilterableTreeItem;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.css.PseudoClass;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.SubScene;
-import javafx.scene.control.TreeItem;
 
 import java.util.function.Function;
 
-public class NodeTreeItem extends TreeItem<Node> {
+public class NodeTreeItem extends FilterableTreeItem<Node> {
 
 	public static final Function<Node, ObservableList<Node>> DEFAULT_CHILDREN_PROVIDER =
 			node -> node instanceof Parent parent ?
@@ -29,7 +30,7 @@ public class NodeTreeItem extends TreeItem<Node> {
 		super(rootNode);
 		this.childrenProvider = childrenProvider;
 		this.expandedProperty().subscribe(expanded -> {
-			if (expanded && getChildren().isEmpty()) {
+			if (expanded && getSourceChildren().isEmpty()) {
 				loadChildren();
 			}
 		});
@@ -38,25 +39,25 @@ public class NodeTreeItem extends TreeItem<Node> {
 
 
 	private void loadChildren() {
-		getChildren().clear();
+		getSourceChildren().clear();
 		ObservableList<Node> childrenNodes = childrenProvider.apply(getValue());
 		if (childrenNodes == null) {
 			return;
 		}
 		for (Node child : childrenNodes) {
 			NodeTreeItem childItem = new NodeTreeItem(child, childrenProvider);
-			getChildren().add(childItem);
+			getSourceChildren().add(childItem);
 		}
 		childrenNodes.addListener((ListChangeListener<? super Node>) change -> {
 			while (change.next()) {
 				if (change.wasAdded()) {
 					for (Node child : change.getAddedSubList()) {
-						getChildren().add(new NodeTreeItem(child, childrenProvider));
+						getSourceChildren().add(new NodeTreeItem(child, childrenProvider));
 					}
 				}
 				if (change.wasRemoved()) {
 					for (Node child : change.getRemoved()) {
-						getChildren().removeIf(item -> item.getValue() == child);
+						getSourceChildren().removeIf(item -> item.getValue() == child);
 					}
 				}
 			}
@@ -65,6 +66,6 @@ public class NodeTreeItem extends TreeItem<Node> {
 
 	@Override
 	public boolean isLeaf() {
-		return getChildren().isEmpty();
+		return getSourceChildren().isEmpty();
 	}
 }

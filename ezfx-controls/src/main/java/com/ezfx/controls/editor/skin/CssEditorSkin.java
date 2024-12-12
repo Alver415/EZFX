@@ -1,9 +1,8 @@
 package com.ezfx.controls.editor.skin;
 
 import com.ezfx.controls.editor.impl.javafx.CssEditor;
-import com.ezfx.controls.editor.impl.javafx.StyleEditor;
 import com.ezfx.controls.editor.impl.standard.StringEditor;
-import com.ezfx.controls.utils.GenericTreeItem;
+import com.ezfx.controls.utils.LazyTreeItem;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.*;
@@ -97,7 +96,7 @@ public class CssEditorSkin extends EditorSkin<CssEditor, Styleable> {
 		return (CssMetaData<T, V>) v;
 	}
 
-	private static class CssMetaDataTreeItem extends GenericTreeItem<CssMetaData<? extends Styleable, ?>> {
+	private static class CssMetaDataTreeItem extends LazyTreeItem<CssMetaData<? extends Styleable, ?>> {
 
 		public CssMetaDataTreeItem(CssMetaData<? extends Styleable, ?> child) {
 			this(child, cssMetaData -> {
@@ -111,7 +110,7 @@ public class CssEditorSkin extends EditorSkin<CssEditor, Styleable> {
 		}
 
 		@Override
-		protected GenericTreeItem<CssMetaData<?, ?>> create(CssMetaData<? extends Styleable, ?> child, Function<CssMetaData<?, ?>, ObservableList<CssMetaData<? extends Styleable, ?>>> childrenProvider) {
+		protected LazyTreeItem<CssMetaData<?, ?>> create(CssMetaData<? extends Styleable, ?> child, Function<CssMetaData<?, ?>, ObservableList<CssMetaData<? extends Styleable, ?>>> childrenProvider) {
 			return new CssMetaDataTreeItem(child);
 		}
 	}

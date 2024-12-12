@@ -2,7 +2,9 @@ package com.ezfx.controls.nodetree;
 
 import com.ezfx.base.utils.Resources;
 import com.ezfx.controls.icons.Icons;
+import com.ezfx.controls.misc.FilterableTreeItem;
 import javafx.beans.binding.Bindings;
+import javafx.css.PseudoClass;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -17,9 +19,13 @@ import java.util.stream.Collectors;
 
 public class NodeTreeCell extends TreeCell<Node> {
 	private static final Image MISSING_ICON = Resources.image(Icons.class, "fx-icons/MissingIcon.png");
+	private static final String STYLE_SHEET = Resources.css(NodeTreeCell.class, "NodeTreeCell.css");
 	private static final Map<Class<?>, Image> ICON_MAP = new HashMap<>();
 
+	public static final PseudoClass FILTERED = PseudoClass.getPseudoClass("filtered");
+
 	public NodeTreeCell() {
+		getStylesheets().add(STYLE_SHEET);
 		setContentDisplay(ContentDisplay.LEFT);
 	}
 
@@ -30,43 +36,46 @@ public class NodeTreeCell extends TreeCell<Node> {
 			clear();
 			return;
 		}
+		Class<?> clazz = item.getClass();
+		boolean isAnonymous = clazz.isAnonymousClass();
+		while (clazz.isAnonymousClass()) {
+			clazz = clazz.getSuperclass();
+		}
+		String name = clazz.getName();
+		name = name.substring(name.lastIndexOf(".") + 1);
+		Image icon = getIcon(item);
+		Label type = new Label(name);
+		if (isAnonymous) {
+			type.setTooltip(new Tooltip(item.getClass().getName()));
+		}
+		type.setStyle("-fx-font-weight:bold;");
 
+		Label id = new Label();
+		id.textProperty().bind(Bindings.createStringBinding(() -> item.getId() == null ?
+				"" : " #%s".formatted(item.getId()), item.idProperty()));
 
-		// Graphic is icon for associated class and the class name
-		graphicProperty().bind(Bindings.createObjectBinding(() -> {
-			Class<?> clazz = item.getClass();
-			boolean isAnonymous = clazz.isAnonymousClass();
-			while (clazz.isAnonymousClass()) {
-				clazz = clazz.getSuperclass();
-			}
-			String name = clazz.getName();
-			name = name.substring(name.lastIndexOf(".") + 1);
-			Image icon = getIcon(item);
-			Label type = new Label(name);
-			if (isAnonymous) {
-				type.setTooltip(new Tooltip(item.getClass().getName()));
-			}
-			type.setStyle("-fx-font-weight:bold;");
+		CheckBox visible = new CheckBox();
+		visible.selectedProperty().bindBidirectional(item.visibleProperty());
 
-			Label id = new Label();
-			id.textProperty().bind(Bindings.createStringBinding(() -> item.getId() == null ?
-					"" : " #%s".formatted(item.getId()), item.idProperty()));
+		Label styleClasses = new Label();
+		styleClasses.textProperty().bind(
+				Bindings.createStringBinding(() -> item.getStyleClass().stream()
+								.map(".%s"::formatted)
+								.collect(Collectors.joining(", ")),
+						item.getStyleClass()));
 
-			CheckBox visible = new CheckBox();
-			visible.selectedProperty().bindBidirectional(item.visibleProperty());
+		HBox hbox = new HBox(new ImageView(icon), type, id, styleClasses);
+		BorderPane borderPane = new BorderPane(hbox);
+		borderPane.setRight(visible);
 
-			Label styleClasses = new Label();
-			styleClasses.textProperty().bind(
-					Bindings.createStringBinding(() -> item.getStyleClass().stream()
-									.map(".%s"::formatted)
-									.collect(Collectors.joining(", ")),
-							item.getStyleClass()));
+		setGraphic(borderPane);
 
-			HBox hbox = new HBox(new ImageView(icon), type, id, styleClasses);
-			BorderPane borderPane = new BorderPane(hbox);
-			borderPane.setRight(visible);
-			return borderPane;
-		}));
+		if (getTreeItem() instanceof FilterableTreeItem<Node> filterableTreeItem){
+			filterableTreeItem.predicateProperty().subscribe(predicate -> {
+				boolean matched = predicate.test(item);
+				pseudoClassStateChanged(FILTERED, !matched);
+			});
+		}
 	}
 
 	private void clear() {

@@ -36,8 +36,9 @@ public class EditorFactory {
 			Type rawType = parameterizedType.getRawType();
 			Type genericType = parameterizedType.getActualTypeArguments()[0];
 			return buildEditor(rawType, genericType, property);
-		}
-		return buildEditor((Class<T>) type, property);
+		} else if (type instanceof Class clazz) {
+			return buildEditor((Class<T>) clazz, property);
+		} else return new Editor<>();
 	}
 
 	public <T> Editor<T> buildEditor(Class<T> type) {

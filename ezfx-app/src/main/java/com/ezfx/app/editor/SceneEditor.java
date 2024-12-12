@@ -14,10 +14,15 @@ import javafx.scene.control.Skin;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.StackPane;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class SceneEditor extends ObjectEditor<Node> {
 
 	private final NodeTreeView treeView = new NodeTreeView();
 	private final Viewport viewport = new Viewport();
+
+	private final Map<Node, Editor<Node>> editorCache = new HashMap<>();
 
 	public SceneEditor() {
 		treeView.rootProperty().bind(target.map(NodeTreeItem::new));
@@ -26,6 +31,7 @@ public class SceneEditor extends ObjectEditor<Node> {
 		editorProperty().bind(treeView.getSelectionModel()
 				.selectedItemProperty()
 				.map(TreeItem::getValue)
+//				.map(node -> editorCache.computeIfAbsent(node, IntrospectingPropertiesEditor::new)));
 				.map(IntrospectingPropertiesEditor::new));
 		treeView.rootProperty().subscribe(treeView.getSelectionModel()::select);
 	}

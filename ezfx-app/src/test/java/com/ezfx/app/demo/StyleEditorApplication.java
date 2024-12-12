@@ -2,27 +2,19 @@ package com.ezfx.app.demo;
 
 import com.ezfx.base.utils.Screens;
 import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.EditorWrapper;
+import com.ezfx.controls.editor.EditorFactory;
 import com.ezfx.controls.editor.impl.javafx.StyleEditor;
 import com.ezfx.controls.editor.introspective.IntrospectingPropertiesEditor;
 import javafx.application.Application;
-import javafx.beans.property.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
-import javafx.scene.effect.Effect;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Shape;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
-import java.util.stream.Collectors;
 
 public class StyleEditorApplication extends Application {
 
@@ -38,9 +30,11 @@ public class StyleEditorApplication extends Application {
 		Label label = new Label("EXAMPLE");
 		label.setStyle("-fx-background-color: yellow");
 		label.setBorder(Border.stroke(Color.RED));
+		StackPane stackPane = new StackPane(label);
+
 		StyleEditor styleEditor = new StyleEditor(label.styleProperty());
 
-		Scene scene = new Scene(new SplitPane(styleEditor, new StackPane(label)));
+		Scene scene = new Scene(new SplitPane(styleEditor, stackPane));
 		stage.setScene(scene);
 		stage.setTitle("Test Application");
 		stage.setWidth(600);

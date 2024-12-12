@@ -7,6 +7,7 @@ public class StringEditorSkin extends EditorSkin<StringEditor, String> {
 	public StringEditorSkin(StringEditor control, TextInputControl inputControl) {
 		super(control);
 		inputControl.textProperty().bindBidirectional(control.property());
+		inputControl.promptTextProperty().bindBidirectional(control.promptTextProperty());
 		getChildren().setAll(inputControl);
 	}
 }

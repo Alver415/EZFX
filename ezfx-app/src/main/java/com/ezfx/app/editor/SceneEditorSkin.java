@@ -1,5 +1,7 @@
 package com.ezfx.app.editor;
 
+import com.ezfx.controls.editor.impl.standard.StringEditor;
+import com.ezfx.controls.misc.FilterableTreeItem;
 import com.ezfx.controls.nodetree.NodeTreeCell;
 import com.ezfx.controls.nodetree.NodeTreeView;
 import javafx.beans.binding.Bindings;
@@ -57,7 +59,36 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 		StackPane center = new StackPane(control.getViewport(), overlay);
 		borderPane.setCenter(center);
 
-		NodeTreeView left = control.getTreeView();
+		StringEditor filterEditor = new StringEditor();
+		filterEditor.setPadding(new Insets(4));
+		filterEditor.setPromptText("Filter...");
+		Property<String> filterProperty = filterEditor.property();
+		NodeTreeView treeView = control.getTreeView();
+		if (treeView.getRoot() instanceof FilterableTreeItem<Node> root) {
+			root.predicateProperty().bind(Bindings.createObjectBinding(() -> node -> {
+				if (filterProperty.getValue() == null) return true;
+				String filterText = filterProperty.getValue().toLowerCase();
+
+				if (filterText.startsWith("#")) {
+					if (node.getId() != null && node.getId().toLowerCase().contains(filterText.substring(1))) {
+						return true;
+					}
+				} else if (filterText.startsWith(".")) {
+					for (String styleClass : node.getStyleClass()) {
+						if (styleClass.toLowerCase().contains(filterText.substring(1))) {
+							return true;
+						}
+					}
+				} else {
+					if (node.getClass().getSimpleName().toLowerCase().contains(filterText)) {
+						return true;
+					}
+				}
+				return false;
+			}, filterProperty));
+		}
+		VBox left = new VBox(filterEditor, treeView);
+		VBox.setVgrow(treeView, Priority.ALWAYS);
 		left.setPrefWidth(450);
 		borderPane.setLeft(left);
 

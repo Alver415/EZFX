@@ -74,11 +74,11 @@ public interface EZFX {
 		return () -> running.set(false);
 	}
 
-	static void runOnNewThread(UncheckedRunnable runnable) {
-		runOnNewThread((Runnable) runnable);
+	static void runAsync(UncheckedRunnable runnable) {
+		runAsync((Runnable) runnable);
 	}
 
-	static void runOnNewThread(Runnable runnable) {
+	static void runAsync(Runnable runnable) {
 		runOnVirtualThread(runnable);
 	}
 

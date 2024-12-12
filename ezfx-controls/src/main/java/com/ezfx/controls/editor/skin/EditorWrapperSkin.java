@@ -16,12 +16,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+
+import static org.controlsfx.control.action.ActionUtils.ActionTextBehavior.HIDE;
 
 public class EditorWrapperSkin<T, C extends Editor<T>> extends SkinBase<EditorWrapper<T, C>> {
 
@@ -40,14 +43,13 @@ public class EditorWrapperSkin<T, C extends Editor<T>> extends SkinBase<EditorWr
 		title.getStyleClass().add("title");
 		title.textProperty().bind(wrapper.nameProperty());
 
-		HBox actionsBar = new HBox();
-		wrapper.actionsProperty()
-				.map(actions -> actions.stream().map(this::buildActionControl).toList())
-				.subscribe(actionControls -> actionsBar.getChildren().setAll(actionControls));
+		SegmentedButton actionButtons = ActionUtils.createSegmentedButton(HIDE, wrapper.getActions());
+		actionButtons.getStyleClass().add("actions");
 
 		BorderPane top = new BorderPane();
+		top.getStyleClass().add("header");
 		top.setLeft(title);
-		top.setRight(actionsBar);
+		top.setRight(actionButtons);
 		borderPane.setTop(top);
 
 		HBox center = new HBox();
@@ -62,7 +64,7 @@ public class EditorWrapperSkin<T, C extends Editor<T>> extends SkinBase<EditorWr
 	}
 
 	private Node buildActionControl(Action action) {
-		return ActionUtils.createButton(action, ActionUtils.ActionTextBehavior.HIDE);
+		return ActionUtils.createButton(action, HIDE);
 	}
 
 	private static <A, B> List<B> mapList(List<A> actions, Function<A, B> function) {

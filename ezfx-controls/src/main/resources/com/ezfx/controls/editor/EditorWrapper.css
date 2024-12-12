@@ -4,23 +4,9 @@
 .editor-wrapper:hover {
 	-fx-background-color: -fx-outer-border, -fx-inner-border, derive(-fx-base, -10%);
 }
-
+.header {
+    -fx-padding: 0 0 2 0;
+}
 .title {
     -fx-font-weight: bold;
-}
-
-.button, .action {
-    -fx-padding: 0px;
-    -fx-exact-size: 16px;
-    -fx-min-width: -fx-exact-size;
-    -fx-min-height: -fx-exact-size;
-    -fx-pref-width: -fx-exact-size;
-    -fx-pref-height: -fx-exact-size;
-    -fx-max-width: -fx-exact-size;
-    -fx-max-height: -fx-exact-size;
-}
-
-.glyph-font {
-    -fx-font-family:"FontAwesome";
-    -fx-font-size: 16px;
 }

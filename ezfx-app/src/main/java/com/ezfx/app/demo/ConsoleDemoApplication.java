@@ -3,6 +3,7 @@ package com.ezfx.app.demo;
 import com.ezfx.app.stage.DecoratedStage;
 import com.ezfx.base.io.IOConsole;
 import com.ezfx.base.io.SystemIO;
+import com.ezfx.base.utils.EZFX;
 import com.ezfx.controls.console.ConsoleView;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -23,7 +24,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.ezfx.base.utils.EZFX.runFX;
-import static com.ezfx.base.utils.EZFX.runOnNewThread;
+import static com.ezfx.base.utils.EZFX.runAsync;
 import static java.lang.Thread.sleep;
 
 public class ConsoleDemoApplication extends Application {
@@ -50,7 +51,7 @@ public class ConsoleDemoApplication extends Application {
 
 		stage.setOnCloseRequest(_ -> this.close());
 
-		runOnNewThread(() -> {
+		EZFX.runAsync(() -> {
 			runFX(() -> {
 				ColorPicker in = new ColorPicker(Color.BLUE);
 				ColorPicker out = new ColorPicker(Color.GREEN);
@@ -92,7 +93,7 @@ public class ConsoleDemoApplication extends Application {
 							"ProcessPane - " + program.getProcess().info().command().orElse(""),
 							program));
 
-			runOnNewThread(() -> {
+			EZFX.runAsync(() -> {
 
 				sleep(2000);
 				// Note that we're using normal System in/out/err

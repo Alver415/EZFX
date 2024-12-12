@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.TreeMap;
 
 import static com.ezfx.controls.editor.EditorFactory.DEFAULT_FACTORY;
@@ -47,7 +48,8 @@ public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
 				.map(propertyInfoList -> {
 					ObservableMap<Category, ObservableList<Editor<?>>> categorized = FXCollections.observableMap(new TreeMap<>());
 					for (PropertyInfo propertyInfo : propertyInfoList) {
-						Editor<?> subEditor = buildSubEditor(property, propertyInfo, categorized);
+						Editor<?> subEditor = buildSubEditor(property.getValue(), propertyInfo);
+						if (subEditor == null) continue;
 						Category category = propertyInfo.category();
 						ObservableList<Editor<?>> list = categorized.computeIfAbsent(category, _ -> FXCollections.observableArrayList());
 						list.add(subEditor);
@@ -62,12 +64,15 @@ public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
 		}));
 	}
 
-	private <R> Editor<R> buildSubEditor(Property<T> property, PropertyInfo propertyInfo, ObservableMap<Category, ObservableList<Editor<?>>> categorized) {
+	private <R> Editor<R> buildSubEditor(T target, PropertyInfo propertyInfo) {
 		try {
-			Property<R> subProperty = (Property<R>) propertyInfo.property().invoke(property.getValue());
+			Method propertyMethod = propertyInfo.property();
+			if (!propertyMethod.canAccess(target)) return null;
+			Property<R> subProperty = (Property<R>) propertyMethod.invoke(target);
 			return getEditorFactory().buildEditor(propertyInfo, subProperty);
 		} catch (IllegalAccessException | InvocationTargetException e) {
-			throw new RuntimeException(e);
+			log.warn(e.getMessage(), e);
+			return getEditorFactory().buildEditor(propertyInfo, new SimpleObjectProperty<>(this, propertyInfo.name(), null));
 		}
 	}
 

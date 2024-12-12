@@ -7,7 +7,7 @@ import javafx.scene.control.TreeItem;
 
 import java.util.function.Function;
 
-public abstract class GenericTreeItem<T> extends TreeItem<T> {
+public abstract class LazyTreeItem<T> extends TreeItem<T> {
 
 	private boolean isLeaf;
 	private boolean isFirstTimeChildren = true;
@@ -15,12 +15,12 @@ public abstract class GenericTreeItem<T> extends TreeItem<T> {
 
 	private final Function<T, ObservableList<T>> childrenProvider;
 
-	public GenericTreeItem(T value, Function<T, ObservableList<T>> childrenProvider) {
+	public LazyTreeItem(T value, Function<T, ObservableList<T>> childrenProvider) {
 		super(value);
 		this.childrenProvider = childrenProvider;
 	}
 
-	protected abstract GenericTreeItem<T> create(T childValue, Function<T, ObservableList<T>> childrenProvider);
+	protected abstract LazyTreeItem<T> create(T childValue, Function<T, ObservableList<T>> childrenProvider);
 
 	@Override
 	public ObservableList<TreeItem<T>> getChildren() {
@@ -46,7 +46,7 @@ public abstract class GenericTreeItem<T> extends TreeItem<T> {
 		ObservableList<TreeItem<T>> childrenItems = FXCollections.observableArrayList();
 
 		for (T child : children) {
-			GenericTreeItem<T> childItem = create(child, childrenProvider);
+			LazyTreeItem<T> childItem = create(child, childrenProvider);
 			childrenItems.add(childItem);
 		}
 

@@ -2,6 +2,7 @@ package com.ezfx.base.io;
 
 
 import com.ezfx.base.exception.UncheckedRunnable;
+import com.ezfx.base.utils.EZFX;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,12 +13,12 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-import static com.ezfx.base.utils.EZFX.runOnNewThread;
+import static com.ezfx.base.utils.EZFX.runAsync;
 
 public interface FileSystemIO {
 
 	static void transfer(InputStream inputStream, OutputStream outputStream) {
-		runOnNewThread(() -> inputStream.transferTo(outputStream));
+		EZFX.runAsync(() -> inputStream.transferTo(outputStream));
 	}
 
 	static Path getOrCreateDirectory(Path path) throws IOException {

@@ -21,6 +21,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.control.*;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -35,6 +36,8 @@ import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionProxy;
 import org.controlsfx.control.action.ActionUtils;
+import org.controlsfx.glyphfont.FontAwesome;
+import org.controlsfx.glyphfont.Glyph;
 
 import java.util.Collection;
 import java.util.List;
@@ -92,6 +95,7 @@ public class StageDecorationSkin extends SkinBase<StageDecoration> {
 		titleBar.getStyleClass().add("title-bar");
 
 		iconView = new ImageView();
+		iconView.setPickOnBounds(true);
 		ObjectBinding<Image> firstIcon = Bindings.createObjectBinding(
 				() -> stageProperty().map(Stage::getIcons).orElse(EMPTY_LIST).getValue()
 						.stream().findFirst().orElse(null), stageProperty());

@@ -77,7 +77,7 @@ public class ConsoleViewSkin extends SkinBase<ConsoleView> {
 		inputText.bind(codeArea.textProperty().map(s -> s.substring(inputTextIndex.get())));
 
 		scrollPane = new VirtualizedScrollPane<>(codeArea);
-		ChangeListener<Double> listener = (_, oldValue, newValue) -> {
+		ChangeListener<Double> listener = (_, _, newValue) -> {
 			boolean singleLine = (codeArea.getTotalHeightEstimate() - codeArea.getViewportHeight()) - newValue < 12;
 			control.setAutoScroll(singleLine);
 		};

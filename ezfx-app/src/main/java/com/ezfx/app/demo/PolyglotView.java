@@ -2,6 +2,7 @@ package com.ezfx.app.demo;
 
 import com.ezfx.base.io.IOConsole;
 import com.ezfx.base.io.StringConsumingOutputStream;
+import com.ezfx.base.utils.EZFX;
 import com.ezfx.controls.console.ConsoleView;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
@@ -11,7 +12,7 @@ import java.io.PrintStream;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static com.ezfx.base.utils.EZFX.runOnNewThread;
+import static com.ezfx.base.utils.EZFX.runAsync;
 
 public class PolyglotView extends ConsoleView {
 
@@ -34,7 +35,7 @@ public class PolyglotView extends ConsoleView {
 		this.languageId = languageId;
 		this.console.in.subscribe(new StringConsumingOutputStream(string -> {
 			CompletableFuture<Value> future = getManagedContext().evalAsync(getLanguageId(), string);
-			runOnNewThread(() -> {
+			EZFX.runAsync(() -> {
 				try {
 					future.get();
 				} catch (ExecutionException e) {

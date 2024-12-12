@@ -10,6 +10,8 @@ public interface Icons {
 	Image LOCKED = load("locked.png");
 	Image UNLOCKED = load("unlocked.png");
 
+	Image EDIT = load("font-awesome/edit.png");
+
 	private static Image load(String image) {
 		return Resources.image(Icons.class, image);
 	}

@@ -24,6 +24,10 @@ public class Editor<T> extends Control {
 
 	private final Property<T> property;
 
+	public Editor() {
+		this(new SimpleObjectProperty<>());
+	}
+
 	public Editor(Property<T> property) {
 		this.property = property;
 		getStyleClass().add(STYLE_CLASS);

@@ -1,3 +1,7 @@
+* {
+    -fx-tab-size: 4;
+}
+
 .lineno {
      -fx-fill: lightgrey;
      -fx-background-color: -fx-fill;

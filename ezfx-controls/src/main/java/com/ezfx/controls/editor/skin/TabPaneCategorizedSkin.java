@@ -5,6 +5,7 @@ import com.ezfx.controls.editor.Category;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.EditorWrapper;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -39,13 +40,13 @@ public class TabPaneCategorizedSkin<E extends Editor<T> & CategorizedMultiEditor
 
 		Tab tab = tabMap.computeIfAbsent(category, this::buildTab);
 		VBox content = new VBox();
+		content.setPadding(new Insets(4));
 		ScrollPane scrollPane = new ScrollPane(content);
 		scrollPane.setFitToWidth(true);
 		scrollPane.setFitToHeight(true);
-		tab.setContent(content);
+		tab.setContent(scrollPane);
 
-		editors.stream().map(EditorWrapper::new).toList().forEach(content.getChildren()::add);
-
+		content.getChildren().setAll(editors.stream().map(EditorWrapper::new).toList());
 		return tab;
 	}
 

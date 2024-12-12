@@ -1,22 +1,17 @@
 package com.ezfx.controls.editor;
 
-import com.ezfx.controls.editor.impl.standard.SelectionEditor;
 import com.ezfx.controls.editor.introspective.ActionIntrospector;
-import com.ezfx.controls.editor.introspective.EditorDialog;
-import com.ezfx.controls.icons.Icons;
-import javafx.beans.property.*;
-import javafx.beans.value.ObservableValue;
+import javafx.beans.property.MapProperty;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleMapProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
-import javafx.event.ActionEvent;
-import org.controlsfx.control.action.Action;
-import org.controlsfx.control.action.ActionMap;
 import org.controlsfx.control.action.ActionProxy;
 
-import java.util.Map;
-
 public abstract class ObjectEditor<T> extends Editor<T> {
+
+	private final T initialValue;
 
 	public ObjectEditor() {
 		this(new SimpleObjectProperty<>());
@@ -28,37 +23,23 @@ public abstract class ObjectEditor<T> extends Editor<T> {
 
 	public ObjectEditor(Property<T> property) {
 		super(property);
+		initialValue = property.getValue();
 		setupActions();
 	}
 
-	@ActionProxy(id="clearValue", text="Clear", longText = "Set value to null", graphic = "font>FontAwesome|TIMES")
-	public void clearValue(ActionEvent event) {
+	@ActionProxy(id = "clear", text = "Clear", longText = "Set value to null", graphic = "font>FontAwesome|TIMES")
+	public void clear() {
 		setValue(null);
+	}
+
+	@ActionProxy(id = "reset", text = "Reset", longText = "Reset value to initial value", graphic = "font>FontAwesome|UNDO")
+	public void reset() {
+		setValue(initialValue);
 	}
 
 	private void setupActions() {
 		ActionIntrospector.register(this);
-		Action clearAction = ActionIntrospector.action("clearValue");
-//
-//		Action setAction = new Action();
-//		setAction.setName("Set Value");
-//		setAction.setIcon(Icons.PLUS);
-//		setAction.setAction(() -> {
-//			ObservableValue<ObservableList<String>> names = knownValues.map(Map::keySet).map(FXCollections::observableArrayList);
-////			ChoiceDialog<String> dialog = new ChoiceDialog<>(null, names.getValue());
-////			dialog.initOwner(getScene().getWindow());
-////			dialog.setTitle("Value");
-////			dialog.setHeaderText("Choose a value.");
-////			dialog.getDialogPane().getButtonTypes().setAll(OK, CANCEL);
-////			dialog.showAndWait().map(knownValues::get).ifPresent(this::setValue);
-//			SelectionEditor<String> selectionEditor = new SelectionEditor<>(names.getValue());
-//			SimpleStringProperty selectedName = new SimpleStringProperty();
-//			EditorDialog<String> bd = new EditorDialog<>(selectedName, selectionEditor);
-//			bd.show();
-//			selectedName.addListener((_, _, value) -> property().setValue(knownValues.get(value)));
-//		});
-
-		getActions().addAll(clearAction);
+		getActions().addAll(ActionIntrospector.actions("reset", "clear"));
 	}
 
 	private final MapProperty<String, T> knownValues = new SimpleMapProperty<>(this, "knownValues", FXCollections.observableHashMap());
@@ -75,17 +56,4 @@ public abstract class ObjectEditor<T> extends Editor<T> {
 		this.knownValuesProperty().setValue(value);
 	}
 
-//	private final ListProperty<T> knownValues = new SimpleListProperty<>(this, "knownValues", FXCollections.observableArrayList());
-//
-//	public ListProperty<T> knownValuesProperty() {
-//		return this.knownValues;
-//	}
-//
-//	public ObservableList<T> getKnownValues() {
-//		return this.knownValuesProperty().getValue();
-//	}
-//
-//	public void setKnownValues(ObservableList<T> value) {
-//		this.knownValuesProperty().setValue(value);
-//	}
 }
