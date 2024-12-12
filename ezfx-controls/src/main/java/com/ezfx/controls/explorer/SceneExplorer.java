@@ -11,7 +11,6 @@ import com.ezfx.controls.editor.introspective.PropertyInfo;
 import com.ezfx.controls.editor.introspective.StandardIntrospector;
 import com.ezfx.controls.misc.FilterableTreeItem;
 import com.ezfx.controls.nodetree.NodeTreeItem;
-import com.ezfx.controls.nodetree.NodeTreeTableView;
 import com.ezfx.controls.nodetree.NodeTreeView;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
@@ -115,57 +114,4 @@ public class SceneExplorer extends Control {
 			getChildren().setAll(splitPane);
 		}
 	}
-
-
-	public static class SceneExplorerTreeTableSkin extends SkinBase<SceneExplorer> {
-
-		protected SceneExplorerTreeTableSkin(SceneExplorer sceneExplorer) {
-			super(sceneExplorer);
-
-			NodeTreeTableView treeView = new NodeTreeTableView();
-			treeView.rootProperty().bind(sceneExplorer.rootProperty().map(NodeTreeItem::new));
-			treeView.getSelectionModel().select(0);
-
-			TreeTableColumn<Node, BooleanEditor> visible = new TreeTableColumn<>("Visible");
-			visible.setCellValueFactory(cdf -> cdf.getValue().valueProperty().map(Node::visibleProperty).map(BooleanEditor::new));
-			treeView.getColumns().add(visible);
-
-			Editor<Node> beanEditor = new IntrospectingPropertiesEditor<>();
-			beanEditor.property().bind(treeView.selectionModelProperty().flatMap(SelectionModel::selectedItemProperty).map(TreeItem::getValue));
-			ScrollPane scrollPane = new ScrollPane(beanEditor);
-			scrollPane.setFitToWidth(true);
-			scrollPane.setFitToHeight(true);
-
-			SplitPane splitPane = new SplitPane(treeView, scrollPane);
-			getChildren().setAll(splitPane);
-
-			ContextMenu contextMenu = new ContextMenu();
-			Introspector introspector = new StandardIntrospector();
-			EditorFactory editorFactory = new EditorFactory();
-			Node target = sceneExplorer.getRoot();
-			for (PropertyInfo propertyInfo : introspector.getPropertyInfo(target.getClass())) {
-				MenuItem menuItem = new MenuItem(propertyInfo.displayName());
-				menuItem.setOnAction(a -> {
-					TreeTableColumn<Node, Editor<?>> editorColumn = new TreeTableColumn<>(propertyInfo.displayName());
-					editorColumn.setCellValueFactory(cdf -> cdf.getValue().valueProperty()
-							.map(node -> buildEditor(propertyInfo, node, introspector, editorFactory)));
-					treeView.getColumns().add(editorColumn);
-				});
-				contextMenu.getItems().add(menuItem);
-			}
-			treeView.setContextMenu(contextMenu);
-		}
-
-		private static <T> Editor<T> buildEditor(PropertyInfo propertyInfo, Node node, Introspector introspector, EditorFactory editorFactory) {
-			try {
-				//noinspection unchecked
-				Property<T> subProperty = (Property<T>) propertyInfo.property().invoke(node);
-				return editorFactory.buildEditor(propertyInfo, subProperty);
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
-
-
 }

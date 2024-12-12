@@ -9,7 +9,7 @@
     -fx-font-weight: bold;
 }
 
-.fx-id {
+.node-id {
     -fx-text-fill: -fx-color-secondary;
 }
 
