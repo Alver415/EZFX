@@ -21,15 +21,13 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 import java.lang.reflect.Parameter;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.lang.reflect.Proxy;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class IntrospectorFX extends StandardIntrospector {
 
-	public static final Introspector DEFAULT_INTROSPECTOR = new IntrospectorFX();
+	public static final Introspector DEFAULT_INTROSPECTOR = CachedProxy.wrap(new IntrospectorFX(), Introspector.class);
 
 	@Override
 	public <T> List<PropertyInfo> getPropertyInfo(Class<T> type) {
@@ -110,9 +108,9 @@ public class IntrospectorFX extends StandardIntrospector {
 			return (S) DEFAULT_BORDERSTROKE;
 		} else if (Image.class.equals(type) || Image.class.isAssignableFrom(type) || type.isAssignableFrom(Image.class)) {
 			return (S) EMPTY_IMAGE;
-		} else if (Point3D.class.equals(type)){
+		} else if (Point3D.class.equals(type)) {
 			return (S) Point3D.ZERO;
-		} else if (Point2D.class.equals(type)){
+		} else if (Point2D.class.equals(type)) {
 			return (S) Point2D.ZERO;
 		}
 		return null;

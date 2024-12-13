@@ -1,4 +1,4 @@
-package com.ezfx.app.demo;
+package com.ezfx.demo;
 
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;

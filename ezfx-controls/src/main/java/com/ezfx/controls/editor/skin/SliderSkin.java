@@ -19,11 +19,11 @@ public class SliderSkin extends EditorSkin<DoubleEditor, Double> {
 			slider.minProperty().bind(control.minProperty());
 			slider.maxProperty().bind(control.maxProperty());
 			slider.setSnapToTicks(true);
-			Tooltip tooltip = new Tooltip();
-			tooltip.textProperty().bind(Bindings.createStringBinding(
-					() -> "%.2f (min=%.2f, max=%.2f)".formatted(slider.getValue(), slider.getMin(), slider.getMax()),
-					slider.valueProperty(), slider.minProperty(), slider.maxProperty()));
-			slider.setTooltip(tooltip);
+//			Tooltip tooltip = new Tooltip();
+//			tooltip.textProperty().bind(Bindings.createStringBinding(
+//					() -> "%.2f (min=%.2f, max=%.2f)".formatted(slider.getValue(), slider.getMin(), slider.getMax()),
+//					slider.valueProperty(), slider.minProperty(), slider.maxProperty()));
+//			slider.setTooltip(tooltip);
 			getChildren().setAll(slider);
 		}
 	}

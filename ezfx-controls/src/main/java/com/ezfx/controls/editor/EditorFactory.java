@@ -45,6 +45,10 @@ public class EditorFactory {
 		return buildEditor(type, new SimpleObjectProperty<>());
 	}
 
+	public <T> Editor<T> buildEditor(T value) {
+		return buildEditor((Class<T>)value.getClass(), new SimpleObjectProperty<>(value));
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T> Editor<T> buildEditor(Class<T> type, Property<T> property) {
 		Objects.requireNonNull(property);
@@ -52,7 +56,7 @@ public class EditorFactory {
 
 
 		//TODO: REMOVE ME
-		if (property.getName().equals("style")){
+		if ("style".equals(property.getName())){
 			StringEditor stringEditor = new StringEditor((Property<String>) property);
 			stringEditor.setSkin(new CSSEditorSkin(stringEditor));
 			stringEditor.setMinHeight(300);

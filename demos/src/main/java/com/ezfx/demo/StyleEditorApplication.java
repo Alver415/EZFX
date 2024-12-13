@@ -1,10 +1,11 @@
-package com.ezfx.app.demo;
+package com.ezfx.demo;
 
 import com.ezfx.base.utils.Screens;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.EditorFactory;
 import com.ezfx.controls.editor.impl.javafx.StyleEditor;
 import com.ezfx.controls.editor.introspective.IntrospectingPropertiesEditor;
+import com.ezfx.controls.explorer.ApplicationExplorer;
 import javafx.application.Application;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
@@ -41,5 +42,7 @@ public class StyleEditorApplication extends Application {
 		stage.setHeight(400);
 		stage.centerOnScreen();
 		stage.show();
+
+		ApplicationExplorer.explore(this);
 	}
 }

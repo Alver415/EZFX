@@ -19,6 +19,7 @@
         <module>ezfx-polyglot</module>
 
         <module>ezfx-app</module>
+        <module>demos</module>
     </modules>
 
     <properties>
@@ -84,6 +85,11 @@
             <dependency>
                 <groupId>ezfx</groupId>
                 <artifactId>ezfx-spring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ezfx</groupId>
+                <artifactId>ezfx-app</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

@@ -1,5 +1,5 @@
-open module ezfx.app.test {
-	exports com.ezfx.app.demo;
+open module ezfx.demo{
+	exports com.ezfx.demo;
 
 	// EZFX
 	requires transitive ezfx.base;
@@ -18,8 +18,7 @@ open module ezfx.app.test {
 
 	// Logging
 	requires transitive org.slf4j;
-	requires org.junit.jupiter.api;
 	requires org.reflections;
 	requires javafx.fxml;
-	requires org.graalvm.nativebridge;
+	requires ezfx.app;
 }

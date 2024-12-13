@@ -2,7 +2,7 @@ package com.ezfx.app.console;
 
 import com.ezfx.app.demo.ProcessView;
 import com.ezfx.app.stage.DecoratedStage;
-import com.ezfx.controls.explorer.SceneExplorer;
+import com.ezfx.controls.explorer.ApplicationExplorer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -22,6 +22,5 @@ public class EZFZConsole extends Application {
 		stage.setTitle("EZFX Console");
 		stage.show();
 
-		SceneExplorer.stage(scene);
 	}
 }

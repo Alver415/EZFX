@@ -7,12 +7,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.Duration;
 import javafx.util.Subscription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public interface EZFX {
+
+	Logger log = LoggerFactory.getLogger(EZFX.class);
 
 	static void sleep(Duration duration) {
 		sleep(duration.toMillis());
@@ -109,6 +113,24 @@ public interface EZFX {
 	static boolean isFxApplicationThread() {
 		return Platform.isFxApplicationThread();
 	}
+
+
+	// region Timer
+	static void printTime(Runnable runnable){
+		printTime("Delta Time", runnable);
+	}
+	static void printTime(String message, Runnable runnable){
+		long start = System.nanoTime();
+		try{
+			runnable.run();
+		} finally {
+			long end = System.nanoTime();
+			long deltaNanos = end - start;
+			long deltaMillis = deltaNanos / 1000000;
+			log.info("%s: %dms".formatted(message, deltaMillis));
+		}
+	}
+	// endregion Timer
 
 
 

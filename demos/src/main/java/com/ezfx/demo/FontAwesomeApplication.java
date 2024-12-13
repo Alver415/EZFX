@@ -1,63 +1,92 @@
-package com.ezfx.app.demo;
+package com.ezfx.demo;
 
 import com.ezfx.base.utils.Screens;
-import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.EditorWrapper;
-import com.ezfx.controls.editor.introspective.IntrospectingPropertiesEditor;
 import javafx.application.Application;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.effect.Effect;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.controlsfx.control.GridCell;
+import org.controlsfx.control.GridView;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.control.action.ActionUtils;
+import org.controlsfx.glyphfont.FontAwesome;
+import org.controlsfx.glyphfont.Glyph;
 
-import java.util.stream.Collectors;
-
-public class TestApplication extends Application {
+public class FontAwesomeApplication extends Application {
 
 
 	public static void main(String... args) {
-		Application.launch(TestApplication.class);
+		Application.launch(FontAwesomeApplication.class);
 	}
 
 	@Override
 	public void start(Stage stage) {
 		Screens.setScreen(stage, 1);
 
-		Example example = new Example();
-		Editor<Example> editor = new IntrospectingPropertiesEditor<>(example);
+		TextField filterField = new TextField();
+		ObservableList<FontAwesome.Glyph> glyphs = FXCollections.observableArrayList(FontAwesome.Glyph.values());
+		FilteredList<FontAwesome.Glyph> filteredGlyphs = new FilteredList<>(glyphs);
+		filteredGlyphs.predicateProperty().bind(filterField.textProperty().map(filterText -> glyph -> {
+			String glyphName = glyph.name().toLowerCase();
+			String filter = filterText.toLowerCase();
+			return glyphName.contains(filter);
+		}));
 
 		BorderPane borderPane = new BorderPane();
-		Text text = new Text();
-		StackPane stackPane = new StackPane(text);
+		HBox top = new HBox(new Label("Filter: "), filterField);
+		HBox.setHgrow(filterField, Priority.ALWAYS);
+		top.setAlignment(Pos.CENTER);
+		top.setPadding(new Insets(32));
+		borderPane.setTop(top);
 
-		editor.property().flatMap(Example::shapeProperty).subscribe(borderPane::setCenter);
+		GridView<FontAwesome.Glyph> gridView = new GridView<>();
+		gridView.setCellWidth(128);
+		gridView.setCellHeight(128);
+		gridView.setCellFactory(_ -> new GridCell<>() {
+			@Override
+			protected void updateItem(FontAwesome.Glyph item, boolean empty) {
+				super.updateItem(item, empty);
+				if (empty || item == null) {
+					setText(null);
+					setGraphic(null);
+				} else {
+					Action action = new Action(item.name());
+					action.setLongText(item.name());
+					Glyph glyphNode = Glyph.create("FontAwesome|%s".formatted(item));
+					glyphNode = glyphNode.sizeFactor(6);
+					action.setGraphic(glyphNode);
+					Button button = ActionUtils.createButton(action, ActionUtils.ActionTextBehavior.HIDE);
+					button.setMinSize(128, 128);
+					button.setMaxSize(128, 128);
+					setGraphic(button);
+				}
+			}
+		});
 
-		editor.property().flatMap(Example::backgroundProperty)
-				.subscribe(stackPane.backgroundProperty()::setValue);
-		editor.property().flatMap(Example::stringsProperty)
-				.map(s -> s.stream().sorted().collect(Collectors.joining(", ")))
-				.subscribe(text.textProperty()::setValue);
-		editor.property().flatMap(Example::effectProperty)
-				.subscribe(text.effectProperty()::setValue);
+		gridView.setItems(filteredGlyphs);
+		borderPane.setCenter(gridView);
 
-		borderPane.setCenter(stackPane);
-		EditorWrapper<Example, Editor<Example>> wrapper = new EditorWrapper<>("Editor", editor);
-		wrapper.setPrefWidth(600);
-		borderPane.setRight(wrapper);
 		Scene scene = new Scene(borderPane);
 		stage.setScene(scene);
 		stage.setWidth(600);
 		stage.setHeight(600);
 		stage.centerOnScreen();
-		stage.setTitle("Test Application");
+		stage.setTitle("FontAwesome Glyph Viewer");
 		stage.show();
 	}
 
