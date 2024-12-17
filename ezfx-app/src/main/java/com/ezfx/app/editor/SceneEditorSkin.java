@@ -1,9 +1,13 @@
 package com.ezfx.app.editor;
 
+import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.impl.standard.StringEditor;
+import com.ezfx.controls.editor.introspective.IntrospectingPropertiesEditor;
 import com.ezfx.controls.misc.FilterableTreeItem;
 import com.ezfx.controls.nodetree.NodeTreeCell;
+import com.ezfx.controls.nodetree.NodeTreeItem;
 import com.ezfx.controls.nodetree.NodeTreeView;
+import com.ezfx.controls.viewport.Viewport;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.Property;
@@ -13,18 +17,36 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.Shadow;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
+import org.reactfx.EventStreams;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Stream;
+
+import static com.ezfx.base.utils.EZFX.*;
 
 public class SceneEditorSkin extends SkinBase<SceneEditor> {
+
+	private final Map<Node, Editor<?>> cache = new ConcurrentHashMap<>();
+
+	private final NodeTreeView treeView = new NodeTreeView();
+	private final Viewport viewport = new Viewport();
+	private final StackPane editorWrapper;
 
 	protected BorderPane borderPane = new BorderPane();
 	protected Pane overlay = new Pane();
@@ -37,7 +59,7 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 		MenuBar menuBar = new MenuBar();
 		Menu fileMenu = new Menu("File");
 		MenuItem open = new MenuItem("Open...");
-		open.setOnAction(a -> {
+		open.setOnAction(_ -> {
 			FileChooser fileChooser = new FileChooser();
 			fileChooser.setInitialDirectory(Path.of(System.getProperty("user.dir")).toFile());
 			File file = fileChooser.showOpenDialog(control.getScene().getWindow());
@@ -56,14 +78,13 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 		menuBar.getMenus().setAll(fileMenu);
 		borderPane.setTop(menuBar);
 
-		StackPane center = new StackPane(control.getViewport(), overlay);
+		StackPane center = new StackPane(viewport, overlay);
 		borderPane.setCenter(center);
 
 		StringEditor filterEditor = new StringEditor();
 		filterEditor.setPadding(new Insets(4));
 		filterEditor.setPromptText("Filter...");
 		Property<String> filterProperty = filterEditor.property();
-		NodeTreeView treeView = control.getTreeView();
 		if (treeView.getRoot() instanceof FilterableTreeItem<Node> root) {
 			root.predicateProperty().bind(Bindings.createObjectBinding(() -> node -> {
 				if (filterProperty.getValue() == null) return true;
@@ -92,19 +113,13 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 		left.setPrefWidth(450);
 		borderPane.setLeft(left);
 
-		ScrollPane right = new ScrollPane();
-		control.editorProperty().subscribe(right::setContent);
+		editorWrapper = new StackPane();
+		ScrollPane right = new ScrollPane(editorWrapper);
 		right.setFitToWidth(true);
 		right.setFitToHeight(true);
 		right.setPrefWidth(450);
 		borderPane.setRight(right);
 
-		setup();
-	}
-
-	private void setup() {
-		SceneEditor sceneEditor = getSkinnable();
-		NodeTreeView treeView = sceneEditor.getTreeView();
 		ObservableValue<Node> selected = treeView.getSelectionModel().selectedItemProperty().map(TreeItem::getValue);
 		Property<Node> hovered = new SimpleObjectProperty<>();
 		treeView.setCellFactory(_ -> new NodeTreeCell() {
@@ -129,13 +144,55 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 			Optional.ofNullable(oldValue).map(overlay.getChildren()::remove);
 			Optional.ofNullable(newValue).map(overlay.getChildren()::add);
 		});
+		treeView.rootProperty().bind(control.targetProperty().map(NodeTreeItem::new));
+		viewport.contentProperty().bind(control.targetProperty().map(t -> t instanceof Parent p ? p : new StackPane(t)).orElse(new StackPane()));
+
+		ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+		EventStreams.valuesOf(treeView.getSelectionModel().selectedItemProperty())
+				.threadBridgeFromFx(executor)
+				.map(TreeItem::getValue)
+				.map(this::getEditorForNode)
+				.threadBridgeToFx(executor)
+				.feedTo(editorProperty());
+
+		editorProperty().subscribe((oldValue, newValue) -> {
+			Optional.ofNullable(oldValue).ifPresent(ov -> ov.setVisible(false));
+			Optional.ofNullable(newValue).ifPresent(nv -> nv.setVisible(true));
+		});
+
+		treeView.rootProperty().subscribe(treeView.getSelectionModel()::select);
+	}
+
+	private Editor<?> getEditorForNode(Node node) {
+		return cache.computeIfAbsent(node, n -> {
+			IntrospectingPropertiesEditor<Node> editor = new IntrospectingPropertiesEditor<>(n);
+			editor.setVisible(false);
+			runFX(() -> {
+				n.getStyleClass().add("LOADED");
+				editorWrapper.getChildren().add(editor);
+			});
+			return editor;
+		});
+	}
+
+	private final Property<Editor<?>> editor = new SimpleObjectProperty<>(this, "editor");
+
+	public Property<Editor<?>> editorProperty() {
+		return this.editor;
+	}
+
+	public Editor<?> getEditor() {
+		return this.editorProperty().getValue();
+	}
+
+	public void setEditor(Editor<?> value) {
+		this.editorProperty().setValue(value);
 	}
 
 	private class Shadow extends Region {
 
 		private Shadow(Node node, Color color) {
 			setPickOnBounds(false);
-			SceneEditor sceneEditor = getSkinnable();
 			Region region = getParentRegion(node);
 			ObjectBinding<Bounds> bounds = Bindings.createObjectBinding(() ->
 							region.boundsInLocalProperty()
@@ -143,9 +200,9 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 									.map(overlay::screenToLocal).getValue(),
 					region.boundsInLocalProperty(),
 					region.boundsInParentProperty(),
-					sceneEditor.getViewport().contentScaleProperty(),
-					sceneEditor.getViewport().contentPositionXProperty(),
-					sceneEditor.getViewport().contentPositionYProperty());
+					viewport.contentScaleProperty(),
+					viewport.contentPositionXProperty(),
+					viewport.contentPositionYProperty());
 
 			translateXProperty().bind(bounds.map(Bounds::getMinX));
 			translateYProperty().bind(bounds.map(Bounds::getMinY));
