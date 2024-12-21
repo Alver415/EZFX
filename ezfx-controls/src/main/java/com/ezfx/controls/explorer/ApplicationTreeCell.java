@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ApplicationTreeCell<T> extends TreeCell<T> {
-	private static final String STYLE_SHEET = Resources.css(ApplicationTreeCell.class, "ApplicationTreeCell.css");
 
 	private static final Map<Class<?>, Image> ICON_CACHE = new HashMap<>();
 	private static final Map<Class<?>, String> JAVA_TYPE_CACHE = new HashMap<>();
@@ -39,7 +38,6 @@ public class ApplicationTreeCell<T> extends TreeCell<T> {
 	private final CheckBox visibleCheckBox;
 
 	public ApplicationTreeCell() {
-		getStylesheets().add(STYLE_SHEET);
 		setContentDisplay(ContentDisplay.LEFT);
 
 		// Build Structure

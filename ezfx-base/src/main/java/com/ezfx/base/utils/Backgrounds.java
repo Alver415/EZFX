@@ -1,12 +1,15 @@
 package com.ezfx.base.utils;
 
+import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 
@@ -17,6 +20,16 @@ public interface Backgrounds {
 	Color DEFAULT_SECONDARY = Color.DARKGRAY;
 
 	Background CHECKERED = checkeredBackground();
+
+	static Background borderedBackground(Color inside, Color middle, Color outside) {
+		Insets insideInsets = new Insets(-1);
+		Insets middleInsets = Insets.EMPTY;
+		Insets outsideInsets = new Insets(1);
+
+		return new Background(new BackgroundFill(inside, CornerRadii.EMPTY, insideInsets),
+				new BackgroundFill(middle, CornerRadii.EMPTY, middleInsets),
+				new BackgroundFill(outside, CornerRadii.EMPTY, outsideInsets));
+	}
 
 	static ImagePattern checkeredImagePattern() {
 		return checkeredImagePattern(DEFAULT_PRIMARY, DEFAULT_SECONDARY, 10, 10, 2, 2);

@@ -3,6 +3,7 @@ package com.ezfx.app.editor;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.impl.standard.StringEditor;
 import com.ezfx.controls.editor.introspective.IntrospectingPropertiesEditor;
+import com.ezfx.controls.editor.skin.TabPaneCategorizedSkin;
 import com.ezfx.controls.misc.FilterableTreeItem;
 import com.ezfx.controls.nodetree.NodeTreeCell;
 import com.ezfx.controls.nodetree.NodeTreeItem;
@@ -164,13 +165,10 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 	}
 
 	private Editor<?> getEditorForNode(Node node) {
-		return cache.computeIfAbsent(node, n -> {
-			IntrospectingPropertiesEditor<Node> editor = new IntrospectingPropertiesEditor<>(n);
+		return cache.computeIfAbsent(node, _ -> {
+			IntrospectingPropertiesEditor<Node> editor = new IntrospectingPropertiesEditor<>(node);
 			editor.setVisible(false);
-			runFX(() -> {
-				n.getStyleClass().add("LOADED");
-				editorWrapper.getChildren().add(editor);
-			});
+			runFX(() -> editorWrapper.getChildren().add(editor));
 			return editor;
 		});
 	}

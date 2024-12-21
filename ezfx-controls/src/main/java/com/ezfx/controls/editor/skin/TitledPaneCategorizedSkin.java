@@ -23,7 +23,7 @@ public class TitledPaneCategorizedSkin<E extends Editor<T> & CategorizedMultiEdi
 					Category category = entry.getKey();
 					ObservableList<Editor<?>> editors = entry.getValue();
 
-					VBox content = new VBox();
+					VBox content = new VBox(4);
 					TitledPane titledPane = new TitledPane(category.title(), content);
 					for (Editor<?> editor : editors) {
 						content.getChildren().add(new EditorWrapper<>(editor));

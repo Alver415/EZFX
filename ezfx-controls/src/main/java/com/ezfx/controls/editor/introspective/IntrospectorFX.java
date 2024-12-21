@@ -48,10 +48,12 @@ public class IntrospectorFX extends StandardIntrospector {
 				if (propertyInfo.name().startsWith("on") && assignableFrom) {
 					order = Integer.MAX_VALUE;
 					category = Category.of("Event Handlers", Integer.MAX_VALUE - 1);
+					return null;
 				}
 				if (propertyInfo.name().startsWith("accessible")) {
 					order = Integer.MAX_VALUE;
 					category = Category.of("Accessibility", Integer.MAX_VALUE);
+					return null;
 				}
 			}
 			return new PropertyInfo(
@@ -62,7 +64,7 @@ public class IntrospectorFX extends StandardIntrospector {
 					propertyInfo.property(),
 					propertyInfo.setter(),
 					propertyInfo.getter());
-		});
+		}).filter(Objects::nonNull);
 		Comparator<PropertyInfo> comparator = Comparator.comparing(p -> p.getter().getReturnType().getSimpleName());
 		Comparator<PropertyInfo> byTypeThenName = comparator.thenComparing(PropertyInfo::displayName);
 		return propertyInfoStream.sorted(byTypeThenName).toList();

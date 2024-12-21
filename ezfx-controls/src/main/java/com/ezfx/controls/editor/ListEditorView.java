@@ -31,9 +31,6 @@ public class ListEditorView<T> extends ListView<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(ListEditorView.class);
 
-	private static final String STYLE_SHEET = Objects.requireNonNull(
-			Editor.class.getResource("ListEditorView.css")).toExternalForm();
-
 	private final ObservableMap<Integer, Editor<T>> editors = FXCollections.observableMap(new TreeMap<>());
 	private final Button addButton = new Button("Add");
 
@@ -54,7 +51,6 @@ public class ListEditorView<T> extends ListView<T> {
 		minHeightProperty().bind(height);
 		maxHeightProperty().bind(height);
 		setPlaceholder(addButton);
-		getStylesheets().add(STYLE_SHEET);
 
 		setCellFactory(_ -> new ListEditorCell());
 		itemsProperty().bind(editor.property());

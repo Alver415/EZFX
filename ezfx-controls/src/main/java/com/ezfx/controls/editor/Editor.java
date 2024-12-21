@@ -18,10 +18,6 @@ import java.util.Optional;
 
 public class Editor<T> extends Control {
 
-	public static final String STYLE_CLASS = "property-editor";
-	public static final String STYLE_SHEET = Objects.requireNonNull(
-			Editor.class.getResource("PropertyEditor.css")).toExternalForm();
-
 	private final Property<T> property;
 
 	public Editor() {
@@ -30,8 +26,6 @@ public class Editor<T> extends Control {
 
 	public Editor(Property<T> property) {
 		this.property = property;
-		getStyleClass().add(STYLE_CLASS);
-		getStylesheets().add(STYLE_SHEET);
 		setFocusTraversable(false);
 		if (property.isBound()) setDisable(true);
 	}

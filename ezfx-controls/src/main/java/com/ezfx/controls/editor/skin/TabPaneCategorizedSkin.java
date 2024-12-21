@@ -39,8 +39,8 @@ public class TabPaneCategorizedSkin<E extends Editor<T> & CategorizedMultiEditor
 		ObservableList<Editor<?>> editors = entry.getValue();
 
 		Tab tab = tabMap.computeIfAbsent(category, this::buildTab);
-		VBox content = new VBox();
-		content.setPadding(new Insets(4));
+		VBox content = new VBox(4);
+		content.setPadding(new Insets(8));
 		ScrollPane scrollPane = new ScrollPane(content);
 		scrollPane.setFitToWidth(true);
 		scrollPane.setFitToHeight(true);

@@ -87,7 +87,6 @@ public class StageDecorationSkin extends SkinBase<StageDecoration> {
 		minimizeAction.disabledProperty().bind(stageProperty().flatMap(Stage::iconifiedProperty));
 
 		contextMenu = ActionUtils.createContextMenu(actions);
-//		actionButtons = ActionUtils.createSegmentedButton(ActionUtils.ActionTextBehavior.HIDE, actions);
 		actionButtons = createActionButtons(actions);
 		actionButtons.getStyleClass().add("button-bar");
 

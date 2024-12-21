@@ -15,8 +15,6 @@ public class FXMLEditorApplication extends Application {
 
 	@Override
 	public void start(Stage stage) {
-
-		stage = new DecoratedStage();
 		File file = Optional.ofNullable(getParameters())
 				.map(Parameters::getNamed)
 				.map(p -> p.get("fxml"))
@@ -34,7 +32,7 @@ public class FXMLEditorApplication extends Application {
 		stage.setMaximized(true);
 		stage.show();
 
-		ApplicationExplorer.explore(this);
+//		ApplicationExplorer.explore(this);
 
 	}
 
