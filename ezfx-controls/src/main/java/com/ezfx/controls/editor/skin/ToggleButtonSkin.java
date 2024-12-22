@@ -8,7 +8,7 @@ public class ToggleButtonSkin extends BooleanEditorSkinBase {
 		super(control);
 		ToggleButton toggleButton = new ToggleButton();
 		toggleButton.textProperty().bind(toggleButton.selectedProperty().map(String::valueOf));
-		toggleButton.selectedProperty().bindBidirectional(control.property());
+		toggleButton.selectedProperty().bindBidirectional(control.valueProperty());
 		HBox hBox = new HBox(toggleButton);
 		getChildren().setAll(hBox);
 	}

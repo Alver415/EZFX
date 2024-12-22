@@ -18,7 +18,7 @@ public class EditorWrapper<T, E extends Editor<T>> extends Control {
 	}
 
 	public EditorWrapper(E editor) {
-		this(editor.property().getName(), editor);
+		this(editor.valueProperty().getName(), editor);
 	}
 
 	public EditorWrapper(String name, E editor) {

@@ -1,10 +1,8 @@
 package com.ezfx.controls.editor.skin;
 
 import com.ezfx.controls.editor.impl.standard.DoubleEditor;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.scene.control.Slider;
-import javafx.scene.control.Tooltip;
 
 public class SliderSkin extends EditorSkin<DoubleEditor, Double> {
 		// This is needed to prevent weak reference being garbage collected.
@@ -14,7 +12,7 @@ public class SliderSkin extends EditorSkin<DoubleEditor, Double> {
 			super(control);
 			Slider slider = new Slider();
 			valueProperty = slider.valueProperty().asObject();
-			valueProperty.bindBidirectional(control.property());
+			valueProperty.bindBidirectional(control.valueProperty());
 			slider.orientationProperty().bind(control.orientationProperty());
 			slider.minProperty().bind(control.minProperty());
 			slider.maxProperty().bind(control.maxProperty());

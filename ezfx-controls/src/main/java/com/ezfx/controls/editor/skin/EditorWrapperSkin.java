@@ -48,8 +48,8 @@ public class EditorWrapperSkin<T, C extends Editor<T>> extends SkinBase<EditorWr
 		// Bindings
 		title.textProperty().bind(wrapper.nameProperty());
 		wrapper.actionsProperty()
-				.map(actions -> ActionNodes.createButtonBar(actions, HIDE))
-				.subscribe(top::setRight);
+				.map(ActionUtils::createContextMenu)
+				.subscribe(wrapper::setContextMenu);
 		wrapper.editorProperty()
 				.subscribe(control -> {
 					HBox.setHgrow(control, Priority.ALWAYS);

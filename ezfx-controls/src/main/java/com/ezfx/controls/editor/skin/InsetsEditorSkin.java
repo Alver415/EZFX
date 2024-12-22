@@ -18,7 +18,7 @@ public class InsetsEditorSkin extends EditorSkin<InsetsEditor, Insets> {
 			DoubleProperty right = new SimpleDoubleProperty();
 			DoubleProperty left = new SimpleDoubleProperty();
 
-			control.property().subscribe(insets -> {
+			control.valueProperty().subscribe(insets -> {
 				insets = insets == null ? Insets.EMPTY : insets;
 				top.set(insets.getTop());
 				right.set(insets.getRight());
@@ -27,7 +27,7 @@ public class InsetsEditorSkin extends EditorSkin<InsetsEditor, Insets> {
 			});
 
 			List.of(top, right, bottom, left).forEach(property -> property.subscribe(_ ->
-					control.property().setValue(new Insets(top.get(), right.get(), bottom.get(), left.get()))));
+					control.valueProperty().setValue(new Insets(top.get(), right.get(), bottom.get(), left.get()))));
 
 			PropertiesEditor<Object> beanEditor = new PropertiesEditor<>();
 			beanEditor.setSkin(new MultiEditorSkin<>(beanEditor));

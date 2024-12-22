@@ -13,7 +13,7 @@ public class ComboBoxSelectionEditorSkin<T> extends EditorSkin<SelectionEditor<T
 		comboBox.itemsProperty().bindBidirectional(control.itemsProperty());
 		comboBox.cellFactoryProperty().bindBidirectional(control.cellFactoryProperty());
 		comboBox.buttonCellProperty().bindBidirectional(control.buttonCellProperty());
-		comboBox.valueProperty().bindBidirectional(control.property());
+		comboBox.valueProperty().bindBidirectional(control.valueProperty());
 
 		HBox hBox = new HBox(comboBox);
 		getChildren().setAll(hBox);

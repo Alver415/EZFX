@@ -52,14 +52,14 @@ public class CssEditorSkin extends EditorSkin<CssEditor, Styleable> {
 	}
 
 	private <S extends Styleable, T> StringEditor buildEditor(CssMetaData<S, T> cssMetaData) {
-		S styleable = (S) editor().property().getValue();
+		S styleable = (S) editor().valueProperty().getValue();
 		StyleableProperty<T> property = cssMetaData.getStyleableProperty(styleable);
 		if (property == null) return null;
 
 		StringEditor stringEditor = new StringEditor();
 		stringEditor.setValue(String.valueOf(property.getValue()));
 		stringEditor.setDisable(!cssMetaData.isSettable(styleable));
-		stringEditor.property().addListener((_, _, value) -> {
+		stringEditor.valueProperty().addListener((_, _, value) -> {
 			try {
 				String css = "*{%s: %s;}".formatted(cssMetaData.getProperty(), value);
 				StyleConverter<?, T> converter = cssMetaData.getConverter();

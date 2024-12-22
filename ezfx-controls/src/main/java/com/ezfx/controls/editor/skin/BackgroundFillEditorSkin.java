@@ -25,7 +25,7 @@ public class BackgroundFillEditorSkin extends EditorSkin<BackgroundFillEditor, B
 
 			ObjectProperty<Color> color = new SimpleObjectProperty<>();
 
-			control.property().subscribe(backgroundFill -> {
+			control.valueProperty().subscribe(backgroundFill -> {
 				if (backgroundFill == null) {
 					color.set(Color.TRANSPARENT);
 					return;
@@ -39,7 +39,7 @@ public class BackgroundFillEditorSkin extends EditorSkin<BackgroundFillEditor, B
 			});
 
 			List.of(fill, radii, insets, color).forEach(property -> property.subscribe(_ ->
-					control.property().setValue(new BackgroundFill(color.get(), radii.get(), insets.get()))));
+					control.valueProperty().setValue(new BackgroundFill(color.get(), radii.get(), insets.get()))));
 
 			PropertiesEditor<Object> beanEditor = new PropertiesEditor<>();
 			beanEditor.setSkin(new MultiEditorSkin<>(beanEditor));

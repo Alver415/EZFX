@@ -8,7 +8,7 @@ public class CheckBoxSkin extends BooleanEditorSkinBase {
 	public CheckBoxSkin(BooleanEditor control) {
 		super(control);
 		CheckBox checkBox = new CheckBox();
-		checkBox.selectedProperty().bindBidirectional(control.property());
+		checkBox.selectedProperty().bindBidirectional(control.valueProperty());
 		HBox hBox = new HBox(checkBox);
 		getChildren().setAll(hBox);
 	}

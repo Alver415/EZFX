@@ -35,7 +35,7 @@ public class FontEditorSkin extends EditorSkin<FontEditor, Font> {
 			availableNames.setAll(family);
 			family.stream().findFirst().ifPresent(name::set);
 		});
-		control.property().subscribe(font -> {
+		control.valueProperty().subscribe(font -> {
 			family.set(font.getFamily());
 			name.set(font.getName());
 			size.set(font.getSize());

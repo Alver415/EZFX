@@ -47,7 +47,7 @@ public class FunctionParameterEditor<T> extends IntrospectingEditor<T> implement
 
 		MonadicBinding<T> defaultValue = EasyBind.combine(introspectorProperty(), typeProperty(), Introspector::getDefaultValueForType);
 
-		Property<?>[] properties = getEditors().stream().map(Editor::property).toArray(Property[]::new);
+		Property<?>[] properties = getEditors().stream().map(Editor::valueProperty).toArray(Property[]::new);
 		valueBinding = Bindings.createObjectBinding(() -> {
 			Object[] arguments = Arrays.stream(properties).map(Property::getValue)
 					.map(FunctionParameterEditor::handleArrays)

@@ -6,7 +6,7 @@ import javafx.collections.ObservableList;
 
 public interface MultiEditor<T> {
 
-	Property<T> property();
+	Property<T> valueProperty();
 
 	ListProperty<Editor<?>> editorsProperty();
 

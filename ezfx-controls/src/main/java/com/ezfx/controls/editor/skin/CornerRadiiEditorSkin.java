@@ -11,12 +11,12 @@ public class CornerRadiiEditorSkin extends EditorSkin<CornerRadiiEditor, CornerR
 			super(control);
 
 			DoubleProperty allRadii = new SimpleDoubleProperty(0d);
-			control.property().subscribe(radii -> {
+			control.valueProperty().subscribe(radii -> {
 				allRadii.set(radii.getTopLeftHorizontalRadius());
 			});
 
 
-			allRadii.subscribe(newValue -> control.property().setValue(new CornerRadii(newValue.doubleValue())));
+			allRadii.subscribe(newValue -> control.valueProperty().setValue(new CornerRadii(newValue.doubleValue())));
 
 			getChildren().setAll(new DoubleEditor(allRadii));
 		}

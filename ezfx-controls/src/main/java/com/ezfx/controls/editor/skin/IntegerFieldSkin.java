@@ -14,7 +14,7 @@ public class IntegerFieldSkin extends EditorSkin<IntegerEditor, Integer> {
 	public IntegerFieldSkin(IntegerEditor control) {
 		super(control);
 		TextField integerField = new TextField();
-		bindBidirectional(integerField.textProperty(), control.property(), Converters.STRING_TO_INTEGER);
+		bindBidirectional(integerField.textProperty(), control.valueProperty(), Converters.STRING_TO_INTEGER);
 		Button increment = new Button("", new ImageView(Icons.PLUS));
 		increment.setOnAction(a -> property().setValue(property().getValue() + 1));
 		Button decrement = new Button("", new ImageView(Icons.MINUS));

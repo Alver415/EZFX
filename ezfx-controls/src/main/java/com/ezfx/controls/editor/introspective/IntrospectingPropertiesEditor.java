@@ -42,7 +42,7 @@ public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
 		setIntrospector(introspector);
 		setEditorFactory(factory);
 
-		categorizedEditorsProperty().bind(property()
+		categorizedEditorsProperty().bind(valueProperty()
 				.map(T::getClass)
 				.map(getIntrospector()::getPropertyInfo)
 				.map(propertyInfoList -> {

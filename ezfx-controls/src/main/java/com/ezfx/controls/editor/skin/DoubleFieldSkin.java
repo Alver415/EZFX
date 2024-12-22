@@ -27,7 +27,7 @@ public class DoubleFieldSkin extends EditorSkin<DoubleEditor, Double> {
 				doubleField.setText(oldValue); // Restore old newValue if the input is invalid
 			}
 		});
-		bindBidirectional(doubleField.textProperty(), control.property(), STRING_TO_DOUBLE);
+		bindBidirectional(doubleField.textProperty(), control.valueProperty(), STRING_TO_DOUBLE);
 		getChildren().setAll(new HBox(doubleField, increment, decrement));
 	}
 }

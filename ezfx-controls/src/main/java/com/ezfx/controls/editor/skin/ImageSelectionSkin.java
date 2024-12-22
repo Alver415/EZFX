@@ -18,7 +18,7 @@ public class ImageSelectionSkin extends EditorSkin<ImageSelectionEditor, Image> 
 		super(editor);
 		TextField urlTextField = new TextField();
 
-		bindBidirectional(urlTextField.textProperty(), editor.property(), STRING_TO_IMAGE);
+		bindBidirectional(urlTextField.textProperty(), editor.valueProperty(), STRING_TO_IMAGE);
 		getChildren().setAll(urlTextField);
 	}
 

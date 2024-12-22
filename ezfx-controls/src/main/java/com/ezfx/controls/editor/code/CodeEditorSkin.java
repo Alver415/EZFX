@@ -1,6 +1,5 @@
 package com.ezfx.controls.editor.code;
 
-import com.ezfx.base.utils.EZFX;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.skin.EditorSkin;
 import javafx.concurrent.Task;
@@ -14,11 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
 
 public class CodeEditorSkin extends EditorSkin<Editor<String>, String> {
 	private static final Logger log = LoggerFactory.getLogger(CodeEditorSkin.class);
@@ -67,13 +64,13 @@ public class CodeEditorSkin extends EditorSkin<Editor<String>, String> {
 
 		//Binding
 		codeArea.replaceText(Optional.ofNullable(editor().getValue()).orElse(""));
-		editor().property().addListener((_, _, text) -> {
+		editor().valueProperty().addListener((_, _, text) -> {
 			if (codeArea.getText().equals(text)) return;
 			codeArea.replaceText(Optional.ofNullable(text).orElse(""));
 		});
 		codeArea.textProperty().addListener((_, _, text) -> {
-			if (editor().property().getValue().equals(text)) return;
-			editor().property().setValue(text);
+			if (editor().valueProperty().getValue().equals(text)) return;
+			editor().valueProperty().setValue(text);
 		});
 
 		getChildren().setAll(scrollPane);

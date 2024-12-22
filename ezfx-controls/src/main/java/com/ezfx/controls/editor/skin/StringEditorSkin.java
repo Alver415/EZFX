@@ -6,7 +6,7 @@ import javafx.scene.control.TextInputControl;
 public class StringEditorSkin extends EditorSkin<StringEditor, String> {
 	public StringEditorSkin(StringEditor control, TextInputControl inputControl) {
 		super(control);
-		inputControl.textProperty().bindBidirectional(control.property());
+		inputControl.textProperty().bindBidirectional(control.valueProperty());
 		inputControl.promptTextProperty().bindBidirectional(control.promptTextProperty());
 		getChildren().setAll(inputControl);
 	}

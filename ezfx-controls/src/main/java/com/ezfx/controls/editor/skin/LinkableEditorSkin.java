@@ -33,7 +33,7 @@ public class LinkableEditorSkin<T, C extends Editor<T>> extends EditorWrapperSki
 		name.textProperty().bind(editor.nameProperty());
 
 		Editor<T> control = editor.getEditor();
-		LinkableProperty<T> linkable = LinkableProperty.wrap(control.property());
+		LinkableProperty<T> linkable = LinkableProperty.wrap(control.valueProperty());
 
 		ReadOnlyObjectProperty<LinkableProperty<T>> linkedTo = linkable.linkedToProperty();
 		ReadOnlyListProperty<LinkableProperty<T>> linkedBy = linkable.linkedByProperty();

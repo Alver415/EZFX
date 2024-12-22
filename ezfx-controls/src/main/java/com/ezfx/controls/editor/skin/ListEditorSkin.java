@@ -1,25 +1,17 @@
 package com.ezfx.controls.editor.skin;
 
 import com.ezfx.controls.editor.*;
-import com.ezfx.controls.icons.Icons;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Tooltip;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Subscription;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
-
-import java.util.List;
-import java.util.stream.Stream;
 
 
 public class ListEditorSkin<T> extends EditorSkin<ListEditor<T>, ObservableList<T>> {
@@ -38,7 +30,7 @@ public class ListEditorSkin<T> extends EditorSkin<ListEditor<T>, ObservableList<
 		VBox vBox = new VBox();
 		wrappers.addListener((ListChangeListener<EditorWrapper<?, ?>>) l -> vBox.getChildren().setAll(l.getList()));
 
-		listEditor.property().subscribe(newValue -> {
+		listEditor.valueProperty().subscribe(newValue -> {
 			subscription.unsubscribe();
 			subscription = newValue.subscribe(this::rebuild);
 			rebuild();

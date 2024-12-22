@@ -31,15 +31,15 @@ public class EditorDialog<T> extends Dialog<T> {
 		BooleanEditor autoApply = new BooleanEditor();
 		autoApply.setValue(true);
 		graphic.setOnMouseClicked(a -> autoApply.setValue(!autoApply.getValue()));
-		graphic.imageProperty().bind(autoApply.property().map(isAutoApply -> isAutoApply ? Icons.LOCKED : Icons.UNLOCKED));
+		graphic.imageProperty().bind(autoApply.valueProperty().map(isAutoApply -> isAutoApply ? Icons.LOCKED : Icons.UNLOCKED));
 		setGraphic(graphic);
 		setHeaderText("Header Text");
 		setTitle("Title");
 
-		autoApply.property().subscribe(isAutoApply -> {
-			if (isAutoApply) property.bindBidirectional(editor.property());
+		autoApply.valueProperty().subscribe(isAutoApply -> {
+			if (isAutoApply) property.bindBidirectional(editor.valueProperty());
 			else {
-				property.unbindBidirectional(editor.property());
+				property.unbindBidirectional(editor.valueProperty());
 				property.setValue(originalValue);
 			}
 		});

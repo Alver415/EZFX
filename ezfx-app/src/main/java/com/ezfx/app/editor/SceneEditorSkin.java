@@ -3,7 +3,6 @@ package com.ezfx.app.editor;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.impl.standard.StringEditor;
 import com.ezfx.controls.editor.introspective.IntrospectingPropertiesEditor;
-import com.ezfx.controls.editor.skin.TabPaneCategorizedSkin;
 import com.ezfx.controls.misc.FilterableTreeItem;
 import com.ezfx.controls.nodetree.NodeTreeCell;
 import com.ezfx.controls.nodetree.NodeTreeItem;
@@ -21,23 +20,19 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.effect.BlendMode;
-import javafx.scene.effect.Shadow;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import javafx.util.Duration;
 import org.reactfx.EventStreams;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Stream;
 
 import static com.ezfx.base.utils.EZFX.*;
 
@@ -85,7 +80,7 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 		StringEditor filterEditor = new StringEditor();
 		filterEditor.setPadding(new Insets(4));
 		filterEditor.setPromptText("Filter...");
-		Property<String> filterProperty = filterEditor.property();
+		Property<String> filterProperty = filterEditor.valueProperty();
 		if (treeView.getRoot() instanceof FilterableTreeItem<Node> root) {
 			root.predicateProperty().bind(Bindings.createObjectBinding(() -> node -> {
 				if (filterProperty.getValue() == null) return true;

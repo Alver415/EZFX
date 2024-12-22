@@ -17,7 +17,7 @@ public class EditorSkin<E extends Editor<T>, T> extends SkinBase<E> {
 
 		TextField text = new TextField();
 		text.setDisable(true);
-		text.textProperty().bind(editor.property().map(String::valueOf).orElse("null"));
+		text.textProperty().bind(editor.valueProperty().map(String::valueOf).orElse("null"));
 		getChildren().setAll(text);
 	}
 
@@ -25,7 +25,7 @@ public class EditorSkin<E extends Editor<T>, T> extends SkinBase<E> {
 		return editor;
 	}
 	protected Property<T> property(){
-		return editor.property();
+		return editor.valueProperty();
 	}
 
 	protected void setChildren(Collection<? extends Node> children){

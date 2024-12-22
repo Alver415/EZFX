@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 
@@ -53,7 +52,7 @@ public class ListEditorView<T> extends ListView<T> {
 		setPlaceholder(addButton);
 
 		setCellFactory(_ -> new ListEditorCell());
-		itemsProperty().bind(editor.property());
+		itemsProperty().bind(editor.valueProperty());
 
 		ListChangeListener<T> listener = change -> {
 			lock = true;
@@ -85,7 +84,7 @@ public class ListEditorView<T> extends ListView<T> {
 				setupEditor(i, list.get(i));
 			}
 		};
-		editor.property().addListener((_, oldValue, newValue) -> {
+		editor.valueProperty().addListener((_, oldValue, newValue) -> {
 			try {
 				lock = true;
 				if (oldValue != null) {
@@ -107,7 +106,7 @@ public class ListEditorView<T> extends ListView<T> {
 			Class<T> clazz = (Class<T>) item.getClass();
 			SimpleObjectProperty<T> property = new SimpleObjectProperty<>(item);
 			property.addListener((_, oldValue, newValue) -> {
-				if (!lock) editor.property().getValue().set(index, newValue);
+				if (!lock) editor.valueProperty().getValue().set(index, newValue);
 			});
 			Editor<T> editor = new EditorFactory().buildEditor(clazz, property);
 
@@ -117,7 +116,7 @@ public class ListEditorView<T> extends ListView<T> {
 			Editor<T> editor = editors.get(index);
 			try {
 				lock = true;
-				editor.property().setValue(item);
+				editor.valueProperty().setValue(item);
 			} finally {
 				lock = false;
 			}

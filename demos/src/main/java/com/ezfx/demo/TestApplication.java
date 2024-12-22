@@ -38,14 +38,14 @@ public class TestApplication extends Application {
 		Text text = new Text();
 		StackPane stackPane = new StackPane(text);
 
-		editor.property().flatMap(Example::shapeProperty).subscribe(borderPane::setCenter);
+		editor.valueProperty().flatMap(Example::shapeProperty).subscribe(borderPane::setCenter);
 
-		editor.property().flatMap(Example::backgroundProperty)
+		editor.valueProperty().flatMap(Example::backgroundProperty)
 				.subscribe(stackPane.backgroundProperty()::setValue);
-		editor.property().flatMap(Example::stringsProperty)
+		editor.valueProperty().flatMap(Example::stringsProperty)
 				.map(s -> s.stream().sorted().collect(Collectors.joining(", ")))
 				.subscribe(text.textProperty()::setValue);
-		editor.property().flatMap(Example::effectProperty)
+		editor.valueProperty().flatMap(Example::effectProperty)
 				.subscribe(text.effectProperty()::setValue);
 
 		borderPane.setCenter(stackPane);
