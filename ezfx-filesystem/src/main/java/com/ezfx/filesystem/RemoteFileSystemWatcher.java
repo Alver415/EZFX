@@ -101,8 +101,8 @@ public class RemoteFileSystemWatcher implements FileSystemWatcher {
 	}
 
 
-	public record FileSystemEventRecord(Path path,
-	                                    WatchEvent.Kind<Path> kind) implements FileSystemWatcher.FileSystemEvent {
+	public record FileSystemEventRecord(Path path, WatchEvent.Kind<Path> kind)
+			implements FileSystemWatcher.FileSystemEvent {
 
 		@Override
 		public Path getPath() {

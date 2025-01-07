@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
@@ -37,6 +36,10 @@ public class FileSystemFX {
 
 	final EventSource<Throwable> errors;
 	final ExecutionManager executionManager;
+
+	private final GlobFilter globFilter = GlobFilter.parse("**", //Default include all files
+			"!**/*~" // ignore files ending in '~' (Intellij short-lived temp files)
+	);
 
 	public FileSystemFX() throws IOException {
 		this(DEFAULT_ROOT_PATH);
@@ -130,10 +133,11 @@ public class FileSystemFX {
 
 	Subscription routeEvents(
 			EventStream<FileSystemEvent> events,
-			Predicate<FileSystemEvent> filter,
+			Predicate<FileSystemEvent> eventTypeFilter,
 			Consumer<FileSystemEntry> consumer) {
-		return events.filter(filter)
+		return events.filter(eventTypeFilter)
 				.map(FileSystemEvent::getPath)
+				.filter(globFilter)
 				.map(model::get)
 				.filter(FileSystemEntry::isAutoSync)
 				.subscribe(consumer);

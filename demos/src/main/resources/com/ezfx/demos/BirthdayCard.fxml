@@ -10,11 +10,11 @@
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       alignment="CENTER" spacing="20" style="-fx-padding: 20; -fx-background-color: #ffe5b4;">
     <!-- Title -->
-    <Text text="Happy Birthday!" style="-fx-font-size: 36; -fx-font-weight: bold; -fx-fill: #ff69b4;"/>
+    <Text text="Happy Birthday!" style="-fx-font-size: 36; -fx-font-weight: bold; -fx-fill: #b469b4;"/>
 
     <!-- SVG Drawing -->
     <StackPane>
-        <SVGPath content="M150 0 L75 200 L225 200 Z" fill="#ff69b4" stroke="#221493" strokeWidth="10"/>
+        <SVGPath content="M150 0 L75 200 L225 200 Z" fill="#ff69b4" stroke="#ff1493" strokeWidth="20"/>
     </StackPane>
 
     <!-- Message -->
