@@ -37,8 +37,10 @@ public class FileSystemFX {
 	final EventSource<Throwable> errors;
 	final ExecutionManager executionManager;
 
+	//TODO: Move default filter implementation
 	private final GlobFilter globFilter = GlobFilter.parse("**", //Default include all files
-			"!**/*~" // ignore files ending in '~' (Intellij short-lived temp files)
+			"!**/*~", // ignore files ending in '~' (Intellij short-lived temp files)
+			"!**/.git/**" // ignore .git folder and everything in it.
 	);
 
 	public FileSystemFX() throws IOException {
