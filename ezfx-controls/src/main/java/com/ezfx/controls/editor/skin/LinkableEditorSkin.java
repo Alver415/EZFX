@@ -2,7 +2,7 @@ package com.ezfx.controls.editor.skin;
 
 import com.ezfx.base.linkable.LinkableProperty;
 import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.EditorWrapper;
+import com.ezfx.controls.editor.EditorView;
 import javafx.beans.binding.*;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
@@ -21,13 +21,13 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class LinkableEditorSkin<T, C extends Editor<T>> extends EditorWrapperSkin<T, C> {
+public class LinkableEditorSkin<T, C extends Editor<T>> extends EditorViewSkin<T, C> {
 
 	private static final Insets INSETS = new Insets(2);
 	private static final ObjectProperty<LinkableProperty<?>> selected = new SimpleObjectProperty<>();
 	private static final ObservableValue<Boolean> isLinkStateActive = selected.map(Objects::nonNull).orElse(false);
 
-	public LinkableEditorSkin(EditorWrapper<T, C> editor) {
+	public LinkableEditorSkin(EditorView<T, C> editor) {
 		super(editor);
 		Label name = new Label();
 		name.textProperty().bind(editor.nameProperty());

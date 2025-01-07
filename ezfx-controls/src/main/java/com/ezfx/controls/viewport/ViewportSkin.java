@@ -49,17 +49,6 @@ public class ViewportSkin extends SkinBase<Viewport> {
 		subSceneProperty().subscribe(subScene -> {
 			BorderPane borderPane = new BorderPane();
 
-			DoubleEditor widthEditor = new DoubleEditor(subScene.widthProperty(), 0, 800);
-			SliderSkin widthSkin = new SliderSkin(widthEditor);
-			widthEditor.setSkin(widthSkin);
-			borderPane.setBottom(widthEditor);
-
-			DoubleEditor heightEditor = new DoubleEditor(subScene.heightProperty(), 0, 800);
-			heightEditor.setOrientation(Orientation.VERTICAL);
-			SliderSkin heightSkin = new SliderSkin(heightEditor);
-			heightEditor.setSkin(heightSkin);
-			borderPane.setRight(heightEditor);
-
 			StackPane surface = new StackPane(subScene);
 			surface.setBackground(Backgrounds.CHECKERED);
 			surface.setClip(rectangle(surface));
@@ -77,9 +66,7 @@ public class ViewportSkin extends SkinBase<Viewport> {
 
 			getChildren().setAll(borderPane);
 		});
-
 	}
-
 
 	public void reset() {
 		Viewport viewport = getSkinnable();

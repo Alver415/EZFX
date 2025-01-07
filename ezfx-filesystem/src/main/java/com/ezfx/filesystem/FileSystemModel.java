@@ -20,14 +20,14 @@ public class FileSystemModel {
 	private final FileSystemEntry root;
 	private final Path rootPath;
 
-	public FileSystemModel(FileSystemFX fileSystem, Path rootPath) throws IOException {
+	public FileSystemModel(FileSystemFX fileSystem, Path rootPath) {
 		this.fileSystem = fileSystem;
 		this.cache = new ReadOnlyMapWrapper<>(this, "cache", FXCollections.observableHashMap());
 		this.rootPath = rootPath;
 		this.root = initializeRoot(rootPath);
 	}
 
-	private FileSystemEntry initializeRoot(Path rootPath) throws IOException {
+	private FileSystemEntry initializeRoot(Path rootPath) {
 		FileSystemEntry root = initializeNode(null, rootPath);
 		// Usually read() is restricted to the ioExecutor
 //		Map<String, Object> read = root.read();

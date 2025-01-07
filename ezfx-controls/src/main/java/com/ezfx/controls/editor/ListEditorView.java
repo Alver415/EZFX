@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 
+import static com.ezfx.controls.editor.factory.IntrospectingEditorFactory.DEFAULT_FACTORY;
+
 public class ListEditorView<T> extends ListView<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(ListEditorView.class);
@@ -108,7 +110,7 @@ public class ListEditorView<T> extends ListView<T> {
 			property.addListener((_, oldValue, newValue) -> {
 				if (!lock) editor.valueProperty().getValue().set(index, newValue);
 			});
-			Editor<T> editor = new EditorFactory().buildEditor(clazz, property);
+			Editor<T> editor = DEFAULT_FACTORY.buildEditor(clazz, property).orElseGet(Editor::new);
 
 			editors.put(index, editor);
 			return editor;

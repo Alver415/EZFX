@@ -80,7 +80,7 @@ public abstract class TreeValue<T, C> {
 
 	protected abstract ObservableValue<String> observableStyleClass();
 
-	protected abstract ObservableValue<Boolean> getVisibility();
+	protected abstract ObservableValue<Boolean> observableVisibility();
 
 
 	public static class ApplicationTreeValue extends TreeValue<Application, Stage> {
@@ -116,7 +116,7 @@ public abstract class TreeValue<T, C> {
 		}
 
 		@Override
-		protected ObservableValue<Boolean> getVisibility() {
+		protected ObservableValue<Boolean> observableVisibility() {
 			return valueProperty().map(_ -> null);
 		}
 	}
@@ -149,7 +149,7 @@ public abstract class TreeValue<T, C> {
 		}
 
 		@Override
-		protected ObservableValue<Boolean> getVisibility() {
+		protected ObservableValue<Boolean> observableVisibility() {
 			return valueProperty().flatMap(Window::showingProperty);
 		}
 	}
@@ -182,7 +182,7 @@ public abstract class TreeValue<T, C> {
 		}
 
 		@Override
-		protected ObservableValue<Boolean> getVisibility() {
+		protected ObservableValue<Boolean> observableVisibility() {
 			return valueProperty().map(_ -> null);
 		}
 	}
@@ -220,7 +220,7 @@ public abstract class TreeValue<T, C> {
 		}
 
 		@Override
-		protected ObservableValue<Boolean> getVisibility() {
+		protected ObservableValue<Boolean> observableVisibility() {
 			return valueProperty().flatMap(Node::visibleProperty);
 		}
 	}

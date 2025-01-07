@@ -1,11 +1,8 @@
 package com.ezfx.controls.explorer;
 
 import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.EditorFactory;
 import com.ezfx.controls.editor.PropertiesEditor;
 import javafx.application.Application;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.SplitPane;
@@ -19,13 +16,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.ezfx.base.utils.EZFX.printTime;
+import static com.ezfx.controls.editor.factory.IntrospectingEditorFactory.DEFAULT_FACTORY;
 
 public class ApplicationExplorerSkin extends SkinBase<ApplicationExplorer> {
 
 	private final ApplicationTreeView<Object, Object> treeView;
 
 	private final Map<Object, Editor<?>> cache = new ConcurrentHashMap<>();
-	private final EditorFactory factory = new EditorFactory();
 
 	protected ApplicationExplorerSkin(ApplicationExplorer control) {
 		super(control);
@@ -44,7 +41,7 @@ public class ApplicationExplorerSkin extends SkinBase<ApplicationExplorer> {
 				.filter(Objects::nonNull)
 				.map(selected -> {
 					Object value = selected.getValue().getValue();
-					return cache.computeIfAbsent(value, _ -> factory.buildEditor(value));
+					return cache.computeIfAbsent(value, _ -> DEFAULT_FACTORY.buildEditor(value).orElseGet(Editor::new));
 				})
 				.threadBridgeToFx(executor)
 				.subscribe(editor -> printTime(() -> right.getChildren().setAll(editor)));

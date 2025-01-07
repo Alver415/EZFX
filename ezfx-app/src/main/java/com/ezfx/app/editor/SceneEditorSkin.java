@@ -13,7 +13,6 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -22,13 +21,10 @@ import javafx.scene.control.*;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
 import org.reactfx.EventStreams;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -51,28 +47,6 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 		super(control);
 		getChildren().setAll(borderPane);
 		overlay.setPickOnBounds(false);
-
-		MenuBar menuBar = new MenuBar();
-		Menu fileMenu = new Menu("File");
-		MenuItem open = new MenuItem("Open...");
-		open.setOnAction(_ -> {
-			FileChooser fileChooser = new FileChooser();
-			fileChooser.setInitialDirectory(Path.of(System.getProperty("user.dir")).toFile());
-			File file = fileChooser.showOpenDialog(control.getScene().getWindow());
-			if (file != null) {
-				try {
-					FXMLLoader loader = new FXMLLoader();
-					loader.setLocation(file.toURI().toURL());
-					Node load = loader.load();
-					control.setTarget(load);
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
-			}
-		});
-		fileMenu.getItems().setAll(open);
-		menuBar.getMenus().setAll(fileMenu);
-		borderPane.setTop(menuBar);
 
 		StackPane center = new StackPane(viewport, overlay);
 		borderPane.setCenter(center);
@@ -146,8 +120,7 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 		ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 		EventStreams.valuesOf(treeView.getSelectionModel().selectedItemProperty())
 				.threadBridgeFromFx(executor)
-				.map(TreeItem::getValue)
-				.map(this::getEditorForNode)
+				.map(this::getEditorByTreeItem)
 				.threadBridgeToFx(executor)
 				.feedTo(editorProperty());
 
@@ -159,7 +132,9 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 		treeView.rootProperty().subscribe(treeView.getSelectionModel()::select);
 	}
 
-	private Editor<?> getEditorForNode(Node node) {
+	private Editor<?> getEditorByTreeItem(TreeItem<Node> treeItem) {
+		Node node = Optional.ofNullable(treeItem).map(TreeItem::getValue).orElse(null);
+		if (node == null) return null;
 		return cache.computeIfAbsent(node, _ -> {
 			IntrospectingPropertiesEditor<Node> editor = new IntrospectingPropertiesEditor<>(node);
 			editor.setVisible(false);

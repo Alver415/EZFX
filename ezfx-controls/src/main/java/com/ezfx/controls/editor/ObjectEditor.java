@@ -1,13 +1,11 @@
 package com.ezfx.controls.editor;
 
-import com.ezfx.controls.editor.introspective.ActionIntrospector;
 import javafx.beans.property.MapProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleMapProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
-import org.controlsfx.control.action.ActionProxy;
 
 public abstract class ObjectEditor<T> extends Editor<T> {
 

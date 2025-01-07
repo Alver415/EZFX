@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.css.PseudoClass;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import org.controlsfx.control.action.Action;
@@ -33,8 +34,9 @@ public class Editor<T> extends Control {
 
 		initialValue = value.getValue();
 		setupActions();
-	}
 
+
+	}
 
 	@ActionProxy(id = "clear", text = "Clear", longText = "Set value to null", graphic = "font>FontAwesome|TIMES")
 	public void clear() {
@@ -52,7 +54,7 @@ public class Editor<T> extends Control {
 
 		SkinRegistry skinRegistry = new SkinRegistry();
 		ObservableList<SkinRegistry.SkinOption<Editor<T>>> skinBuilders = skinRegistry.getSkinBuilder(this);
-		if (skinBuilders != null && !skinBuilders.isEmpty()){
+		if (skinBuilders != null && !skinBuilders.isEmpty()) {
 			List<Action> list = skinBuilders.stream().map(option ->
 					new Action(option.getName(), _ -> this.setSkin(option.getFunction().apply(this)))
 			).toList();
@@ -64,10 +66,11 @@ public class Editor<T> extends Control {
 		return value;
 	}
 
-	public T getValue(){
+	public T getValue() {
 		return valueProperty().getValue();
 	}
-	public void setValue(T value){
+
+	public void setValue(T value) {
 		this.value.setValue(value);
 	}
 
@@ -84,7 +87,6 @@ public class Editor<T> extends Control {
 	public void setActions(ObservableList<Action> value) {
 		this.actionsProperty().setValue(value);
 	}
-
 
 	@Override
 	protected Skin<?> createDefaultSkin() {

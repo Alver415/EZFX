@@ -1,36 +1,34 @@
 package com.ezfx.controls.editor.skin;
 
 import com.ezfx.controls.editor.CategorizedMultiEditor;
-import com.ezfx.controls.editor.Category;
 import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.EditorWrapper;
-import javafx.collections.ObservableList;
+import com.ezfx.controls.editor.EditorView;
+import javafx.collections.FXCollections;
+import javafx.scene.control.Accordion;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TitledPane;
-import javafx.scene.layout.VBox;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TitledPaneCategorizedSkin<E extends Editor<T> & CategorizedMultiEditor<T>, T> extends EditorSkin<E, T> {
 
-	private final VBox vBox = new VBox();
+	private final Accordion accordion = new Accordion();
 
 	public TitledPaneCategorizedSkin(E control) {
 		super(control);
-		setChildren(vBox);
+		setChildren(accordion);
 
 		control.categorizedEditorsProperty()
-				.map(categorizedEditors -> categorizedEditors.entrySet().stream().map(entry -> {
-					Category category = entry.getKey();
-					ObservableList<Editor<?>> editors = entry.getValue();
-
-					VBox content = new VBox(4);
-					TitledPane titledPane = new TitledPane(category.title(), content);
-					for (Editor<?> editor : editors) {
-						content.getChildren().add(new EditorWrapper<>(editor));
-					}
-					return titledPane;
-				}).toList()).orElse(List.of())
-				.subscribe(content -> vBox.getChildren().setAll(content));
+				.map(categorizedEditors -> categorizedEditors.entrySet().stream()
+						.map(entry -> new TitledPane(entry.getKey().title(), new ListView<>(entry.getValue().stream()
+								.map(EditorView::new)
+								.collect(Collectors.toCollection(FXCollections::observableArrayList))))).toList())
+				.orElse(List.of())
+				.subscribe(content -> {
+					accordion.getPanes().setAll(content);
+					content.stream().findFirst().ifPresent(accordion::setExpandedPane);
+				});
 	}
 
 }

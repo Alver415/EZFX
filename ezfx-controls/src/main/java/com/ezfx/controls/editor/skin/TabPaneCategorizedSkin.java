@@ -3,7 +3,7 @@ package com.ezfx.controls.editor.skin;
 import com.ezfx.controls.editor.CategorizedMultiEditor;
 import com.ezfx.controls.editor.Category;
 import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.EditorWrapper;
+import com.ezfx.controls.editor.EditorView;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
@@ -46,7 +46,7 @@ public class TabPaneCategorizedSkin<E extends Editor<T> & CategorizedMultiEditor
 		scrollPane.setFitToHeight(true);
 		tab.setContent(scrollPane);
 
-		content.getChildren().setAll(editors.stream().map(EditorWrapper::new).toList());
+		content.getChildren().setAll(editors.stream().map(EditorView::new).toList());
 		return tab;
 	}
 

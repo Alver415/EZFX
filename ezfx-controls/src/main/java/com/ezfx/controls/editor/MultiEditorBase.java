@@ -1,5 +1,7 @@
 package com.ezfx.controls.editor;
 
+import com.ezfx.controls.editor.factory.EditorFactory;
+import com.ezfx.controls.editor.factory.IntrospectingEditorFactory;
 import com.ezfx.controls.editor.introspective.Introspector;
 import com.ezfx.controls.editor.skin.MultiEditorSkin;
 import javafx.beans.property.*;
@@ -41,8 +43,7 @@ public abstract class MultiEditorBase<T> extends Editor<T> implements MultiEdito
 		this.editorsProperty().setValue(value);
 	}
 
-
-	private final Property<EditorFactory> editorFactory = new SimpleObjectProperty<>(this, "editorFactory", EditorFactory.DEFAULT_FACTORY);
+	private final Property<EditorFactory> editorFactory = new SimpleObjectProperty<>(this, "editorFactory", IntrospectingEditorFactory.DEFAULT_FACTORY);
 
 	public Property<EditorFactory> editorFactoryProperty() {
 		return this.editorFactory;

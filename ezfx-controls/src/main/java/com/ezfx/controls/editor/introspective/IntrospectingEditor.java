@@ -1,16 +1,17 @@
 package com.ezfx.controls.editor.introspective;
 
+import com.ezfx.base.utils.EZFX;
 import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.EditorFactory;
+import com.ezfx.controls.editor.factory.EditorFactory;
 import com.ezfx.controls.editor.ObjectEditor;
 import com.ezfx.controls.editor.option.*;
-import com.ezfx.controls.icons.Icons;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
@@ -20,7 +21,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Skin;
 import javafx.stage.PopupWindow;
 import org.controlsfx.control.action.Action;
-import org.controlsfx.glyphfont.Glyph;
+import org.controlsfx.control.action.ActionGroup;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.monadic.MonadicBinding;
 import org.slf4j.Logger;
@@ -33,8 +34,9 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.ezfx.controls.editor.EditorFactory.DEFAULT_FACTORY;
-import static com.ezfx.controls.editor.introspective.IntrospectorFX.DEFAULT_INTROSPECTOR;
+import static com.ezfx.base.utils.EZFX.toObservableArrayList;
+import static com.ezfx.controls.editor.factory.IntrospectingEditorFactory.DEFAULT_FACTORY;
+import static com.ezfx.controls.editor.introspective.EZFXIntrospector.DEFAULT_INTROSPECTOR;
 import static java.lang.reflect.Modifier.*;
 
 @SuppressWarnings("unchecked")
@@ -69,14 +71,6 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 		setType(type);
 		setIntrospector(introspector);
 		setEditorFactory(factory);
-
-		property.subscribe(value -> {
-			if (value == null) {
-				setDelegate(null);
-			} else if (!getIntrospector().getPropertyInfo(value.getClass()).isEmpty()) {
-				setDelegate(new IntrospectingPropertiesEditor<>(value));
-			}
-		});
 
 		fieldOptions = EasyBind.combine(introspectorProperty(), typeProperty(), Introspector::getFields)
 				.map(fields -> fields.stream()
@@ -117,20 +111,16 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 			return list;
 		}, methodOptions, constructorOptions);
 
-		Action setValue = new Action("Set Value", _ -> {
-			Menu valueMenu = new Menu("Value");
-			valueOptions.map(list -> list.stream().map(option -> {
-				MenuItem menuItem = new MenuItem();
-				menuItem.setText(option.getName());
-				menuItem.setOnAction(_ -> property.setValue(option.getValue()));
-				return menuItem;
-			}).toList()).subscribe(items -> valueMenu.getItems().setAll(items));
 
-			Menu builderMenu = new Menu("Builders");
-			builderOptions.map(list -> list.stream().map(option -> {
-				MenuItem menuItem = new MenuItem();
-				menuItem.setText(option.getName());
-				menuItem.setOnAction(_ -> {
+		ActionGroup setValue = new ActionGroup("Value");
+		ObservableValue<ObservableList<Action>> values = valueOptions.map(list -> list.stream()
+				.map(option -> new Action(option.getName(), _ -> property.setValue(option.getValue())))
+				.collect(toObservableArrayList()));
+		values.subscribe(v -> setValue.getActions().setAll(v));
+
+		ActionGroup setBuilder = new ActionGroup("Builders");
+		ObservableValue<ObservableList<Action>> builders = builderOptions.map(list -> list.stream()
+				.map(option -> new Action(option.getName(), _ -> {
 					if (option instanceof ConstructorOption<T> constructorOption) {
 						if (constructorOption.getConstructor().getParameterCount() == 0) {
 							property.setValue(option.buildEditor().getValue());
@@ -140,21 +130,24 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 					EditorDialog<T> dialog = new EditorDialog<>(property, option.buildEditor());
 					dialog.setHeaderText(option.getType().getSimpleName());
 					dialog.show();
-				});
-				return menuItem;
-			}).toList()).subscribe(items -> builderMenu.getItems().setAll(items));
+				}))
+				.collect(toObservableArrayList()));
+		builders.subscribe(v -> setBuilder.getActions().setAll(v));
+		ObservableValue<ObservableList<Action>> items = Bindings.createObjectBinding(() -> {
+			ObservableList<Action> actionGroups = FXCollections.observableArrayList();
+			if (!setValue.getActions().isEmpty()){
+				actionGroups.add(setValue);
+			}
+			if (!setBuilder.getActions().isEmpty()){
+				actionGroups.add(setBuilder);
+			}
+			return actionGroups;
+		}, setValue.getActions(), setBuilder.getActions());
+		ActionGroup setValueGroup = new ActionGroup("Set Value");
+		items.subscribe(v -> setValueGroup.getActions().setAll(v));
 
-			ContextMenu contextMenu = new ContextMenu();
-			contextMenu.getItems().setAll(valueMenu, builderMenu);
 
-			Bounds bounds = localToScreen(getBoundsInLocal());
-			double x = bounds.getCenterX();
-			double y = bounds.getCenterY();
-			contextMenu.setAnchorLocation(PopupWindow.AnchorLocation.CONTENT_TOP_LEFT);
-			contextMenu.show(this, x, y);
-		});
-		actionsProperty().add(setValue);
-
+		actionsProperty().add(setValueGroup);
 
 		knownValuesProperty().putAll((Map<String, T>) EasyBind.combine(introspectorProperty(), typeProperty(), Introspector::getFields)
 				.map(fields -> fields.stream()
@@ -166,6 +159,17 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 								IntrospectingEditor::getStaticFieldValue,
 								(existing, _) -> existing,
 								() -> FXCollections.observableMap(new TreeMap<>())))).get());
+
+		property.subscribe(value -> {
+			if (value == null) {
+				setDelegate(null);
+			} else if (!getIntrospector().getPropertyInfo(value.getClass()).isEmpty()) {
+				setDelegate(new IntrospectingPropertiesEditor<>(value));
+			} else if (!constructorOptions.getValue().isEmpty()){
+				setDelegate((Editor<T>) constructorOptions.getValue().getFirst().buildEditor());
+			}
+		});
+
 	}
 
 	private FieldOption<T> build(Field field) {

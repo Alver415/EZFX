@@ -2,12 +2,15 @@ package com.ezfx.controls.editor.option;
 
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.introspective.FunctionParameterEditor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.util.function.Function;
 
 public class ConstructorOption<T> extends BuilderOption<T> {
 
+	private static final Logger log = LoggerFactory.getLogger(ConstructorOption.class);
 	private final Constructor<T> constructor;
 
 	public ConstructorOption(String name, Class<T> type, Constructor<T> constructor) {
@@ -24,7 +27,9 @@ public class ConstructorOption<T> extends BuilderOption<T> {
 			try {
 				return constructor.newInstance(args);
 			} catch (Exception e) {
-				throw new RuntimeException(e);
+				log.debug(e.getMessage(), e);
+				return (T) new Editor<>();
+//				throw new RuntimeException(e);
 			}
 		};
 		return new FunctionParameterEditor<>(type, constructor.getParameters(), buildFunction);

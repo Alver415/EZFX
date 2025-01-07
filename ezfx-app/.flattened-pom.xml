@@ -52,7 +52,7 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-          <mainClass>com.ezfx.app.demo.ConsoleDemoApplication</mainClass>
+          <mainClass>com.ezfx.app.console.ConsoleDemoApplication</mainClass>
         </configuration>
       </plugin>
     </plugins>

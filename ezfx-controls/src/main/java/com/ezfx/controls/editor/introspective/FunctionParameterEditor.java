@@ -59,7 +59,7 @@ public class FunctionParameterEditor<T> extends IntrospectingEditor<T> implement
 				return defaultValue.get();
 			}
 		}, properties);
-		valueBinding.subscribe(property::setValue);
+		valueBinding.addListener((_, _, value) -> property.setValue(value));
 
 	}
 
@@ -81,7 +81,7 @@ public class FunctionParameterEditor<T> extends IntrospectingEditor<T> implement
 		String name = "%s (%s)".formatted(parameterName, parameterType);
 		R value = getIntrospector().getDefaultValueForType(type);
 		Property<R> property = new SimpleObjectProperty<>(this, name, value);
-		Editor<R> editor = getEditorFactory().buildEditor(type, property);
+		Editor<R> editor = getEditorFactory().buildEditor(type, property).orElseGet(Editor::new);;
 
 		//TODO: Cleanup
 		handleList(parameter, editor);

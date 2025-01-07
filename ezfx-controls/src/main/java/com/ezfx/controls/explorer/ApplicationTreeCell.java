@@ -1,7 +1,5 @@
 package com.ezfx.controls.explorer;
 
-import com.ezfx.base.utils.Resources;
-import com.ezfx.controls.icons.Icons;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -64,23 +62,16 @@ public class ApplicationTreeCell<T> extends TreeCell<T> {
 		borderPane.setRight(right);
 
 		// Setup Bindings
-
 		ObservableValue<TreeValue<?, ?>> treeValue = treeItemProperty()
 				.flatMap(TreeItem::valueProperty)
 				.map(cast -> (TreeValue<?, ?>) cast);
-
 
 		icon.imageProperty().bind(treeValue.flatMap(TreeValue::observableIcon));
 		javaTypeLabel.textProperty().bind(treeValue.flatMap(TreeValue::observableJavaType));
 		nodeIdLabel.textProperty().bind(treeValue.flatMap(TreeValue::observableNodeId));
 		styleClassLabel.textProperty().bind(treeValue.flatMap(TreeValue::observableStyleClass));
+		visibleCheckBox.selectedProperty().bind(treeValue.flatMap(TreeValue::observableVisibility));
 
-//		currentItemProperty().subscribe((oldValue, newValue) -> {
-//			Optional.ofNullable(oldValue).ifPresent(ov -> visibleCheckBox.selectedProperty().unbindBidirectional(getVisibility(ov)));
-//			Optional.ofNullable(newValue).ifPresent(nv -> visibleCheckBox.selectedProperty().bindBidirectional(getVisibility(nv)));
-//		});
-//		visibleCheckBox.disableProperty().bind(currentItemProperty().map(this::getVisibility).map(Property::isBound));
-//
 //		treeItemProperty()
 //				.flatMap(treeItem -> treeItem instanceof FilterableTreeItem<?> filterableTreeItem ?
 //						filterableTreeItem.predicateProperty() : null)

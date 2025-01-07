@@ -11,6 +11,7 @@ import java.util.Collection;
 public class EditorSkin<E extends Editor<T>, T> extends SkinBase<E> {
 
 	private final E editor;
+
 	public EditorSkin(E editor) {
 		super(editor);
 		this.editor = editor;
@@ -21,17 +22,19 @@ public class EditorSkin<E extends Editor<T>, T> extends SkinBase<E> {
 		getChildren().setAll(text);
 	}
 
-	protected E editor(){
+	protected E editor() {
 		return editor;
 	}
-	protected Property<T> property(){
+
+	protected Property<T> property() {
 		return editor.valueProperty();
 	}
 
-	protected void setChildren(Collection<? extends Node> children){
+	protected void setChildren(Collection<? extends Node> children) {
 		getChildren().setAll(children);
 	}
-	protected void setChildren(Node... children){
+
+	protected void setChildren(Node... children) {
 		getChildren().setAll(children);
 	}
 }

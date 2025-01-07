@@ -10,8 +10,8 @@ import java.util.List;
 
 public class FrameInfo {
 
-	public static final DoubleProperty animationTicks = new SimpleDoubleProperty();
-	public static final LongProperty animationFrames = new SimpleLongProperty();
+	public static final DoubleProperty FRAME_RATE = new SimpleDoubleProperty();
+	public static final LongProperty LAST_FRAME = new SimpleLongProperty();
 
 	private static boolean started = false;
 	public static void start() {
@@ -23,12 +23,12 @@ public class FrameInfo {
 					int n = ticks.size() - 1;
 					return n * 1_000_000_000.0 / (ticks.get(n) - ticks.getFirst());
 				})
-				.feedTo(animationTicks);
+				.feedTo(FRAME_RATE);
 
 		EventStreams.animationFrames()
 				.latestN(100)
 				.map(List::getLast)
 				.map(frame -> frame / 1_000_000)
-				.feedTo(animationFrames);
+				.feedTo(LAST_FRAME);
 	}
 }

@@ -1,7 +1,7 @@
 package com.ezfx.controls.editor;
 
 import com.ezfx.controls.editor.introspective.Introspector;
-import com.ezfx.controls.editor.introspective.IntrospectorFX;
+import com.ezfx.controls.editor.introspective.EZFXIntrospector;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ public class IntrospectorTest {
 
 	@Test
 	public void test() throws Exception {
-		Introspector introspector = IntrospectorFX.DEFAULT_INTROSPECTOR;
+		Introspector introspector = EZFXIntrospector.DEFAULT_INTROSPECTOR;
 
 		Method[] methods = IntrospectorTest.class.getMethods();
 

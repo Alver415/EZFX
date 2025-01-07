@@ -17,24 +17,24 @@ import org.controlsfx.control.action.ActionUtils;
 
 import java.lang.reflect.Array;
 
+import static com.ezfx.controls.editor.factory.IntrospectingEditorFactory.DEFAULT_FACTORY;
+
 
 @SuppressWarnings("unchecked")
 public class ArrayEditorSkin<T> extends EditorSkin<ArrayEditor<T>, ObservableObjectArray<T>> {
 
-	private final ObservableList<EditorWrapper<T, Editor<T>>> wrappers = FXCollections.observableArrayList();
+	private final ObservableList<EditorView<T, Editor<T>>> wrappers = FXCollections.observableArrayList();
 
 	boolean lock = false;
 
 	private Subscription subscription = () -> {
 	};
 
-	EditorFactory factory = new EditorFactory();
-
 	public ArrayEditorSkin(ArrayEditor<T> listEditor) {
 		super(listEditor);
 
 		VBox vBox = new VBox();
-		wrappers.addListener((ListChangeListener<EditorWrapper<?, ?>>) l -> vBox.getChildren().setAll(l.getList()));
+		wrappers.addListener((ListChangeListener<EditorView<?, ?>>) l -> vBox.getChildren().setAll(l.getList()));
 
 		listEditor.valueProperty().subscribe(newValue -> {
 			subscription.unsubscribe();
@@ -86,7 +86,7 @@ public class ArrayEditorSkin<T> extends EditorSkin<ArrayEditor<T>, ObservableObj
 				for (; index < originalArray.size(); index++) {
 					if (index < wrappers.size()) {
 						// Reset existing
-						EditorWrapper<T, Editor<T>> existing = wrappers.get(index);
+						EditorView<T, Editor<T>> existing = wrappers.get(index);
 						T item = originalArray.get(index);
 						boolean changed = existing.getEditor().getValue() != item;
 						if (changed) {
@@ -109,8 +109,8 @@ public class ArrayEditorSkin<T> extends EditorSkin<ArrayEditor<T>, ObservableObj
 								property().setValue(newA);
 							}
 						});
-						Editor<T> editor = factory.buildEditor(type, property);
-						EditorWrapper<T, Editor<T>> wrapper = new EditorWrapper<>(editor);
+						Editor<T> editor = DEFAULT_FACTORY.buildEditor(type, property).orElseGet(Editor::new);;
+						EditorView<T, Editor<T>> wrapper = new EditorView<>(editor);
 						wrapper.nameProperty().bind(Bindings.createIntegerBinding(
 								() -> wrappers.indexOf(wrapper), wrappers).map("[%s]"::formatted));
 						wrappers.add(index, wrapper);

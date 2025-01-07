@@ -1,5 +1,5 @@
 open module ezfx.demo{
-	exports com.ezfx.demo;
+	exports com.ezfx.demos;
 
 	// EZFX
 	requires transitive ezfx.base;

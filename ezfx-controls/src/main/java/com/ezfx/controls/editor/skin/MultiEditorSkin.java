@@ -1,7 +1,7 @@
 package com.ezfx.controls.editor.skin;
 
 import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.EditorWrapper;
+import com.ezfx.controls.editor.EditorView;
 import com.ezfx.controls.editor.MultiEditor;
 import javafx.collections.FXCollections;
 import javafx.scene.layout.VBox;
@@ -19,7 +19,7 @@ public class MultiEditorSkin<E extends Editor<T> & MultiEditor<T>, T> extends Ed
 		getChildren().setAll(vBox);
 
 		control.editorsProperty()
-				.map(editors -> editors.stream().map(EditorWrapper::new).toList())
+				.map(editors -> editors.stream().map(EditorView::new).toList())
 				.orElse(FXCollections.observableArrayList())
 				.subscribe(editors -> vBox.getChildren().setAll(editors));
 	}

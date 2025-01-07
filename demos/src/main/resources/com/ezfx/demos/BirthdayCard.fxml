@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.layout.StackPane?>
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      alignment="CENTER" spacing="20" style="-fx-padding: 20; -fx-background-color: #ffe5b4;">
+    <!-- Title -->
+    <Text text="Happy Birthday!" style="-fx-font-size: 36; -fx-font-weight: bold; -fx-fill: #ff69b4;"/>
+
+    <!-- SVG Drawing -->
+    <StackPane>
+        <SVGPath content="M150 0 L75 200 L225 200 Z" fill="#ff69b4" stroke="#221493" strokeWidth="10"/>
+    </StackPane>
+
+    <!-- Message -->
+    <Text text="Wishing you a day filled with love, laughter, and all your favorite things!"
+          wrappingWidth="400" style="-fx-font-size: 18; -fx-text-alignment: center;"/>
+
+    <!-- Signature -->
+    <Label text="With lots of love, [Your Name]"
+           style="-fx-font-size: 16; -fx-font-style: italic;"/>
+</VBox>

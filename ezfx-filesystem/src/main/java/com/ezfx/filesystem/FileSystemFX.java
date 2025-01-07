@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
@@ -38,14 +39,14 @@ public class FileSystemFX {
 	final ExecutionManager executionManager;
 
 	public FileSystemFX() throws IOException {
-		this(DEFAULT_ROOT_PATH, new LocalFileSystemWatcher());
+		this(DEFAULT_ROOT_PATH);
 	}
 
 	public FileSystemFX(Path rootPath) throws IOException {
 		this(rootPath, new LocalFileSystemWatcher());
 	}
 
-	public FileSystemFX(Path rootPath, FileSystemWatcher fileSystemWatcher) throws IOException {
+	public FileSystemFX(Path rootPath, FileSystemWatcher fileSystemWatcher) {
 		this.ioExecutor = Executors.newSingleThreadExecutor(runnable -> new Thread(runnable, IO_THREAD_NAME));
 		this.fxExecutor = EZFX::runFX;
 		this.executionManager = new ExecutionManager(ioExecutor, fxExecutor);

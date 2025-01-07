@@ -1,7 +1,7 @@
 open module ezfx.app {
 	exports com.ezfx.app.console;
-	exports com.ezfx.app.demo;
 	exports com.ezfx.app.editor;
+	exports com.ezfx.app.stage;
 
 	// EZFX
 	requires transitive ezfx.base;

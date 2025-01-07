@@ -13,22 +13,23 @@ import javafx.util.Subscription;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
 
+import static com.ezfx.controls.editor.factory.IntrospectingEditorFactory.DEFAULT_FACTORY;
+
 
 public class ListEditorSkin<T> extends EditorSkin<ListEditor<T>, ObservableList<T>> {
 
-	private final ObservableList<EditorWrapper<T, Editor<T>>> wrappers = FXCollections.observableArrayList();
+	private final ObservableList<EditorView<T, Editor<T>>> wrappers = FXCollections.observableArrayList();
 
 	boolean lock = false;
 
 	private Subscription subscription = () -> {
 	};
 
-	EditorFactory factory = new EditorFactory();
 	public ListEditorSkin(ListEditor<T> listEditor) {
 		super(listEditor);
 
 		VBox vBox = new VBox();
-		wrappers.addListener((ListChangeListener<EditorWrapper<?, ?>>) l -> vBox.getChildren().setAll(l.getList()));
+		wrappers.addListener((ListChangeListener<EditorView<?, ?>>) l -> vBox.getChildren().setAll(l.getList()));
 
 		listEditor.valueProperty().subscribe(newValue -> {
 			subscription.unsubscribe();
@@ -73,7 +74,7 @@ public class ListEditorSkin<T> extends EditorSkin<ListEditor<T>, ObservableList<
 				for (; index < list.size(); index++) {
 					if (index < wrappers.size()) {
 						// Reset existing
-						EditorWrapper<T, Editor<T>> existing = wrappers.get(index);
+						EditorView<T, Editor<T>> existing = wrappers.get(index);
 						T item = list.get(index);
 						boolean changed = existing.getEditor().getValue() == item;
 						if (changed) {
@@ -88,8 +89,9 @@ public class ListEditorSkin<T> extends EditorSkin<ListEditor<T>, ObservableList<
 						property.addListener((_, _, v) -> {
 							if (!lock) property().getValue().set(i, v);
 						});
-						Editor<T> editor = factory.buildEditor(type, property);
-						EditorWrapper<T, Editor<T>> wrapper = new EditorWrapper<>(editor);
+						//TODO: Remove dependence on DEFAULT_FACTORY
+						Editor<T> editor = DEFAULT_FACTORY.buildEditor(type, property).orElseGet(Editor::new);;
+						EditorView<T, Editor<T>> wrapper = new EditorView<>(editor);
 						wrapper.nameProperty().bind(Bindings.createIntegerBinding(
 								() -> wrappers.indexOf(wrapper), wrappers).map("[%s]"::formatted));
 						wrappers.add(index, wrapper);

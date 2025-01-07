@@ -41,7 +41,7 @@ public class CachedProxy<T> implements InvocationHandler {
 	}
 
 	private Object invoke(Method method, Object[] args) {
-		log.info("%s.%s(%s)".formatted(
+		log.debug("%s.%s(%s)".formatted(
 				target.getClass().getSimpleName(),
 				method.getName(),
 				Arrays.toString(args)));

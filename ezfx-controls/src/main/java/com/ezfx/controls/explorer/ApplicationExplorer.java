@@ -23,8 +23,8 @@ public class ApplicationExplorer extends Control {
 		FrameInfo.start();
 		stage.titleProperty().bind(Bindings.createStringBinding(() ->
 						"Application Explorer - FPS: %.0f | Frame Time: %dms"
-								.formatted(FrameInfo.animationTicks.get(), FrameInfo.animationFrames.get()),
-				FrameInfo.animationFrames, FrameInfo.animationTicks));
+								.formatted(FrameInfo.FRAME_RATE.get(), FrameInfo.LAST_FRAME.get()),
+				FrameInfo.LAST_FRAME, FrameInfo.FRAME_RATE));
 
 		ApplicationExplorer applicationExplorer = new ApplicationExplorer(application);
 		applicationExplorer.setPrefSize(1200, 800);

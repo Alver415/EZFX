@@ -2,7 +2,8 @@ package com.ezfx.controls.editor.introspective;
 
 import com.ezfx.controls.editor.Category;
 import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.EditorFactory;
+import com.ezfx.controls.editor.ListEditor;
+import com.ezfx.controls.editor.factory.EditorFactory;
 import com.ezfx.controls.editor.PropertiesEditor;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
@@ -14,10 +15,13 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.List;
 import java.util.TreeMap;
 
-import static com.ezfx.controls.editor.EditorFactory.DEFAULT_FACTORY;
-import static com.ezfx.controls.editor.introspective.IntrospectorFX.DEFAULT_INTROSPECTOR;
+import static com.ezfx.controls.editor.factory.IntrospectingEditorFactory.DEFAULT_FACTORY;
+import static com.ezfx.controls.editor.introspective.EZFXIntrospector.DEFAULT_INTROSPECTOR;
 
 @SuppressWarnings("unchecked")
 public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
@@ -69,11 +73,27 @@ public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
 			Method propertyMethod = propertyInfo.property();
 			if (!propertyMethod.canAccess(target)) return null;
 			Property<R> subProperty = (Property<R>) propertyMethod.invoke(target);
-			return getEditorFactory().buildEditor(propertyInfo, subProperty);
+			return buildEditor(propertyInfo, subProperty);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			log.warn(e.getMessage(), e);
-			return getEditorFactory().buildEditor(propertyInfo, new SimpleObjectProperty<>(this, propertyInfo.name(), null));
+			return buildEditor(propertyInfo, new SimpleObjectProperty<>(target, propertyInfo.name(), null));
 		}
+	}
+
+	public <T> Editor<T> buildEditor(PropertyInfo propertyInfo, Property<T> property) {
+		Type type = propertyInfo.getter().getGenericReturnType();
+		if (type instanceof ParameterizedType parameterizedType) {
+			Type rawType = parameterizedType.getRawType();
+			Type genericType = parameterizedType.getActualTypeArguments()[0];
+			if (rawType instanceof Class clazz && genericType instanceof Class genericClazz && List.class.isAssignableFrom(clazz)) {
+				ListEditor<T> listEditor = new ListEditor<>((Property<ObservableList<T>>) property);
+				listEditor.setGenericType(genericClazz);
+				return (Editor<T>) listEditor;
+			}
+			return getEditorFactory().buildEditor((Class<T>) rawType, property).orElseGet(Editor::new);
+		} else if (type instanceof Class clazz) {
+			return getEditorFactory().buildEditor((Class<T>) clazz, property).orElseGet(Editor::new);
+		} else return new Editor<>();
 	}
 
 	private final Property<Introspector> introspector = new SimpleObjectProperty<>(this, "introspector");
