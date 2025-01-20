@@ -2,6 +2,8 @@ open module ezfx.app {
 	exports com.ezfx.app.console;
 	exports com.ezfx.app.editor;
 	exports com.ezfx.app.stage;
+	exports com.ezfx.app.explorer;
+	exports com.ezfx.app;
 
 	// EZFX
 	requires transitive ezfx.base;
@@ -22,4 +24,7 @@ open module ezfx.app {
 	// Logging
 	requires transitive org.slf4j;
 	requires org.apache.logging.log4j;
+	requires org.fxmisc.flowless;
+	requires org.fxmisc.richtext;
+	requires easybind;
 }

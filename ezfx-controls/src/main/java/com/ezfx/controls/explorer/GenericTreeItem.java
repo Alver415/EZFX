@@ -19,9 +19,9 @@ import javafx.stage.Window;
 
 import java.util.function.Function;
 
-public class GenericTreeItem extends FilterableTreeItem<TreeValue<Object, Object>> {
+public class GenericTreeItem<T, C> extends FilterableTreeItem<TreeValue<T, C>> {
 
-	public GenericTreeItem(Object value) {
+	public GenericTreeItem(T value) {
 		super(TreeValue.build(value));
 		this.expandedProperty().subscribe(expanded -> {
 			if (expanded && getSourceChildren().isEmpty()) {
@@ -31,15 +31,14 @@ public class GenericTreeItem extends FilterableTreeItem<TreeValue<Object, Object
 //		setExpanded(true);
 	}
 
-
 	private void loadChildren() {
 		getSourceChildren().clear();
-		TreeValue<Object, Object> treeValue = getValue();
-		ObservableList<Object> childrenNodes = treeValue.getChildren();
+		TreeValue<T, C> treeValue = getValue();
+		ObservableList<C> childrenNodes = treeValue.getChildren();
 		if (childrenNodes == null) {
 			return;
 		}
-		for (Object child : childrenNodes) {
+		for (C child : childrenNodes) {
 			GenericTreeItem childItem = new GenericTreeItem(child);
 			getSourceChildren().add(childItem);
 		}

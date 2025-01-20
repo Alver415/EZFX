@@ -1,14 +1,17 @@
 package com.ezfx.controls.editor.impl.javafx;
 
+import com.ezfx.base.io.SystemIO;
+import com.ezfx.controls.console.ConsoleView;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.skin.EditorSkin;
-import com.ezfx.controls.explorer.FrameInfo;
+import com.ezfx.controls.icons.Icons;
 import com.ezfx.controls.misc.ProgressView;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -24,22 +27,29 @@ public class ApplicationEditorSkin extends EditorSkin<Editor<Application>, Appli
 	public ApplicationEditorSkin(ApplicationEditor editor) {
 		super(editor);
 
+		ImageView spinner = new ImageView(Icons.LOADING);
+		spinner.setFitWidth(64);
+		spinner.setFitHeight(64);
+
 		Label frameRateLabel = new Label("Frame Rate: ");
 		ProgressView frameRateBar = new ProgressView();
-		frameRateBar.textProperty().bind(FrameInfo.FRAME_RATE.map(Number::intValue).map(Objects::toString));
-		frameRateBar.progressProperty().bind(FrameInfo.FRAME_RATE.divide(60));
+//		frameRateBar.textProperty().bind(FrameInfo.FRAME_RATE.map(Number::intValue).map(Objects::toString));
+//		frameRateBar.progressProperty().bind(FrameInfo.FRAME_RATE.divide(60));
 
 		Label frameTimeLabel = new Label("Frame Delta: ");
 		ProgressView frameTimeBar = new ProgressView();
-		frameTimeBar.textProperty().bind(FrameInfo.LAST_FRAME.map(Number::intValue).map(Objects::toString));
-		frameTimeBar.progressProperty().bind(FrameInfo.LAST_FRAME.divide(100d));
+//		frameTimeBar.textProperty().bind(FrameInfo.LAST_FRAME.map(Number::intValue).map(Objects::toString));
+//		frameTimeBar.progressProperty().bind(FrameInfo.LAST_FRAME.divide(100d));
 
 		Button forceClose = new Button("FORCE CLOSE");
 		forceClose.setOnAction(_ -> forceClose());
 
+		SystemIO.overrideSystemDefaults();
+		ConsoleView consoleView = new ConsoleView(SystemIO.console);
+
 		HBox frameRateBox = new HBox(4, frameRateLabel, frameRateBar);
 		HBox frameTimeBox = new HBox(4, frameTimeLabel, frameTimeBar);
-		VBox vBox = new VBox(8, frameRateBox, frameTimeBox, forceClose);
+		VBox vBox = new VBox(8, spinner, frameRateBox, frameTimeBox, forceClose, consoleView);
 
 		StackPane stackPane = new StackPane(vBox);
 		stackPane.setPadding(new Insets(8));

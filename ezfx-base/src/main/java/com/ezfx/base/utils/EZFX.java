@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -116,18 +117,22 @@ public interface EZFX {
 
 
 	// region Timer
-	static void printTime(Runnable runnable){
-		printTime("Delta Time", runnable);
+
+	static void deltaTime(Runnable runnable){
+		deltaTime(runnable, "Delta Time");
 	}
-	static void printTime(String message, Runnable runnable){
+	static void deltaTime(Runnable runnable, String logMessage){
+		deltaTime(runnable, delta -> log.info("%s: %dms".formatted(logMessage, delta)));
+	}
+	static void deltaTime(Runnable runnable, Consumer<Long> consumer){
 		long start = System.nanoTime();
 		try{
 			runnable.run();
 		} finally {
 			long end = System.nanoTime();
 			long deltaNanos = end - start;
-			long deltaMillis = deltaNanos / 1000000;
-			log.info("%s: %dms".formatted(message, deltaMillis));
+			long deltaMillis = deltaNanos / 1_000_000;
+			consumer.accept(deltaMillis);
 		}
 	}
 	// endregion Timer

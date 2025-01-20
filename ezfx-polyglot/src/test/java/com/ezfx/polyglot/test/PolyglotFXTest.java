@@ -22,11 +22,13 @@ public class PolyglotFXTest extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 
-		Context context = Context.newBuilder().build();
+		Context context = Context.newBuilder().allowAllAccess(true).build();
 
 		PolyglotDialog<Integer> dialog = new PolyglotDialog<>(context, Integer.class);
 		Optional<Integer> result = dialog.showAndWait();
 
-		log.info(result.toString());
+		result.ifPresentOrElse(
+				r -> log.info(String.valueOf(r)),
+				() -> log.info("[Empty]"));
 	}
 }

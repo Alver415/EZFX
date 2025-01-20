@@ -11,6 +11,7 @@ public interface EditorFactory {
 
 	EditorFactory DEFAULT_FACTORY = composite(
 			new EZFXEditorFactory(), // First, check if there's EZFX Editor.
+			new FileSystemEditorFactory(),
 			new StandardEditorFactory(), // Then default to basic primitive, enum, array, etc.
 			new IntrospectingEditorFactory(), // Finally, fall back to building editor via property or constructor introspection
 			new IntrospectingEditorFactory() // Finally, fall back to building editor via property or constructor introspection

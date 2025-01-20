@@ -1,14 +1,17 @@
 package com.ezfx.demos;
 
+import com.ezfx.app.EZFXApplication;
 import com.ezfx.app.console.ManagedContext;
+import com.ezfx.app.console.MonoglotView;
 import com.ezfx.app.console.PolyglotView;
 import com.ezfx.app.console.ProcessView;
-import com.ezfx.app.stage.DecoratedStage;
 import com.ezfx.base.io.IOConsole;
 import com.ezfx.base.io.SystemIO;
 import com.ezfx.base.utils.EZFX;
 import com.ezfx.controls.console.ConsoleView;
+import com.ezfx.controls.utils.Tabs;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Tab;
@@ -17,11 +20,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.graalvm.polyglot.Context;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -29,29 +29,25 @@ import java.util.stream.Stream;
 import static com.ezfx.base.utils.EZFX.runFX;
 import static java.lang.Thread.sleep;
 
-public class ConsoleApplication extends Application {
+public class SimpleConsoleApplication extends EZFXApplication {
 
-	private final List<IOConsole> consoles = new ArrayList<>();
 
 	public static void main(String[] args) {
 		//Replaces System in/out/err with read/write capable IOStreams.
 		SystemIO.overrideSystemDefaults();
-		Application.launch(ConsoleApplication.class, args);
+		Application.launch(SimpleConsoleApplication.class, args);
 	}
 
 	private final TabPane tabPane = new TabPane();
 
 	@Override
-	public void start(Stage primaryStage) {
-		Stage stage = new DecoratedStage();
+	public void start(Stage stage) {
 		Scene scene = new Scene(tabPane);
 		stage.setScene(scene);
 		stage.setTitle("Demo Application");
 		stage.setWidth(600);
 		stage.setHeight(400);
 		stage.show();
-
-		stage.setOnCloseRequest(_ -> this.close());
 
 		EZFX.runAsync(() -> {
 			runFX(() -> {
@@ -66,7 +62,6 @@ public class ConsoleApplication extends Application {
 				borderPane.setRight(colorPickers);
 
 				Tab tab = new Tab("Editable Colors", borderPane);
-				consoles.add(consoleView.getConsole());
 				tabPane.getTabs().add(tab);
 
 				in.setOnAction(_ -> consoleView.setTextInFill(in.getValue()));
@@ -76,24 +71,37 @@ public class ConsoleApplication extends Application {
 
 
 			IOConsole console = new IOConsole();
-			ManagedContext managedContext =
-					ManagedContext.start(Context.newBuilder("js", "python", "java")
-							.allowAllAccess(true)
-							.in(console.in.getInputStream())
-							.out(console.out.getPrintStream())
-							.err(console.err.getPrintStream()));
+			ManagedContext managedContext = ManagedContext.newBuilder()
+					.permittedLanguages("js", "python")
+					.allowAllAccess(true)
+					.in(console.in.getInputStream())
+					.out(console.out.getPrintStream())
+					.err(console.err.getPrintStream()).build();
 
 
-			IntStream.range(0, 2).forEach(i -> createTab("ConsolePane - " + i, new ConsoleView(SystemIO.console)));
-			Stream.of("java", "js", "python").forEach(lang -> createTab(
-					"PolyglotPane - " + lang,
-					new PolyglotView(console, lang, managedContext)));
+			// ConsolePane
+			IntStream.range(0, 2)
+					.mapToObj(i -> Tabs.create("ConsolePane - " + i, new ConsoleView(SystemIO.console)))
+					.forEach(tab -> Platform.runLater(() -> tabPane.getTabs().add(tab)));
+
+			// PolyglotPane
+			Platform.runLater(() -> tabPane.getTabs().add(
+					Tabs.create("PolyglotPane", new PolyglotView(managedContext))));
+
+			// MonoglotPanes
+			managedContext.getLanguages().values().stream().map(language -> Tabs.create(
+							"PolyglotPane - " + language.getName(),
+							new MonoglotView(managedContext, language)))
+					.forEach(tab -> Platform.runLater(() -> tabPane.getTabs().add(tab)));
+
+			// ProcessView
 			Stream.of("cmd", "powershell")
-					.map(ConsoleApplication::startProcess)
+					.map(SimpleConsoleApplication::startProcess)
 					.map(ProcessView::new)
-					.forEach(program -> createTab(
+					.map(program -> Tabs.create(
 							"ProcessPane - " + program.getProcess().info().command().orElse(""),
-							program));
+							program))
+					.forEach(tab -> Platform.runLater(() -> tabPane.getTabs().add(tab)));
 
 			EZFX.runAsync(() -> {
 
@@ -120,31 +128,11 @@ public class ConsoleApplication extends Application {
 
 	}
 
-	private static Process startProcess(String command){
+	private static Process startProcess(String command) {
 		try {
 			return new ProcessBuilder(command).start();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
-		}
-	}
-
-
-	private boolean createTab(String title, ConsoleView content) {
-		runFX(() -> {
-			Tab tab = new Tab(title, content);
-			consoles.add(content.getConsole());
-			tabPane.getTabs().add(tab);
-		});
-		return true;
-	}
-
-	private void close() {
-		for (IOConsole console : consoles) {
-			try {
-				console.close();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
 		}
 	}
 

@@ -19,13 +19,15 @@ public class DecoratedApplication extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		VBox root = new VBox(new Label("Test"), new Button("This"));
+		configureStage("Standard Stage", primaryStage);
+		configureStage("Decorated Stage", new DecoratedStage());
+	}
 
-		Stage stage = new DecoratedStage();
+	private static void configureStage(String title, Stage stage) {
 		Scene scene = new Scene(new Group(new Text("TESTING")));
 		stage.setScene(scene);
 
-		stage.setTitle("Test Example");
+		stage.setTitle(title);
 		stage.getIcons().add(Resources.image(Icons.class, "unlocked.png"));
 		stage.setWidth(600);
 		stage.setHeight(400);

@@ -1,4 +1,4 @@
-package com.ezfx.controls.explorer;
+package com.ezfx.app.explorer;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.LongProperty;
@@ -13,6 +13,9 @@ public class FrameInfo {
 	public static final DoubleProperty FRAME_RATE = new SimpleDoubleProperty();
 	public static final LongProperty LAST_FRAME = new SimpleLongProperty();
 
+	static {
+		start();
+	}
 	private static boolean started = false;
 	public static void start() {
 		if (started) return;

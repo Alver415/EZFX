@@ -1,14 +1,12 @@
 package com.ezfx.demos;
 
+import com.ezfx.app.EZFXApplication;
 import com.ezfx.app.editor.SceneEditor;
 import com.ezfx.base.utils.Screens;
-import com.ezfx.controls.explorer.ApplicationExplorer;
 import com.ezfx.controls.icons.Icons;
 import com.ezfx.filesystem.FileSystemEntry;
 import com.ezfx.filesystem.FileSystemFX;
-import com.ezfx.filesystem.ReadableAttributeProperty;
 import com.ezfx.fxml.FXMLSaver;
-import javafx.application.Application;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
@@ -29,7 +27,7 @@ import java.util.Optional;
 
 import static com.ezfx.base.utils.Converters.STRING_TO_BYTE_BUFFER;
 
-public class FXMLEditorApplication extends Application {
+public class FXMLEditorApplication extends EZFXApplication {
 
 	private FileSystemFX fileSystem;
 
@@ -49,13 +47,14 @@ public class FXMLEditorApplication extends Application {
 	}
 
 	@Override
-	public void init() throws IOException {
+	public void init() throws Exception {
+		super.init();
 		fileSystem = new FileSystemFX();
 
 	}
 
 	@Override
-	public void start(Stage stage) {
+	public void start(Stage stage) throws Exception {
 		SceneEditor sceneEditor = new SceneEditor();
 
 		content = pathProperty().map(fileSystem::get)
@@ -107,9 +106,6 @@ public class FXMLEditorApplication extends Application {
 		stage.centerOnScreen();
 		stage.setMaximized(true);
 		stage.show();
-
-		ApplicationExplorer.explore(this);
-
 
 		// Load initial file
 		Optional.ofNullable(getParameters())

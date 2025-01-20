@@ -9,22 +9,20 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
-public class PolyglotTest {
+public class PolyglotJavaTest {
 
-	private static final Logger log = LoggerFactory.getLogger(PolyglotTest.class);
+	private static final Logger log = LoggerFactory.getLogger(PolyglotJavaTest.class);
 
-
-	private final Context context =
-			Context.newBuilder("js")
-					.allowHostAccess(HostAccess.ALL)
-					.allowHostClassLookup(className -> true)
-					.build();
+	private final Context context = Context.newBuilder("java")
+			.allowAllAccess(true)
+			.logHandler(System.out)
+			.build();
 
 	private final ContextFX contextFX = new ContextFX(context);
 
 	@Test
 	public void testBoolean() throws Exception {
-		boolean result = contextFX.execute("""
+		boolean result = contextFX.execute("java", """
 				true || false
 				""");
 		log.info(String.valueOf(result));
@@ -32,7 +30,7 @@ public class PolyglotTest {
 
 	@Test
 	public void testInteger() throws Exception {
-		int result = contextFX.execute("""
+		int result = contextFX.execute("java", """
 				2 + 2
 				""");
 		log.info(String.valueOf(result));
@@ -40,7 +38,7 @@ public class PolyglotTest {
 
 	@Test
 	public void testDouble() throws Exception {
-		double result = contextFX.execute("""
+		double result = contextFX.execute("java", """
 				2 * 3.14
 				""");
 		log.info(String.valueOf(result));
@@ -48,9 +46,8 @@ public class PolyglotTest {
 
 	@Test
 	public void testArrayList() throws Exception {
-		ArrayList<String> result = contextFX.execute("""
-				const ArrayList = Java.type('java.util.ArrayList');
-				const list = new ArrayList();
+		ArrayList<String> result = contextFX.execute("java", """
+				List<String> list = new ArrayList<>();
 				list.add("Hello from JavaScript");
 				list.add("Another item");
 				list;

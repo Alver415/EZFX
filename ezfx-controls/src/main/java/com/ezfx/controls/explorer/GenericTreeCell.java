@@ -1,5 +1,6 @@
 package com.ezfx.controls.explorer;
 
+import com.ezfx.controls.misc.FilterableTreeItem;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -16,7 +17,7 @@ import javafx.scene.layout.HBox;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ApplicationTreeCell<T> extends TreeCell<T> {
+public class GenericTreeCell<T> extends TreeCell<T> {
 
 	private static final Map<Class<?>, Image> ICON_CACHE = new HashMap<>();
 	private static final Map<Class<?>, String> JAVA_TYPE_CACHE = new HashMap<>();
@@ -35,7 +36,7 @@ public class ApplicationTreeCell<T> extends TreeCell<T> {
 	private final HBox right;
 	private final CheckBox visibleCheckBox;
 
-	public ApplicationTreeCell() {
+	public GenericTreeCell() {
 		setContentDisplay(ContentDisplay.LEFT);
 
 		// Build Structure
@@ -69,14 +70,14 @@ public class ApplicationTreeCell<T> extends TreeCell<T> {
 		icon.imageProperty().bind(treeValue.flatMap(TreeValue::observableIcon));
 		javaTypeLabel.textProperty().bind(treeValue.flatMap(TreeValue::observableJavaType));
 		nodeIdLabel.textProperty().bind(treeValue.flatMap(TreeValue::observableNodeId));
-		styleClassLabel.textProperty().bind(treeValue.flatMap(TreeValue::observableStyleClass));
+		styleClassLabel.textProperty().bind(treeValue.map(TreeValue::observableStyleClass).map(v -> String.join(", ", v)));
 		visibleCheckBox.selectedProperty().bind(treeValue.flatMap(TreeValue::observableVisibility));
 
-//		treeItemProperty()
-//				.flatMap(treeItem -> treeItem instanceof FilterableTreeItem<?> filterableTreeItem ?
-//						filterableTreeItem.predicateProperty() : null)
-//				.flatMap(filter -> currentItemProperty().map(filter::test).map(b -> !b))
-//				.subscribe(filtered -> pseudoClassStateChanged(FILTERED, filtered != null && filtered));
+		treeItemProperty()
+				.flatMap(treeItem -> treeItem instanceof FilterableTreeItem<T> filterableTreeItem ?
+						filterableTreeItem.predicateProperty() : null)
+				.flatMap(filter -> currentItemProperty().map(filter::test).map(b -> !b))
+				.subscribe(filtered -> pseudoClassStateChanged(FILTERED, filtered != null && filtered));
 	}
 
 

@@ -1,10 +1,7 @@
 package com.ezfx.controls.editor.introspective;
 
-import com.ezfx.controls.editor.Category;
-import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.ListEditor;
+import com.ezfx.controls.editor.*;
 import com.ezfx.controls.editor.factory.EditorFactory;
-import com.ezfx.controls.editor.PropertiesEditor;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -50,12 +47,14 @@ public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
 				.map(T::getClass)
 				.map(getIntrospector()::getPropertyInfo)
 				.map(propertyInfoList -> {
-					ObservableMap<Category, ObservableList<Editor<?>>> categorized = FXCollections.observableMap(new TreeMap<>());
+					ObservableMap<Category, ObservableList<Editor<?>>> categorized =
+							FXCollections.observableMap(new TreeMap<>());
 					for (PropertyInfo propertyInfo : propertyInfoList) {
 						Editor<?> subEditor = buildSubEditor(property.getValue(), propertyInfo);
 						if (subEditor == null) continue;
 						Category category = propertyInfo.category();
-						ObservableList<Editor<?>> list = categorized.computeIfAbsent(category, _ -> FXCollections.observableArrayList());
+						ObservableList<Editor<?>> list = categorized.computeIfAbsent(category,
+								_ -> FXCollections.observableArrayList());
 						list.add(subEditor);
 					}
 					return categorized;
@@ -123,4 +122,5 @@ public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
 	public void setEditorFactory(EditorFactory value) {
 		this.editorFactoryProperty().setValue(value);
 	}
+
 }

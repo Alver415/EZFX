@@ -44,7 +44,9 @@ public class ObservableOutputStream extends OutputStream implements ObservableVa
 	}
 
 	public Subscription subscribe(OutputStream outputStream) {
-		return subscribe(flushed -> Optional.ofNullable(flushed).map(String::getBytes)
+		return subscribe(flushed -> Optional.ofNullable(flushed)
+				.filter(s -> !s.isEmpty())
+				.map(String::getBytes)
 				.ifPresent(bytes -> tryRun(() -> {
 					outputStream.write(bytes);
 					outputStream.flush();

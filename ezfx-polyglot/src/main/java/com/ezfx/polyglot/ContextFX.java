@@ -11,8 +11,8 @@ public class ContextFX {
 		this.context = context;
 	}
 
-	public <T> T execute(String script) {
-		Value result = context.eval("js", script);
+	public <T> T execute(String languageId, String script) {
+		Value result = context.eval(languageId, script);
 		return cast(result);
 	}
 

@@ -6,13 +6,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.*;
 import javafx.css.converter.PaintConverter;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,13 +31,8 @@ public class StageDecoration extends Control {
 	}
 
 	public StageDecoration() {
-		getStylesheets().add(Resources.css(StageDecorationSkin.class, "StageDecoration.css"));
+		getStylesheets().add(Resources.css(DefaultSkin.class, "StageDecoration.css"));
 		getStyleClass().add("stage-decoration");
-	}
-
-	@Override
-	protected Skin<?> createDefaultSkin() {
-		return new StageDecorationSkin(this);
 	}
 
 	private StyleableObjectProperty<Paint> sceneFill = new SimpleStyleableObjectProperty<>(StyleableProperties.SCENE_FILL, this, "sceneFill");
@@ -87,4 +78,15 @@ public class StageDecoration extends Control {
 		return StyleableProperties.STYLEABLES;
 	}
 
+
+	@Override
+	protected Skin<?> createDefaultSkin() {
+		return new DefaultSkin(this);
+	}
+
+	public static class DefaultSkin extends StageDecorationSkin<StageDecoration> {
+		public DefaultSkin(StageDecoration control) {
+			super(control);
+		}
+	}
 }

@@ -12,6 +12,7 @@ open module ezfx.controls {
 	exports com.ezfx.controls.editor.impl.javafx;
 	exports com.ezfx.controls.editor.skin;
 	exports com.ezfx.controls.editor.factory;
+	exports com.ezfx.controls.editor.code;
 
 
 	// EZFX

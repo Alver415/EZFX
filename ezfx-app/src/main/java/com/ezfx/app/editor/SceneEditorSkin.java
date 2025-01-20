@@ -23,12 +23,14 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.reactfx.EventStreams;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Predicate;
 
 import static com.ezfx.base.utils.EZFX.*;
 
@@ -54,30 +56,13 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 		StringEditor filterEditor = new StringEditor();
 		filterEditor.setPadding(new Insets(4));
 		filterEditor.setPromptText("Filter...");
-		Property<String> filterProperty = filterEditor.valueProperty();
-		if (treeView.getRoot() instanceof FilterableTreeItem<Node> root) {
-			root.predicateProperty().bind(Bindings.createObjectBinding(() -> node -> {
-				if (filterProperty.getValue() == null) return true;
-				String filterText = filterProperty.getValue().toLowerCase();
+		Property<String> filterTextProperty = filterEditor.valueProperty();
+		treeView.rootProperty().subscribe(root -> {
+			if (root instanceof FilterableTreeItem<Node> filterableRoot) {
+				filterableRoot.predicateProperty().bind(filterTextProperty.map(filterText -> node -> filter(filterText, node)));
+			}
+		});
 
-				if (filterText.startsWith("#")) {
-					if (node.getId() != null && node.getId().toLowerCase().contains(filterText.substring(1))) {
-						return true;
-					}
-				} else if (filterText.startsWith(".")) {
-					for (String styleClass : node.getStyleClass()) {
-						if (styleClass.toLowerCase().contains(filterText.substring(1))) {
-							return true;
-						}
-					}
-				} else {
-					if (node.getClass().getSimpleName().toLowerCase().contains(filterText)) {
-						return true;
-					}
-				}
-				return false;
-			}, filterProperty));
-		}
 		VBox left = new VBox(filterEditor, treeView);
 		VBox.setVgrow(treeView, Priority.ALWAYS);
 		left.setPrefWidth(450);
@@ -130,6 +115,27 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 		});
 
 		treeView.rootProperty().subscribe(treeView.getSelectionModel()::select);
+	}
+
+	private static boolean filter(String filterText, Node node) {
+		if (filterText == null || filterText.isEmpty()) return true;
+		filterText = filterText.toLowerCase();
+		if (filterText.startsWith("#")) {
+			if (node.getId() != null && node.getId().toLowerCase().contains(filterText.substring(1))) {
+				return true;
+			}
+		} else if (filterText.startsWith(".")) {
+			for (String styleClass : node.getStyleClass()) {
+				if (styleClass.toLowerCase().contains(filterText.substring(1))) {
+					return true;
+				}
+			}
+		} else {
+			if (node.getClass().getSimpleName().toLowerCase().contains(filterText)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private Editor<?> getEditorByTreeItem(TreeItem<Node> treeItem) {

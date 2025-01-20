@@ -18,6 +18,8 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
+import java.util.List;
+
 public abstract class TreeValue<T, C> {
 
 	private final Property<T> value = new SimpleObjectProperty<>(this, "value");
@@ -26,22 +28,22 @@ public abstract class TreeValue<T, C> {
 		this.value.setValue(value);
 	}
 
-	public static <T> TreeValue<T, Object> build(T value) {
+	public static <T, C> TreeValue<T, C> build(T value) {
 		if (value instanceof Application application) {
 			TreeValue<?, ?> treeValue = new ApplicationTreeValue(application);
-			return (TreeValue<T, Object>) treeValue;
+			return (TreeValue<T, C>) treeValue;
 		}
 		if (value instanceof Stage stage) {
 			TreeValue<?, ?> treeValue = new StageTreeValue(stage);
-			return (TreeValue<T, Object>) treeValue;
+			return (TreeValue<T, C>) treeValue;
 		}
 		if (value instanceof Scene scene) {
 			TreeValue<?, ?> treeValue = new SceneTreeValue(scene);
-			return (TreeValue<T, Object>) treeValue;
+			return (TreeValue<T, C>) treeValue;
 		}
 		if (value instanceof Node node) {
 			TreeValue<?, ?> treeValue = new NodeTreeValue(node);
-			return (TreeValue<T, Object>) treeValue;
+			return (TreeValue<T, C>) treeValue;
 		}
 		throw new IllegalStateException();
 	}
@@ -72,15 +74,25 @@ public abstract class TreeValue<T, C> {
 		this.childrenProperty().setValue(value);
 	}
 
-	protected abstract ObservableValue<Image> observableIcon();
+	protected ObservableValue<Image> observableIcon() {
+		return valueProperty().map(_ -> null);
+	}
 
-	protected abstract ObservableValue<String> observableJavaType();
+	protected ObservableValue<String> observableJavaType() {
+		return valueProperty().map(_ -> null);
+	}
 
-	protected abstract ObservableValue<String> observableNodeId();
+	protected ObservableValue<String> observableNodeId() {
+		return valueProperty().map(_ -> null);
+	}
 
-	protected abstract ObservableValue<String> observableStyleClass();
+	protected ObservableList<String> observableStyleClass() {
+		return FXCollections.observableArrayList();
+	}
 
-	protected abstract ObservableValue<Boolean> observableVisibility();
+	protected ObservableValue<Boolean> observableVisibility() {
+		return valueProperty().map(_ -> null);
+	}
 
 
 	public static class ApplicationTreeValue extends TreeValue<Application, Stage> {
@@ -94,31 +106,11 @@ public abstract class TreeValue<T, C> {
 			listener.invalidated(null);
 
 		}
-
-		@Override
-		protected ObservableValue<Image> observableIcon() {
-			return valueProperty().map(_ -> null);
-		}
-
 		@Override
 		protected ObservableValue<String> observableJavaType() {
 			return valueProperty().map(Application::getClass).map(Class::getSimpleName);
 		}
 
-		@Override
-		protected ObservableValue<String> observableNodeId() {
-			return valueProperty().map(_ -> null);
-		}
-
-		@Override
-		protected ObservableValue<String> observableStyleClass() {
-			return valueProperty().map(_ -> null);
-		}
-
-		@Override
-		protected ObservableValue<Boolean> observableVisibility() {
-			return valueProperty().map(_ -> null);
-		}
 	}
 
 	public static class StageTreeValue extends TreeValue<Stage, Scene> {
@@ -128,10 +120,6 @@ public abstract class TreeValue<T, C> {
 			value.sceneProperty().subscribe(scene -> getChildren().setAll(scene));
 		}
 
-		@Override
-		protected ObservableValue<Image> observableIcon() {
-			return valueProperty().map(_ -> null);
-		}
 
 		@Override
 		protected ObservableValue<String> observableJavaType() {
@@ -141,11 +129,6 @@ public abstract class TreeValue<T, C> {
 		@Override
 		protected ObservableValue<String> observableNodeId() {
 			return valueProperty().flatMap(Stage::titleProperty);
-		}
-
-		@Override
-		protected ObservableValue<String> observableStyleClass() {
-			return valueProperty().map(_ -> null);
 		}
 
 		@Override
@@ -162,29 +145,10 @@ public abstract class TreeValue<T, C> {
 		}
 
 		@Override
-		protected ObservableValue<Image> observableIcon() {
-			return valueProperty().map(_ -> null);
-		}
-
-		@Override
 		protected ObservableValue<String> observableJavaType() {
 			return valueProperty().map(Scene::getClass).map(Class::getSimpleName);
 		}
 
-		@Override
-		protected ObservableValue<String> observableNodeId() {
-			return valueProperty().map(_ -> null);
-		}
-
-		@Override
-		protected ObservableValue<String> observableStyleClass() {
-			return valueProperty().map(_ -> null);
-		}
-
-		@Override
-		protected ObservableValue<Boolean> observableVisibility() {
-			return valueProperty().map(_ -> null);
-		}
 	}
 
 	public static class NodeTreeValue extends TreeValue<Node, Node> {
@@ -199,11 +163,6 @@ public abstract class TreeValue<T, C> {
 		}
 
 		@Override
-		protected ObservableValue<Image> observableIcon() {
-			return valueProperty().map(_ -> null);
-		}
-
-		@Override
 		protected ObservableValue<String> observableJavaType() {
 			return valueProperty().map(Node::getClass).map(Class::getSimpleName);
 		}
@@ -214,9 +173,14 @@ public abstract class TreeValue<T, C> {
 		}
 
 		@Override
-		protected ObservableValue<String> observableStyleClass() {
-			return valueProperty().flatMap(node -> Bindings.createStringBinding(() ->
-					String.join(", ", node.getStyleClass()), node.getStyleClass()));
+		protected ObservableList<String> observableStyleClass() {
+			ObservableList<String> list = FXCollections.observableArrayList();
+			valueProperty().subscribe(value -> {
+				// TODO: proper binding/listeners
+				ObservableList<String> styleClass = value.getStyleClass();
+				list.setAll(styleClass);
+			});
+			return list;
 		}
 
 		@Override

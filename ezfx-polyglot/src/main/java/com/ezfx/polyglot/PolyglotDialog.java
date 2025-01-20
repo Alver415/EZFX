@@ -1,12 +1,20 @@
 package com.ezfx.polyglot;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.util.Callback;
+import javafx.util.StringConverter;
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Language;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PolyglotDialog<T> extends Dialog<T> {
 
@@ -16,12 +24,33 @@ public class PolyglotDialog<T> extends Dialog<T> {
 	private final GridPane grid;
 	private final Label label;
 	private final TextArea textArea;
+	private final ComboBox<Language> languageChoice;
 
 
 	public PolyglotDialog(Context context, Class<T> type) {
 		this.context = new ContextFX(context);
 		this.type = type;
 		final DialogPane dialogPane = getDialogPane();
+
+		// -- languageChoice
+		Map<String, Language> languageMap = context.getEngine().getLanguages();
+		ObservableList<Language> languages = languageMap.values().stream()
+				.collect(Collectors.toCollection(FXCollections::observableArrayList));
+		this.languageChoice = new ComboBox<>(languages);
+		Callback<ListView<Language>, ListCell<Language>> cellFactory = _ -> new ListCell<>() {
+			@Override
+			protected void updateItem(Language item, boolean empty) {
+				super.updateItem(item, empty);
+				if (empty || item == null) {
+					setText(null);
+					setGraphic(null);
+				} else {
+					setText(item.getName());
+				}
+			}
+		};
+		this.languageChoice.setCellFactory(cellFactory);
+		this.languageChoice.setButtonCell(cellFactory.call(null));
 
 		// -- textArea
 		this.textArea = new TextArea();
@@ -30,7 +59,7 @@ public class PolyglotDialog<T> extends Dialog<T> {
 		GridPane.setFillWidth(textArea, true);
 
 		// -- label
-		label = new Label("polyglot Input");
+		label = new Label("Polyglot Input");
 		label.setMaxWidth(Double.MAX_VALUE);
 		label.setMaxHeight(Double.MAX_VALUE);
 		label.getStyleClass().add("content");
@@ -56,7 +85,8 @@ public class PolyglotDialog<T> extends Dialog<T> {
 		setResultConverter((dialogButton) -> {
 			ButtonBar.ButtonData data = dialogButton == null ? null : dialogButton.getButtonData();
 			String input = data == ButtonBar.ButtonData.OK_DONE ? textArea.getText() : null;
-			return this.context.execute(input);
+			String languageId = languageChoice.getSelectionModel().getSelectedItem().getId();
+			return this.context.execute(languageId, input);
 		});
 	}
 
@@ -64,7 +94,8 @@ public class PolyglotDialog<T> extends Dialog<T> {
 		grid.getChildren().clear();
 
 		grid.add(label, 0, 0);
-		grid.add(textArea, 1, 0);
+		grid.add(languageChoice, 1, 0);
+		grid.add(textArea, 2, 0);
 		getDialogPane().setContent(grid);
 
 		Platform.runLater(textArea::requestFocus);

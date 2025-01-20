@@ -4,6 +4,10 @@
   -fx-color-tertiary: #c97200;
 }
 
+*:filtered {
+    -fx-opacity: 0.5;
+}
+
 .java-type {
     -fx-text-fill: derive(-fx-color-primary, -0.5);
     -fx-font-weight: bold;
@@ -16,8 +20,4 @@
 .style-class {
     -fx-text-fill: -fx-color-tertiary;
     -fx-font-style: oblique;
-}
-
-*:filtered {
-    -fx-opacity: 0.5;
 }

@@ -2,7 +2,6 @@ package com.ezfx.demos;
 
 import com.ezfx.base.utils.Screens;
 import com.ezfx.controls.editor.impl.javafx.StyleEditor;
-import com.ezfx.controls.explorer.ApplicationExplorer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -38,6 +37,5 @@ public class StyleEditorApplication extends Application {
 		stage.centerOnScreen();
 		stage.show();
 
-		ApplicationExplorer.explore(this);
 	}
 }

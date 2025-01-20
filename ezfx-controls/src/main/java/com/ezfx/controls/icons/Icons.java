@@ -11,6 +11,7 @@ public interface Icons {
 	Image UNLOCKED = load("unlocked.png");
 
 	Image EDIT = load("font-awesome/edit.png");
+	Image LOADING = load("gifs/loading.gif");
 
 	private static Image load(String image) {
 		return Resources.image(Icons.class, image);

@@ -13,4 +13,5 @@ open module ezfx.base {
 	requires transitive org.slf4j;
 	requires javassist;
 	requires jdk.jfr;
+	requires java.desktop;
 }

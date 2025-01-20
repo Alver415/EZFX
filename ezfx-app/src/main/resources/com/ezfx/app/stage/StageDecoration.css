@@ -1,47 +1,81 @@
 
-.stage-decoration{
+.stage-decoration {
     -fx-background-color: transparent;
-	-fx-scene-fill: rgba(236,236,236,0.5);
+	-fx-scene-fill: transparent;
 }
 
 .boundary {
     -fx-padding: 2px;
     -fx-background-radius: 2px;
-	-fx-background-color: rgba(0,0,0,0.5);
+	-fx-background-color: rgba(0,0,0, 0.5);
 }
 
-.title-bar {
-    -fx-background-radius: 4px;
-    -fx-background-color: rgba(200,230,255,0.5)
+.stage {
+	-fx-background-color: white;
+}
+
+.stage .title-bar {
+    -fx-pref-height: 32px;
+	-fx-background-color: transparent;
+}
+
+.stage:focused .title-bar {
+    -fx-background-color: rgba(104,118,138, 1)
 }
 
 .title-bar .title-header {
     -fx-alignment: center;
-    -fx-padding: 4px;
-    -fx-spacing: 4px;
+    -fx-padding: 2px;
+    -fx-spacing: 2px;
 }
 
-.title-bar .title {
+.stage .title-bar .title {
+    -fx-fill: grey;
+    -fx-font-size: 12px;
+}
+
+.stage:focused .title-bar .title {
     -fx-fill: white;
-    -fx-stroke: black;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
 }
 
 .button-bar {
-    -fx-padding: 4px;
+    -fx-spacing: 2px;
+    -fx-alignment: center;
 }
 
 .button-bar .button {
     -fx-padding: 0px;
-    -fx-exact-size: 24px;
+    -fx-exact-size: 32px;
     -fx-min-width: -fx-exact-size;
     -fx-min-height: -fx-exact-size;
     -fx-pref-width: -fx-exact-size;
     -fx-pref-height: -fx-exact-size;
     -fx-max-width: -fx-exact-size;
     -fx-max-height: -fx-exact-size;
+
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
 }
+
+.button-bar .button:hover {
+    -fx-background-color: rgba(255,255,255, 0.25);
+}
+
+.button-bar .button:pressed {
+    -fx-background-color: rgba(255,255,255, .5);
+}
+
+
+.button-bar .action-close:hover {
+    -fx-background-color: rgba(232,17,35, 0.5);
+}
+
+.button-bar .action-close:pressed {
+    -fx-background-color: rgba(232,17,35, 1);
+}
+
 
 .button-bar .button .glyph-font {
     -fx-text-overrun: clip;

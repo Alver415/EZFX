@@ -1,8 +1,6 @@
 package com.ezfx.app.stage;
 
-import com.ezfx.base.utils.Resources;
 import com.ezfx.controls.editor.introspective.ActionIntrospector;
-import com.ezfx.controls.icons.Icons;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.binding.ObjectBinding;
@@ -13,6 +11,7 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.event.EventType;
@@ -20,30 +19,26 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
-import javafx.scene.control.*;
-import javafx.scene.effect.GaussianBlur;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.SkinBase;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.util.Strings;
-import org.controlsfx.control.SegmentedButton;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionProxy;
 import org.controlsfx.control.action.ActionUtils;
-import org.controlsfx.glyphfont.FontAwesome;
-import org.controlsfx.glyphfont.Glyph;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-public class StageDecorationSkin extends SkinBase<StageDecoration> {
+public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> {
 
 	private static final ObservableList<Image> EMPTY_LIST = FXCollections.emptyObservableList();
 
@@ -57,19 +52,22 @@ public class StageDecorationSkin extends SkinBase<StageDecoration> {
 	private final Text titleText;
 	private final Text separator;
 	private final Text descriptionText;
-	private final ButtonBar actionButtons;
+	private final Region actionButtons;
 
 	private final SubScene subScene;
 
 	private final DoubleBinding horizontalPadding;
 	private final DoubleBinding verticalPadding;
 
-	public StageDecorationSkin(StageDecoration control) {
+	public StageDecorationSkin(T control) {
 		super(control);
 		stage.bind(control.sceneProperty().flatMap(Scene::windowProperty).map(window -> (Stage) window));
 
+
 		borderPane = new BorderPane();
 		borderPane.getStyleClass().add("stage");
+		stage.flatMap(Stage::focusedProperty).subscribe(focused ->
+				borderPane.pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), focused));
 
 		boundary = new StackPane(borderPane);
 		boundary.getStyleClass().add("boundary");
@@ -79,6 +77,7 @@ public class StageDecorationSkin extends SkinBase<StageDecoration> {
 		Action maximizeAction = ActionIntrospector.action("maximize");
 		Action restoreAction = ActionIntrospector.action("restore");
 		Action closeAction = ActionIntrospector.action("close");
+		closeAction.getStyleClass().add("action-close");
 		Collection<Action> actions = List.of(minimizeAction, maximizeAction, restoreAction, closeAction);
 
 		Function<Boolean, Boolean> invert = b -> !b;
@@ -95,6 +94,7 @@ public class StageDecorationSkin extends SkinBase<StageDecoration> {
 
 		iconView = new ImageView();
 		iconView.setPickOnBounds(true);
+		//TODO: Select correct image based on size.
 		ObjectBinding<Image> firstIcon = Bindings.createObjectBinding(
 				() -> stageProperty().map(Stage::getIcons).orElse(EMPTY_LIST).getValue()
 						.stream().findFirst().orElse(null), stageProperty());
@@ -151,17 +151,17 @@ public class StageDecorationSkin extends SkinBase<StageDecoration> {
 		getChildren().setAll(boundary);
 	}
 
-	private ButtonBar createActionButtons(Collection<Action> actions) {
-		ButtonBar buttonBar = new ButtonBar();
+	private Region createActionButtons(Collection<Action> actions) {
+		HBox buttonBar = new HBox();
 		buttonBar.getStyleClass().add("button-bar");
 		List<Button> buttons = actions.stream().map(action -> {
 			Button button = new Button();
-			button.getStyleClass().add("action");
+			button.getStyleClass().addAll(action.getStyleClass());
 			button.graphicProperty().bind(action.graphicProperty());
 			button.setOnAction(action);
 			return button;
 		}).toList();
-		buttonBar.getButtons().setAll(buttons);
+		buttonBar.getChildren().setAll(buttons);
 		return buttonBar;
 	}
 

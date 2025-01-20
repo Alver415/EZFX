@@ -4,9 +4,9 @@ import atlantafx.base.theme.*;
 
 import java.util.Set;
 
-public class Themes {
+public interface Themes {
 
-	public static Set<Theme> getThemes() {
+	static Set<Theme> getThemes() {
 		Dracula dracula = new Dracula();
 		NordLight nordLight = new NordLight();
 		NordDark nordDark = new NordDark();
