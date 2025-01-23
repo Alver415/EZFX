@@ -28,4 +28,14 @@ public interface Screens {
 				.orElse(Screen.getPrimary());
 	}
 
+	static Screen getScreen(double x, double y) {
+		for (Screen screen : Screen.getScreens()) {
+			Rectangle2D bounds = screen.getBounds();
+			if (bounds.contains(x, y)) {
+				return screen;
+			}
+		}
+		return null;
+	}
+
 }

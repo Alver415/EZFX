@@ -1,11 +1,13 @@
 package com.ezfx.app.stage;
 
+import com.ezfx.base.utils.Screens;
 import com.ezfx.controls.editor.introspective.ActionIntrospector;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
@@ -48,7 +50,7 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 	protected final Button settingsButton;
 	protected final Button minimizeButton;
 	protected final Button maximizeButton;
-	protected final Group centerButton;
+	protected final StackPane centerButton;
 	protected final Button restoreButton;
 	protected final Button closeButton;
 
@@ -101,7 +103,7 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 		restoreButton = createActionButton(restoreAction);
 		closeButton = createActionButton(closeAction);
 
-		centerButton = new Group();
+		centerButton = new StackPane();
 		stageProperty().flatMap(Stage::maximizedProperty).orElse(false).subscribe(maximized -> {
 			centerButton.getChildren().setAll(maximized ? restoreButton : maximizeButton);
 		});
@@ -192,13 +194,16 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 
 	private DragListener dragListener;
 	private ResizeListener resizeListener;
+	private DoubleClickerListener doubleClickListener;
 
 	@Override
 	public void install() {
 		super.install();
 
-		dragListener = new DragListener(titleBar);
+		doubleClickListener = new DoubleClickerListener();
+		titleBar.addEventHandler(MouseEvent.MOUSE_PRESSED, doubleClickListener);
 
+		dragListener = new DragListener(titleBar);
 		titleBar.addEventHandler(MouseEvent.MOUSE_PRESSED, dragListener);
 		titleBar.addEventHandler(MouseEvent.MOUSE_RELEASED, dragListener);
 		titleBar.addEventHandler(MouseEvent.MOUSE_DRAGGED, dragListener);
@@ -215,6 +220,8 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 	@Override
 	public void dispose() {
 		super.dispose();
+
+		titleBar.removeEventFilter(MouseEvent.MOUSE_PRESSED, doubleClickListener);
 
 		titleBar.removeEventFilter(MouseEvent.MOUSE_PRESSED, dragListener);
 		titleBar.removeEventFilter(MouseEvent.MOUSE_RELEASED, dragListener);
@@ -265,6 +272,22 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 		stage.setHeight(bounds.getHeight() + dy);
 	}
 
+	private class DoubleClickerListener implements EventHandler<MouseEvent> {
+		@Override
+		public void handle(MouseEvent event) {
+			EventType<? extends MouseEvent> eventType = event.getEventType();
+			if (MouseEvent.MOUSE_PRESSED.equals(eventType)) {
+				if (event.getClickCount() == 2) {
+					if (getStage().isMaximized()) {
+						restore();
+					} else {
+						maximize();
+					}
+				}
+			}
+		}
+	}
+
 
 	private class DragListener implements EventHandler<MouseEvent> {
 
@@ -281,31 +304,29 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 		public void handle(MouseEvent event) {
 			EventType<? extends MouseEvent> eventType = event.getEventType();
 			if (MouseEvent.MOUSE_PRESSED.equals(eventType)) {
-				// TODO: move this section to it's own handler? Not related to dragging
-				if (event.getClickCount() == 2) {
-					if (getStage().isMaximized()) {
-						restore();
-					} else {
-						maximize();
-					}
-				}
-
-
 				deltaX = getStage().getX() - event.getScreenX();
 				deltaY = getStage().getY() - event.getScreenY();
 			} else if (MouseEvent.MOUSE_RELEASED.equals(eventType)) {
 				node.setCursor(Cursor.DEFAULT);
 			} else if (MouseEvent.MOUSE_DRAGGED.equals(eventType)) {
+				if (event.getClickCount() == 2) return;
 				node.setCursor(Cursor.MOVE);
 				if (getStage().isMaximized()) {
 					// This calculation ensures the mouse remains in the same relative area of the title bar after being restored.
 					double width = getStage().getWidth();
 					restore();
 					double deltaWidth = getStage().getWidth() - width;
-					deltaX -= (deltaWidth + width - 2 * event.getScreenX()) / 2;
+					double screenX = event.getScreenX();
+					double screenY = event.getScreenY();
+					Screen screen = Screens.getScreen(screenX, screenY);
+					screenX -= screen.getBounds().getMinX();
+
+					deltaX -= (deltaWidth + width - 2 * screenX) / 2;
 				}
 				getStage().setX(event.getScreenX() + deltaX);
 				getStage().setY(event.getScreenY() + deltaY);
+				System.out.println(getStage().getX() + ", " + getStage().getY());
+
 			} else if (MouseEvent.MOUSE_EXITED.equals(eventType)) {
 				if (!event.isPrimaryButtonDown()) {
 					node.setCursor(Cursor.DEFAULT);
