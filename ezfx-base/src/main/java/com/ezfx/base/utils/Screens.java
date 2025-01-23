@@ -5,6 +5,8 @@ import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.util.Optional;
+
 public interface Screens {
 
 	static void setScreen(Stage stage, int index) {
@@ -28,14 +30,14 @@ public interface Screens {
 				.orElse(Screen.getPrimary());
 	}
 
-	static Screen getScreen(double x, double y) {
+	static Optional<Screen> getScreen(double x, double y) {
 		for (Screen screen : Screen.getScreens()) {
 			Rectangle2D bounds = screen.getBounds();
 			if (bounds.contains(x, y)) {
-				return screen;
+				return Optional.of(screen);
 			}
 		}
-		return null;
+		return Optional.empty();
 	}
 
 }

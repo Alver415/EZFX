@@ -12,6 +12,7 @@ import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.event.EventType;
+import javafx.geometry.Bounds;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.*;
 import javafx.scene.control.Button;
@@ -312,20 +313,26 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 				if (event.getClickCount() == 2) return;
 				node.setCursor(Cursor.MOVE);
 				if (getStage().isMaximized()) {
-					// This calculation ensures the mouse remains in the same relative area of the title bar after being restored.
-					double width = getStage().getWidth();
-					restore();
-					double deltaWidth = getStage().getWidth() - width;
+					// This calculation ensures the mouse remains in the center of the title bar after being restored.
+					double startWidth = getStage().getWidth();
 					double screenX = event.getScreenX();
+					double relativeX = screenX / startWidth;
 					double screenY = event.getScreenY();
-					Screen screen = Screens.getScreen(screenX, screenY);
-					screenX -= screen.getBounds().getMinX();
+					restore();
+					double endWidth = getStage().getWidth();
+					double deltaWidth = endWidth - startWidth;
 
-					deltaX -= (deltaWidth + width - 2 * screenX) / 2;
+					//Adjust for multiple screens
+					screenX -= Screens.getScreen(screenX, screenY)
+							.map(Screen::getBounds)
+							.map(Rectangle2D::getMinX)
+							.orElse(0d);
+
+					deltaX -= (deltaWidth + startWidth - 2 * screenX) / 2;
+					deltaX -= (relativeX * endWidth) - endWidth / 2;
 				}
 				getStage().setX(event.getScreenX() + deltaX);
 				getStage().setY(event.getScreenY() + deltaY);
-				System.out.println(getStage().getX() + ", " + getStage().getY());
 
 			} else if (MouseEvent.MOUSE_EXITED.equals(eventType)) {
 				if (!event.isPrimaryButtonDown()) {
