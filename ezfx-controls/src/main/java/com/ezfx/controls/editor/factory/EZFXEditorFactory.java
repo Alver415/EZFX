@@ -13,6 +13,7 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -30,6 +31,8 @@ public class EZFXEditorFactory implements EditorFactory {
 			StringEditor stringEditor = new StringEditor((Property<String>) property);
 			stringEditor.setSkin(new CSSEditorSkin(stringEditor));
 			editor = (Editor<T>) stringEditor;
+		} else if (Font.class.equals(type)) {
+			editor = (Editor<T>) new FontEditor((Property<Font>) property);
 		} else if (Background.class.equals(type)) {
 			editor = (Editor<T>) new BackgroundEditor((Property<Background>) property);
 		} else if (BackgroundFill.class.equals(type)) {

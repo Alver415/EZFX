@@ -1,14 +1,11 @@
 package com.ezfx.app.stage;
 
-import com.ezfx.base.utils.Resources;
 import com.ezfx.controls.editor.introspective.ActionIntrospector;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
@@ -39,7 +36,6 @@ import static com.ezfx.controls.icons.SVGs.*;
 public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> {
 
 	protected final StackPane window;
-	protected final StackPane boundary;
 	protected final BorderPane stagePane;
 	protected final ContextMenu contextMenu;
 
@@ -68,18 +64,17 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 
 		window = new StackPane();
 		window.getStyleClass().add("window");
+		window.setPickOnBounds(true);
+		window.setMouseTransparent(false);
 		stage.flatMap(Stage::focusedProperty).orElse(false).subscribe(focused -> {
 			window.pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), focused);
 			window.pseudoClassStateChanged(PseudoClass.getPseudoClass("unfocused"), !focused);
 		});
 
-		boundary = new StackPane();
-		boundary.getStyleClass().add("boundary");
-		window.getChildren().setAll(boundary);
 
 		stagePane = new BorderPane();
 		stagePane.getStyleClass().add("stage");
-		boundary.getChildren().setAll(stagePane);
+		window.getChildren().setAll(stagePane);
 
 		ActionIntrospector.register(this);
 		Action settingsAction = ActionIntrospector.action("settings");
@@ -151,8 +146,8 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 		subScene.fillProperty().bind(control.sceneFillProperty());
 		subScene.userAgentStylesheetProperty().bind(control.sceneProperty().flatMap(Scene::userAgentStylesheetProperty));
 
-		horizontalPadding = Bindings.createDoubleBinding(() -> boundary.getPadding().getLeft() + boundary.getPadding().getRight(), boundary.paddingProperty());
-		verticalPadding = Bindings.createDoubleBinding(() -> boundary.getPadding().getTop() + boundary.getPadding().getBottom(), boundary.paddingProperty());
+		horizontalPadding = Bindings.createDoubleBinding(() -> window.getPadding().getLeft() + window.getPadding().getRight(), window.paddingProperty());
+		verticalPadding = Bindings.createDoubleBinding(() -> window.getPadding().getTop() + window.getPadding().getBottom(), window.paddingProperty());
 
 		stage.subscribe(stage -> {
 			if (stage == null) return;
@@ -212,11 +207,11 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 		titleBar.addEventHandler(MouseEvent.MOUSE_EXITED, dragListener);
 
 		resizeListener = new ResizeListener();
-		boundary.addEventHandler(MouseEvent.MOUSE_MOVED, resizeListener);
-		boundary.addEventHandler(MouseEvent.MOUSE_PRESSED, resizeListener);
-		boundary.addEventHandler(MouseEvent.MOUSE_DRAGGED, resizeListener);
-		boundary.addEventHandler(MouseEvent.MOUSE_EXITED, resizeListener);
-		boundary.addEventHandler(MouseEvent.MOUSE_EXITED_TARGET, resizeListener);
+		window.addEventHandler(MouseEvent.MOUSE_MOVED, resizeListener);
+		window.addEventHandler(MouseEvent.MOUSE_PRESSED, resizeListener);
+		window.addEventHandler(MouseEvent.MOUSE_DRAGGED, resizeListener);
+		window.addEventHandler(MouseEvent.MOUSE_EXITED, resizeListener);
+		window.addEventHandler(MouseEvent.MOUSE_EXITED_TARGET, resizeListener);
 	}
 
 	@Override
@@ -228,11 +223,11 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 		titleBar.removeEventFilter(MouseEvent.MOUSE_DRAGGED, dragListener);
 		titleBar.removeEventFilter(MouseEvent.MOUSE_EXITED, dragListener);
 
-		boundary.removeEventFilter(MouseEvent.MOUSE_MOVED, resizeListener);
-		boundary.removeEventFilter(MouseEvent.MOUSE_PRESSED, resizeListener);
-		boundary.removeEventFilter(MouseEvent.MOUSE_DRAGGED, resizeListener);
-		boundary.removeEventFilter(MouseEvent.MOUSE_EXITED, resizeListener);
-		boundary.removeEventFilter(MouseEvent.MOUSE_EXITED_TARGET, resizeListener);
+		window.removeEventFilter(MouseEvent.MOUSE_MOVED, resizeListener);
+		window.removeEventFilter(MouseEvent.MOUSE_PRESSED, resizeListener);
+		window.removeEventFilter(MouseEvent.MOUSE_DRAGGED, resizeListener);
+		window.removeEventFilter(MouseEvent.MOUSE_EXITED, resizeListener);
+		window.removeEventFilter(MouseEvent.MOUSE_EXITED_TARGET, resizeListener);
 	}
 
 	@ActionProxy(id = "close", text = "Close", longText = "Close the window.", graphic = "com/ezfx/controls/icons/mycons/close.png")
@@ -263,10 +258,13 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 		Screen screen = getScreen(stage);
 		Rectangle2D bounds = screen.getVisualBounds();
 
-		stage.setWidth(bounds.getWidth() + getPadding() * 2);
-		stage.setHeight(bounds.getHeight() + getPadding() * 2);
-		stage.setX(bounds.getMinX() - getPadding());
-		stage.setY(bounds.getMinY() - getPadding());
+		double dx = window.getWidth() - stagePane.getWidth();
+		double dy = window.getHeight() - stagePane.getHeight();
+
+		stage.setX(bounds.getMinX() - (dx / 2));
+		stage.setY(bounds.getMinY() - (dy / 2));
+		stage.setWidth(bounds.getWidth() + dx);
+		stage.setHeight(bounds.getHeight() + dy);
 	}
 
 
@@ -324,11 +322,11 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 					sceneWidth = scene.getWidth(),
 					sceneHeight = scene.getHeight();
 
-			int borderWidth = 8;
+			int borderWidth = 4;
 			if (MouseEvent.MOUSE_MOVED.equals(eventType)) {
 
 				EventTarget target = event.getTarget();
-				if (target != boundary) {
+				if (target != window) {
 					cursor = Cursor.DEFAULT;
 				}
 				if (eventX < borderWidth && eventY < borderWidth) {
@@ -412,21 +410,6 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 
 	public void setDescription(String value) {
 		this.descriptionProperty().setValue(value);
-	}
-
-
-	private final DoubleProperty padding = new SimpleDoubleProperty(this, "padding", 20);
-
-	public DoubleProperty paddingProperty() {
-		return this.padding;
-	}
-
-	public Double getPadding() {
-		return this.paddingProperty().getValue();
-	}
-
-	public void setPadding(Double value) {
-		this.paddingProperty().setValue(value);
 	}
 
 }

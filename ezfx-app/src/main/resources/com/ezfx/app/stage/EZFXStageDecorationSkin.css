@@ -1,10 +1,6 @@
 
 .window {
-    -fx-background-radius: 5px;
-    -fx-background-color: transparent;
-}
-
-.boundary {
+    -fx-background-color: rgba(0,0,0,0.005);
     -fx-padding: 20px;
 }
 
