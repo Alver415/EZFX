@@ -64,8 +64,6 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 
 		window = new StackPane();
 		window.getStyleClass().add("window");
-		window.setPickOnBounds(true);
-		window.setMouseTransparent(false);
 		stage.flatMap(Stage::focusedProperty).orElse(false).subscribe(focused -> {
 			window.pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), focused);
 			window.pseudoClassStateChanged(PseudoClass.getPseudoClass("unfocused"), !focused);
@@ -283,6 +281,7 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 		public void handle(MouseEvent event) {
 			EventType<? extends MouseEvent> eventType = event.getEventType();
 			if (MouseEvent.MOUSE_PRESSED.equals(eventType)) {
+				// TODO: move this section to it's own handler? Not related to dragging
 				if (event.getClickCount() == 2) {
 					if (getStage().isMaximized()) {
 						restore();
@@ -290,12 +289,21 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 						maximize();
 					}
 				}
+
+
 				deltaX = getStage().getX() - event.getScreenX();
 				deltaY = getStage().getY() - event.getScreenY();
 			} else if (MouseEvent.MOUSE_RELEASED.equals(eventType)) {
 				node.setCursor(Cursor.DEFAULT);
 			} else if (MouseEvent.MOUSE_DRAGGED.equals(eventType)) {
 				node.setCursor(Cursor.MOVE);
+				if (getStage().isMaximized()) {
+					// This calculation ensures the mouse remains in the same relative area of the title bar after being restored.
+					double width = getStage().getWidth();
+					restore();
+					double deltaWidth = getStage().getWidth() - width;
+					deltaX -= (deltaWidth + width - 2 * event.getScreenX()) / 2;
+				}
 				getStage().setX(event.getScreenX() + deltaX);
 				getStage().setY(event.getScreenY() + deltaY);
 			} else if (MouseEvent.MOUSE_EXITED.equals(eventType)) {
@@ -322,7 +330,7 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 					sceneWidth = scene.getWidth(),
 					sceneHeight = scene.getHeight();
 
-			int borderWidth = 4;
+			int borderWidth = (int) ((window.getWidth() - stagePane.getWidth()) / 2);
 			if (MouseEvent.MOUSE_MOVED.equals(eventType)) {
 
 				EventTarget target = event.getTarget();

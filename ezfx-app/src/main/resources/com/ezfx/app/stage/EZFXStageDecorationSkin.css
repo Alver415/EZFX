@@ -5,8 +5,12 @@
 }
 
 .stage {
+    -fx-border-color: lightgrey;
 	-fx-background-color: transparent;
-	-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 16, 0, 4, 4);
+	-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 16, 0, 4, 4);
+}
+.window:focused .stage {
+    -fx-border-color: darkgrey;
 }
 
 .scene {
