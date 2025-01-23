@@ -36,10 +36,6 @@
             <artifactId>ezfx-polyglot</artifactId>
         </dependency>
         <dependency>
-            <groupId>ezfx</groupId>
-            <artifactId>ezfx-spring</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <scope>runtime</scope>

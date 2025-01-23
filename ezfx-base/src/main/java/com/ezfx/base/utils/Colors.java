@@ -1,5 +1,6 @@
 package com.ezfx.base.utils;
 
+import javafx.scene.layout.Background;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
@@ -36,5 +37,9 @@ public interface Colors {
 				(int) (color.getGreen() * 255),
 				(int) (color.getBlue() * 255),
 				color.getOpacity());
+	}
+
+	static Color withAlpha(Color white, double alpha) {
+		return white.interpolate(Color.TRANSPARENT, alpha);
 	}
 }

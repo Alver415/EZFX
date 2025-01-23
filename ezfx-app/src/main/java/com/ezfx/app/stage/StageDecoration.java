@@ -1,13 +1,17 @@
 package com.ezfx.app.stage;
 
-import com.ezfx.base.utils.Resources;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.*;
 import javafx.css.converter.PaintConverter;
 import javafx.scene.Parent;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
 import java.util.ArrayList;
@@ -16,7 +20,16 @@ import java.util.List;
 
 public class StageDecoration extends Control {
 
-	private final Property<Parent> root = new SimpleObjectProperty<>(this, "root");
+	public StageDecoration() {
+		setBackground(Background.fill(Color.TRANSPARENT));
+	}
+
+	@Override
+	protected Skin<?> createDefaultSkin() {
+		return new StageDecorationSkin<>(this);
+	}
+
+	private final Property<Parent> root = new SimpleObjectProperty<>(this, "root", new StackPane());
 
 	public Property<Parent> rootProperty() {
 		return this.root;
@@ -30,12 +43,21 @@ public class StageDecoration extends Control {
 		this.rootProperty().setValue(value);
 	}
 
-	public StageDecoration() {
-		getStylesheets().add(Resources.css(DefaultSkin.class, "StageDecoration.css"));
-		getStyleClass().add("stage-decoration");
+	private final BooleanProperty showTitleBar = new SimpleBooleanProperty(this, "showTitleBar", true);
+
+	public BooleanProperty showTitleBarProperty() {
+		return this.showTitleBar;
 	}
 
-	private StyleableObjectProperty<Paint> sceneFill = new SimpleStyleableObjectProperty<>(StyleableProperties.SCENE_FILL, this, "sceneFill");
+	public Boolean getShowTitleBar() {
+		return this.showTitleBarProperty().getValue();
+	}
+
+	public void setShowTitleBar(Boolean value) {
+		this.showTitleBarProperty().setValue(value);
+	}
+
+	private final StyleableObjectProperty<Paint> sceneFill = new SimpleStyleableObjectProperty<>(StyleableProperties.SCENE_FILL, this, "sceneFill", Color.TRANSPARENT);
 
 	public Paint getSceneFill() {
 		return sceneFill.get();
@@ -55,7 +77,7 @@ public class StageDecoration extends Control {
 				new CssMetaData<>("-fx-scene-fill", PaintConverter.getInstance()) {
 					@Override
 					public boolean isSettable(StageDecoration control) {
-						return control.sceneFill == null || !control.sceneFill.isBound();
+						return !control.sceneFill.isBound();
 					}
 
 					@Override
@@ -78,15 +100,4 @@ public class StageDecoration extends Control {
 		return StyleableProperties.STYLEABLES;
 	}
 
-
-	@Override
-	protected Skin<?> createDefaultSkin() {
-		return new DefaultSkin(this);
-	}
-
-	public static class DefaultSkin extends StageDecorationSkin<StageDecoration> {
-		public DefaultSkin(StageDecoration control) {
-			super(control);
-		}
-	}
 }

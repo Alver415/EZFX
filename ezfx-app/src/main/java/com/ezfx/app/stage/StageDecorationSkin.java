@@ -1,168 +1,200 @@
 package com.ezfx.app.stage;
 
+import com.ezfx.base.utils.Resources;
 import com.ezfx.controls.editor.introspective.ActionIntrospector;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
-import javafx.beans.binding.ObjectBinding;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.event.EventType;
-import javafx.scene.Cursor;
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.SubScene;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SkinBase;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
-import org.apache.logging.log4j.util.Strings;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionProxy;
 import org.controlsfx.control.action.ActionUtils;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
+import static com.ezfx.base.utils.Screens.getScreen;
+import static com.ezfx.controls.icons.SVGs.*;
+
 public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> {
 
-	private static final ObservableList<Image> EMPTY_LIST = FXCollections.emptyObservableList();
+	protected final StackPane window;
+	protected final StackPane boundary;
+	protected final BorderPane stagePane;
+	protected final ContextMenu contextMenu;
 
-	private final StackPane boundary;
-	private final BorderPane borderPane;
-	private final ContextMenu contextMenu;
+	protected final BorderPane titleBar;
+	protected final HBox titleHeader;
+	protected final ImageView iconView;
+	protected final Text titleText;
 
-	private final BorderPane titleBar;
-	private final HBox titleHeader;
-	private final ImageView iconView;
-	private final Text titleText;
-	private final Text separator;
-	private final Text descriptionText;
-	private final Region actionButtons;
+	protected final HBox buttonBar;
+	protected final Button settingsButton;
+	protected final Button minimizeButton;
+	protected final Button maximizeButton;
+	protected final Group centerButton;
+	protected final Button restoreButton;
+	protected final Button closeButton;
 
-	private final SubScene subScene;
+	protected final SubScene subScene;
 
 	private final DoubleBinding horizontalPadding;
 	private final DoubleBinding verticalPadding;
+
 
 	public StageDecorationSkin(T control) {
 		super(control);
 		stage.bind(control.sceneProperty().flatMap(Scene::windowProperty).map(window -> (Stage) window));
 
+		window = new StackPane();
+		window.getStyleClass().add("window");
+		stage.flatMap(Stage::focusedProperty).orElse(false).subscribe(focused -> {
+			window.pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), focused);
+			window.pseudoClassStateChanged(PseudoClass.getPseudoClass("unfocused"), !focused);
+		});
 
-		borderPane = new BorderPane();
-		borderPane.getStyleClass().add("stage");
-		stage.flatMap(Stage::focusedProperty).subscribe(focused ->
-				borderPane.pseudoClassStateChanged(PseudoClass.getPseudoClass("focused"), focused));
-
-		boundary = new StackPane(borderPane);
+		boundary = new StackPane();
 		boundary.getStyleClass().add("boundary");
+		window.getChildren().setAll(boundary);
+
+		stagePane = new BorderPane();
+		stagePane.getStyleClass().add("stage");
+		boundary.getChildren().setAll(stagePane);
 
 		ActionIntrospector.register(this);
+		Action settingsAction = ActionIntrospector.action("settings");
 		Action minimizeAction = ActionIntrospector.action("minimize");
 		Action maximizeAction = ActionIntrospector.action("maximize");
 		Action restoreAction = ActionIntrospector.action("restore");
 		Action closeAction = ActionIntrospector.action("close");
 		closeAction.getStyleClass().add("action-close");
-		Collection<Action> actions = List.of(minimizeAction, maximizeAction, restoreAction, closeAction);
+		List<Action> actions = List.of(minimizeAction, maximizeAction, restoreAction, closeAction);
+
+
+		settingsAction.setGraphic(GEAR.svg());
+		minimizeAction.setGraphic(MINIMIZE.svg());
+		maximizeAction.setGraphic(MAXIMIZE.svg());
+		restoreAction.setGraphic(RESTORE.svg());
+		closeAction.setGraphic(CLOSE.svg());
 
 		Function<Boolean, Boolean> invert = b -> !b;
 		restoreAction.disabledProperty().bind(stageProperty().flatMap(Stage::maximizedProperty).map(invert));
 		maximizeAction.disabledProperty().bind(stageProperty().flatMap(Stage::maximizedProperty));
 		minimizeAction.disabledProperty().bind(stageProperty().flatMap(Stage::iconifiedProperty));
 
+		settingsButton = createActionButton(settingsAction);
+		minimizeButton = createActionButton(minimizeAction);
+		maximizeButton = createActionButton(maximizeAction);
+		restoreButton = createActionButton(restoreAction);
+		closeButton = createActionButton(closeAction);
+
+		centerButton = new Group();
+		stageProperty().flatMap(Stage::maximizedProperty).orElse(false).subscribe(maximized -> {
+			centerButton.getChildren().setAll(maximized ? restoreButton : maximizeButton);
+		});
+
+
 		contextMenu = ActionUtils.createContextMenu(actions);
-		actionButtons = createActionButtons(actions);
-		actionButtons.getStyleClass().add("button-bar");
+		buttonBar = new HBox();
+		buttonBar.getStyleClass().add("button-bar");
+		buttonBar.getChildren().setAll(settingsButton, minimizeButton, centerButton, closeButton);
 
 		titleBar = new BorderPane();
+		titleBar.setBackground(Background.fill(Color.WHITE.interpolate(Color.TRANSPARENT, 0.5)));
 		titleBar.getStyleClass().add("title-bar");
 
 		iconView = new ImageView();
+		iconView.getStyleClass().add("icon");
 		iconView.setPickOnBounds(true);
-		//TODO: Select correct image based on size.
-		ObjectBinding<Image> firstIcon = Bindings.createObjectBinding(
-				() -> stageProperty().map(Stage::getIcons).orElse(EMPTY_LIST).getValue()
-						.stream().findFirst().orElse(null), stageProperty());
-		iconView.imageProperty().bind(firstIcon);
+		iconView.imageProperty().bind(stageProperty().flatMap(stage -> {
+			SimpleObjectProperty<Image> property = new SimpleObjectProperty<>();
+			stage.getIcons().addListener((ListChangeListener<? super Image>) change -> {
+				property.set(change.getList().stream().findFirst().orElse(null));
+			});
+			property.set(stage.getIcons().stream().findFirst().orElse(null));
+			return property;
+		}));
 		iconView.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> contextMenu.show(iconView, event.getScreenX(), event.getScreenY()));
 
 		titleText = new Text();
 		titleText.getStyleClass().add("title");
-
-		descriptionText = new Text();
-		descriptionText.getStyleClass().add("description");
 		titleText.textProperty().bind(stageProperty().flatMap(Stage::titleProperty));
-		descriptionText.textProperty().bind(this.descriptionProperty());
 
-		separator = new Text();
-		separator.textProperty().bind(Bindings.createStringBinding(() ->
-						!Strings.isEmpty(titleText.getText()) && !Strings.isEmpty(descriptionText.getText()) ? " - " : "",
-				titleText.textProperty(), descriptionText.textProperty()));
-
-		titleHeader = new HBox(iconView, titleText, separator, descriptionText);
+		titleHeader = new HBox(iconView, titleText);
 		titleHeader.getStyleClass().add("title-header");
 		titleBar.setLeft(titleHeader);
-		titleBar.setRight(actionButtons);
-		borderPane.setTop(titleBar);
-
-		horizontalPadding = Bindings.createDoubleBinding(() -> boundary.getPadding().getLeft() + boundary.getPadding().getRight(), boundary.paddingProperty());
-		verticalPadding = Bindings.createDoubleBinding(() -> boundary.getPadding().getTop() + boundary.getPadding().getBottom(), boundary.paddingProperty());
-
-		stageProperty().subscribe(stage -> {
-			stage.minWidthProperty().bind(
-					actionButtons.widthProperty()
-							.add(titleHeader.widthProperty())
-							.add(horizontalPadding));
-			stage.minHeightProperty().bind(
-					titleBar.heightProperty()
-							.add(verticalPadding));
-		});
+		titleBar.setRight(buttonBar);
+		stagePane.setTop(titleBar);
 
 		subScene = new SubScene(new Pane(), 600, 400);
 		subScene.getStyleClass().add("scene");
 		subScene.fillProperty().bind(control.sceneFillProperty());
 		subScene.userAgentStylesheetProperty().bind(control.sceneProperty().flatMap(Scene::userAgentStylesheetProperty));
-		ObservableValue<Number> stageWidth = stageProperty().flatMap(Stage::widthProperty);
-		ObservableValue<Number> stageHeight = stageProperty().flatMap(Stage::heightProperty);
+
+		horizontalPadding = Bindings.createDoubleBinding(() -> boundary.getPadding().getLeft() + boundary.getPadding().getRight(), boundary.paddingProperty());
+		verticalPadding = Bindings.createDoubleBinding(() -> boundary.getPadding().getTop() + boundary.getPadding().getBottom(), boundary.paddingProperty());
+
+		stage.subscribe(stage -> {
+			if (stage == null) return;
+			stage.minWidthProperty().bind(
+					buttonBar.widthProperty()
+							.add(titleHeader.widthProperty())
+							.add(horizontalPadding));
+			stage.minHeightProperty().bind(
+					titleBar.heightProperty().map(h -> (control.getShowTitleBar() ? h.doubleValue() : 0.0) + verticalPadding.get())
+			);
+		});
+		ObservableValue<Number> stageWidth = stage.flatMap(Stage::widthProperty).orElse(0);
+		ObservableValue<Number> stageHeight = stage.flatMap(Stage::heightProperty).orElse(0);
 		subScene.widthProperty().bind(Bindings.createDoubleBinding(
 				() -> -horizontalPadding.get() + stageWidth.getValue().doubleValue(),
 				horizontalPadding, stageWidth));
 		subScene.heightProperty().bind(Bindings.createDoubleBinding(
-				() -> -verticalPadding.get() - titleHeader.heightProperty().get() + stageHeight.getValue().doubleValue(),
-				verticalPadding, titleHeader.heightProperty(), stageHeight));
-		borderPane.setCenter(subScene);
+				() -> {
+					double titleBarHeight = control.getShowTitleBar() ? titleBar.heightProperty().get() : 0;
+					return -verticalPadding.get() - titleBarHeight + stageHeight.getValue().doubleValue();
+				},
+				verticalPadding,
+				control.showTitleBarProperty(),
+				titleHeader.heightProperty(), stageHeight));
+		stagePane.setCenter(subScene);
 
 		subScene.rootProperty().bind(control.rootProperty());
-		getChildren().setAll(boundary);
+
+		control.showTitleBarProperty()
+				.map(showTitleBar -> showTitleBar ? titleBar : null)
+				.subscribe(stagePane::setTop);
+
+		getChildren().setAll(window);
+
 	}
 
-	private Region createActionButtons(Collection<Action> actions) {
-		HBox buttonBar = new HBox();
-		buttonBar.getStyleClass().add("button-bar");
-		List<Button> buttons = actions.stream().map(action -> {
-			Button button = new Button();
-			button.getStyleClass().addAll(action.getStyleClass());
-			button.graphicProperty().bind(action.graphicProperty());
-			button.setOnAction(action);
-			return button;
-		}).toList();
-		buttonBar.getChildren().setAll(buttons);
-		return buttonBar;
+	private Button createActionButton(Action action) {
+		Button button = new Button();
+		button.getStyleClass().addAll(action.getStyleClass());
+		button.graphicProperty().bind(action.graphicProperty());
+		button.setOnAction(action);
+		return button;
 	}
 
 	private DragListener dragListener;
@@ -203,25 +235,38 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 		boundary.removeEventFilter(MouseEvent.MOUSE_EXITED_TARGET, resizeListener);
 	}
 
-	@ActionProxy(id="restore", text="Restore", longText = "Return the window to its previous size and position.", graphic = "font>FontAwesome|SQUARE_ALT")
+	@ActionProxy(id = "close", text = "Close", longText = "Close the window.", graphic = "com/ezfx/controls/icons/mycons/close.png")
+	public void close() {
+		getStage().close();
+	}
+
+
+	@ActionProxy(id = "settings", text = "Settings", longText = "Open Application Settings.", graphic = "com/ezfx/controls/icons/mycons/gear.png")
+	public void settings() {
+	}
+
+	@ActionProxy(id = "restore", text = "Restore", longText = "Return the window to its previous size and position.", graphic = "com/ezfx/controls/icons/mycons/restore.png")
 	public void restore() {
 		getStage().setMaximized(false);
 	}
 
-	@ActionProxy(id="minimize", text="Minimize", longText = "Minimize the window to the taskbar.", graphic = "font>FontAwesome|MINUS")
+	@ActionProxy(id = "minimize", text = "Minimize", longText = "Minimize the window to the taskbar.", graphic = "com/ezfx/controls/icons/mycons/minimize.png")
 	public void minimize() {
 		getStage().setIconified(true);
 	}
 
-	@ActionProxy(id="maximize", text="Maximize", longText = "Expand the window to fill the screen.", graphic = "font>FontAwesome|SQUARE")
+	@ActionProxy(id = "maximize", text = "Maximize", longText = "Expand the window to fill the screen.", graphic = "com/ezfx/controls/icons/mycons/maximize.png")
 	public void maximize() {
-		getStage().setMaximized(true);
-		getStage().centerOnScreen();
-	}
+		Stage stage = getStage();
+		stage.setMaximized(true);
 
-	@ActionProxy(id="close", text="Close", longText = "Close the window.", graphic = "font>FontAwesome|CLOSE")
-	public void close() {
-		getStage().close();
+		Screen screen = getScreen(stage);
+		Rectangle2D bounds = screen.getVisualBounds();
+
+		stage.setWidth(bounds.getWidth() + getPadding() * 2);
+		stage.setHeight(bounds.getHeight() + getPadding() * 2);
+		stage.setX(bounds.getMinX() - getPadding());
+		stage.setY(bounds.getMinY() - getPadding());
 	}
 
 
@@ -240,22 +285,22 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 		public void handle(MouseEvent event) {
 			EventType<? extends MouseEvent> eventType = event.getEventType();
 			if (MouseEvent.MOUSE_PRESSED.equals(eventType)) {
-				if (event.getTarget() != node) return;
 				if (event.getClickCount() == 2) {
-					getStage().setMaximized(!getStage().isMaximized());
+					if (getStage().isMaximized()) {
+						restore();
+					} else {
+						maximize();
+					}
 				}
 				deltaX = getStage().getX() - event.getScreenX();
 				deltaY = getStage().getY() - event.getScreenY();
 			} else if (MouseEvent.MOUSE_RELEASED.equals(eventType)) {
-				if (event.getTarget() != node) return;
 				node.setCursor(Cursor.DEFAULT);
 			} else if (MouseEvent.MOUSE_DRAGGED.equals(eventType)) {
-				if (event.getTarget() != node) return;
 				node.setCursor(Cursor.MOVE);
 				getStage().setX(event.getScreenX() + deltaX);
 				getStage().setY(event.getScreenY() + deltaY);
 			} else if (MouseEvent.MOUSE_EXITED.equals(eventType)) {
-				if (event.getTarget() != node) return;
 				if (!event.isPrimaryButtonDown()) {
 					node.setCursor(Cursor.DEFAULT);
 				}
@@ -368,4 +413,20 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 	public void setDescription(String value) {
 		this.descriptionProperty().setValue(value);
 	}
+
+
+	private final DoubleProperty padding = new SimpleDoubleProperty(this, "padding", 20);
+
+	public DoubleProperty paddingProperty() {
+		return this.padding;
+	}
+
+	public Double getPadding() {
+		return this.paddingProperty().getValue();
+	}
+
+	public void setPadding(Double value) {
+		this.paddingProperty().setValue(value);
+	}
+
 }

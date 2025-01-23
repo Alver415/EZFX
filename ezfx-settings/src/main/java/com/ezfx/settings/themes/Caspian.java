@@ -1,22 +1,22 @@
-package com.ezfx.settings.theme;
+package com.ezfx.settings.themes;
 
 import atlantafx.base.theme.Theme;
 
-public class Modena implements Theme {
+public class Caspian implements Theme {
 
 	@Override
 	public String getName() {
-		return "Modena";
+		return "Caspian";
 	}
 
 	@Override
 	public String getUserAgentStylesheet() {
-		return "com/sun/javafx/scene/control/skin/modena/modena.css";
+		return "com/sun/javafx/scene/control/skin/caspian/caspian.css";
 	}
 
 	@Override
 	public String getUserAgentStylesheetBSS() {
-		return "com/sun/javafx/scene/control/skin/modena/modena.bss";
+		return "com/sun/javafx/scene/control/skin/caspian/caspian.bss";
 	}
 
 	@Override

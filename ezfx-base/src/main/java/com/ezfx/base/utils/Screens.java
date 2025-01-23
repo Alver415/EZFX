@@ -17,6 +17,15 @@ public interface Screens {
 		stage.setY(bounds.getMinY());
 		stage.setWidth(bounds.getWidth());
 		stage.setHeight(bounds.getHeight());
-
 	}
+
+	static Screen getScreen(Stage stage) {
+		return Screen.getScreensForRectangle(
+						stage.getX(), stage.getY(),
+						stage.getWidth(), stage.getHeight())
+				.stream()
+				.findFirst()
+				.orElse(Screen.getPrimary());
+	}
+
 }

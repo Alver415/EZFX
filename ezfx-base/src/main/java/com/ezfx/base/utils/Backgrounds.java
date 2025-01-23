@@ -16,8 +16,8 @@ import javafx.scene.paint.ImagePattern;
 
 public interface Backgrounds {
 
-	Color DEFAULT_PRIMARY = Color.LIGHTGRAY;
-	Color DEFAULT_SECONDARY = Color.DARKGRAY;
+	Color DEFAULT_PRIMARY = Color.LIGHTGRAY.interpolate(Color.TRANSPARENT, 0.5);
+	Color DEFAULT_SECONDARY = Color.DARKGRAY.interpolate(Color.TRANSPARENT, 0.5);
 
 	Background CHECKERED = checkeredBackground();
 

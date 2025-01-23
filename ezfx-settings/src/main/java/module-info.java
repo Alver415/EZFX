@@ -1,5 +1,6 @@
 open module ezfx.settings {
-	exports com.ezfx.settings.theme;
+	exports com.ezfx.settings.themes;
+	exports com.ezfx.settings;
 
 	// EZFX
 	requires transitive ezfx.base;

@@ -3,6 +3,7 @@ package com.ezfx.controls.editor.impl.javafx;
 import com.ezfx.base.io.SystemIO;
 import com.ezfx.controls.console.ConsoleView;
 import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.introspective.IntrospectingPropertiesEditor;
 import com.ezfx.controls.editor.skin.EditorSkin;
 import com.ezfx.controls.icons.Icons;
 import com.ezfx.controls.misc.ProgressView;
@@ -44,12 +45,12 @@ public class ApplicationEditorSkin extends EditorSkin<Editor<Application>, Appli
 		Button forceClose = new Button("FORCE CLOSE");
 		forceClose.setOnAction(_ -> forceClose());
 
-		SystemIO.overrideSystemDefaults();
-		ConsoleView consoleView = new ConsoleView(SystemIO.console);
+		IntrospectingPropertiesEditor<Application> subEditor = new IntrospectingPropertiesEditor<>(editor.valueProperty());
 
 		HBox frameRateBox = new HBox(4, frameRateLabel, frameRateBar);
 		HBox frameTimeBox = new HBox(4, frameTimeLabel, frameTimeBar);
-		VBox vBox = new VBox(8, spinner, frameRateBox, frameTimeBox, forceClose, consoleView);
+		VBox vBox = new VBox(8, spinner, frameRateBox, frameTimeBox, subEditor, forceClose);
+
 
 		StackPane stackPane = new StackPane(vBox);
 		stackPane.setPadding(new Insets(8));

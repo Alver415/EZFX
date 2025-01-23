@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -69,7 +71,7 @@ public class CodeEditorSkin extends EditorSkin<Editor<String>, String> {
 			codeArea.replaceText(Optional.ofNullable(text).orElse(""));
 		});
 		codeArea.textProperty().addListener((_, _, text) -> {
-			if (editor().valueProperty().getValue().equals(text)) return;
+			if (Objects.equals(editor().valueProperty().getValue(), text)) return;
 			editor().valueProperty().setValue(text);
 		});
 
@@ -88,6 +90,7 @@ public class CodeEditorSkin extends EditorSkin<Editor<String>, String> {
 	 */
 	protected StyleSpans<Collection<String>> computeHighlighting(String text) {
 		StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+		spansBuilder.add(Collections.singleton("none"), text.length());
 		return spansBuilder.create();
 	}
 }

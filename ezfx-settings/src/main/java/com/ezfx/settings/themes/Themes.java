@@ -1,4 +1,4 @@
-package com.ezfx.settings.theme;
+package com.ezfx.settings.themes;
 
 import atlantafx.base.theme.*;
 

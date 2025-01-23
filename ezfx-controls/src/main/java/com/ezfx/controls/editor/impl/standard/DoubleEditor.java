@@ -17,6 +17,9 @@ import static com.ezfx.base.utils.Converters.STRING_TO_DOUBLE;
 
 public class DoubleEditor extends ObjectEditor<Double> {
 
+	public DoubleEditor() {
+		this(new SimpleDoubleProperty());
+	}
 	public DoubleEditor(DoubleProperty property) {
 		this(property.asObject());
 	}

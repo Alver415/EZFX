@@ -1,14 +1,12 @@
 package com.ezfx.controls.editor;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 
-@Target(value = ElementType.METHOD)
+@Inherited
+@Target(value = {ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface EditorInfo {
+public @interface PropertyMetadata {
 
 	String DEFAULT_DISPLAY_NAME = "";
 

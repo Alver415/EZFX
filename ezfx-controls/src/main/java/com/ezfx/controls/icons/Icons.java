@@ -13,6 +13,11 @@ public interface Icons {
 	Image EDIT = load("font-awesome/edit.png");
 	Image LOADING = load("gifs/loading.gif");
 
+	Image CLOSE = load("mycons/close.png");
+	Image RESTORE = load("mycons/restore.png");
+	Image MAXIMIZE = load("mycons/maximize.png");
+	Image MINIMIZE = load("mycons/minimize.png");
+
 	private static Image load(String image) {
 		return Resources.image(Icons.class, image);
 	}

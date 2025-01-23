@@ -41,4 +41,6 @@ open module ezfx.controls {
 
 	// Reflections
 	requires org.reflections;
+	requires org.graalvm.nativeimage;
+	requires java.xml;
 }

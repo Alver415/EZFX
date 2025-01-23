@@ -4,7 +4,6 @@ import com.ezfx.base.observable.ObservableObjectArray;
 import com.ezfx.controls.editor.ArrayEditor;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.impl.standard.*;
-import com.ezfx.controls.editor.option.Option;
 import javafx.beans.property.Property;
 
 import java.util.List;

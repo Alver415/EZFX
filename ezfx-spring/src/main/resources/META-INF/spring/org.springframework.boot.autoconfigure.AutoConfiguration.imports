@@ -1,1 +1,1 @@
-autoconfigure.com.ezfx.spring.SpringFXAutoConfiguration
+com.ezfx.spring.autoconfigure.SpringFXAutoConfiguration

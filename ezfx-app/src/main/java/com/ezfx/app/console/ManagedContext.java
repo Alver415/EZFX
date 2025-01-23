@@ -22,6 +22,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.ezfx.base.utils.EZFX.runFX;
+
 
 public class ManagedContext implements Closeable {
 
@@ -47,13 +49,15 @@ public class ManagedContext implements Closeable {
 				if (closed.get()) continue;
 				try {
 					Evaluation evaluation = queue.poll(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-					try {
-						if (evaluation == null) continue;
-						Value result = context.eval(evaluation.source);
-						evaluation.value.complete(result);
-					} catch (PolyglotException e) {
-						evaluation.value.completeExceptionally(e);
-					}
+					runFX(() -> {
+						try {
+							if (evaluation == null) return;
+							Value result = context.eval(evaluation.source);
+							evaluation.value.complete(result);
+						} catch (PolyglotException e) {
+							evaluation.value.completeExceptionally(e);
+						}
+					});
 				} catch (Exception e) {
 					log.error(e.getMessage(), e);
 				}

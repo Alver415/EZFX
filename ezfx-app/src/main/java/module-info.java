@@ -12,7 +12,6 @@ open module ezfx.app {
 	requires transitive ezfx.settings;
 	requires transitive ezfx.filesystem;
 	requires transitive ezfx.polyglot;
-//	requires transitive ezfx.spring;
 
 	// JavaFX
 	requires transitive javafx.controls;
@@ -23,7 +22,6 @@ open module ezfx.app {
 
 	// Logging
 	requires transitive org.slf4j;
-	requires org.apache.logging.log4j;
 	requires org.fxmisc.flowless;
 	requires org.fxmisc.richtext;
 	requires easybind;

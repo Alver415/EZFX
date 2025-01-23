@@ -4,6 +4,7 @@ import com.ezfx.base.utils.Converter;
 import com.ezfx.controls.editor.ObjectEditor;
 import com.ezfx.controls.editor.skin.EditorSkin;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Skin;
@@ -21,6 +22,10 @@ import static com.ezfx.base.utils.ComplexBinding.bindBidirectional;
 public class FileSelectionEditor extends ObjectEditor<File> {
 
 	private static final Logger log = LoggerFactory.getLogger(FileSelectionEditor.class);
+
+	public FileSelectionEditor() {
+		super(new SimpleObjectProperty<>());
+	}
 
 	public FileSelectionEditor(Property<File> property) {
 		super(property);

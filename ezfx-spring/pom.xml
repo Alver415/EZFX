@@ -28,6 +28,12 @@
             </exclusions>
         </dependency>
 
+        <!-- EZFX -->
+        <dependency>
+            <groupId>ezfx</groupId>
+            <artifactId>ezfx-app</artifactId>
+        </dependency>
+
         <!-- JavaFX -->
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -36,6 +42,10 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ezfx</groupId>
+            <artifactId>ezfx-app</artifactId>
         </dependency>
     </dependencies>
 

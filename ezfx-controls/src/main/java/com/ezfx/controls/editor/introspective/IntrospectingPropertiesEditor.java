@@ -79,19 +79,19 @@ public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
 		}
 	}
 
-	public <T> Editor<T> buildEditor(PropertyInfo propertyInfo, Property<T> property) {
+	public <R> Editor<R> buildEditor(PropertyInfo propertyInfo, Property<R> property) {
 		Type type = propertyInfo.getter().getGenericReturnType();
 		if (type instanceof ParameterizedType parameterizedType) {
 			Type rawType = parameterizedType.getRawType();
 			Type genericType = parameterizedType.getActualTypeArguments()[0];
 			if (rawType instanceof Class clazz && genericType instanceof Class genericClazz && List.class.isAssignableFrom(clazz)) {
-				ListEditor<T> listEditor = new ListEditor<>((Property<ObservableList<T>>) property);
+				ListEditor<R> listEditor = new ListEditor<>((Property<ObservableList<R>>) property);
 				listEditor.setGenericType(genericClazz);
-				return (Editor<T>) listEditor;
+				return (Editor<R>) listEditor;
 			}
-			return getEditorFactory().buildEditor((Class<T>) rawType, property).orElseGet(Editor::new);
+			return getEditorFactory().buildEditor((Class<R>) rawType, property).orElseGet(Editor::new);
 		} else if (type instanceof Class clazz) {
-			return getEditorFactory().buildEditor((Class<T>) clazz, property).orElseGet(Editor::new);
+			return getEditorFactory().buildEditor((Class<R>) clazz, property).orElseGet(Editor::new);
 		} else return new Editor<>();
 	}
 

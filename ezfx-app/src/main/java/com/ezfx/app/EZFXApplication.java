@@ -1,29 +1,51 @@
 package com.ezfx.app;
 
+import atlantafx.base.theme.*;
 import com.ezfx.app.explorer.ApplicationExplorer;
 import com.ezfx.base.utils.ListChangeListeners;
+import com.ezfx.settings.themes.Caspian;
+import com.ezfx.settings.themes.Modena;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.event.EventHandler;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.effect.BlendMode;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public abstract class EZFXApplication extends Application {
 
 	@Override
 	public void init() throws Exception {
+
+		Files.readAllLines(Path.of("ezfx-app/src/main/resources/settings.properties")).stream().forEach(string -> {
+			int splitIndex = string.indexOf("=");
+			String key = string.substring(0, splitIndex);
+			String value = string.substring(splitIndex + 1);
+			if (key.equals("theme")) {
+				setTheme(ApplicationTheme.valueOf(value));
+			}
+		});
+
 		//This is needed to ensure removeEventFilter works
 		EventHandler<KeyEvent> handleDevToolsAction = this::handleDevToolsAction;
 
@@ -32,9 +54,22 @@ public abstract class EZFXApplication extends Application {
 			// as they are shown/hidden multiple times.
 			window.removeEventFilter(KeyEvent.KEY_PRESSED, handleDevToolsAction);
 			window.addEventHandler(KeyEvent.KEY_PRESSED, handleDevToolsAction);
-			darkModeProperty().map(darkMode -> darkMode ? BlendMode.DIFFERENCE : BlendMode.SRC_OVER)
-					.subscribe(blendMode -> window.getScene().getRoot().setBlendMode(blendMode));
+
+			if (window instanceof Stage stage){
+				if (stage.getTitle() == null && getTitle() != null) {
+					stage.setTitle(getTitle());
+				}
+//				if (stage.getIcons().isEmpty() && getIcon() != null) {
+//					stage.getIcons().add(getIcon());
+//				}
+			}
+
 		}));
+
+		themeProperty()
+				.map(ApplicationTheme::getTheme)
+				.map(Theme::getUserAgentStylesheet)
+				.subscribe(Application::setUserAgentStylesheet);
 	}
 
 	@Override
@@ -99,18 +134,69 @@ public abstract class EZFXApplication extends Application {
 		this.devToolsShortcutProperty().setValue(value);
 	}
 
-	private final BooleanProperty darkMode = new SimpleBooleanProperty(this, "darkMode");
 
-	public BooleanProperty darkModeProperty() {
-		return this.darkMode;
+	private final StringProperty title = new SimpleStringProperty(this, "title", "EZFX Application");
+
+	public StringProperty titleProperty() {
+		return this.title;
 	}
 
-	public Boolean getDarkMode() {
-		return this.darkModeProperty().getValue();
+	public String getTitle() {
+		return this.titleProperty().getValue();
 	}
 
-	public void setDarkMode(Boolean value) {
-		this.darkModeProperty().setValue(value);
+	public void setTitle(String value) {
+		this.titleProperty().setValue(value);
+	}
+
+	private final Property<Image> icon = new SimpleObjectProperty<>(this, "icon");
+
+	public Property<Image> iconProperty() {
+		return this.icon;
+	}
+
+	public Image getIcon() {
+		return this.iconProperty().getValue();
+	}
+
+	public void setIcon(Image value) {
+		this.iconProperty().setValue(value);
+	}
+
+	private final Property<ApplicationTheme> theme = new SimpleObjectProperty<>(this, "theme", ApplicationTheme.MODENA);
+
+	public Property<ApplicationTheme> themeProperty() {
+		return this.theme;
+	}
+
+	public ApplicationTheme getTheme() {
+		return this.themeProperty().getValue();
+	}
+
+	public void setTheme(ApplicationTheme value) {
+		this.themeProperty().setValue(value);
+	}
+
+	public enum ApplicationTheme {
+		MODENA(new Modena()),
+		CASPIAN(new Caspian()),
+		DRACULA(new Dracula()),
+		NORD_DARK(new NordDark()),
+		NORD_LIGHT(new NordLight()),
+		CUPERTINO_DARK(new CupertinoDark()),
+		CUPERTINO_LIGHT(new CupertinoLight()),
+		PRIMER_DARK(new PrimerDark()),
+		PRIMER_LIGHT(new PrimerLight());
+
+		private final Theme theme;
+
+		ApplicationTheme(Theme theme) {
+			this.theme = theme;
+		}
+
+		public Theme getTheme() {
+			return theme;
+		}
 	}
 
 }

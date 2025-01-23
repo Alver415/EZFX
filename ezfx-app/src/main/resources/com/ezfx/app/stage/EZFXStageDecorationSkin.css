@@ -1,0 +1,86 @@
+
+.window {
+    -fx-background-radius: 5px;
+    -fx-background-color: transparent;
+}
+
+.boundary {
+    -fx-padding: 20px;
+}
+
+.stage {
+	-fx-background-color: transparent;
+	-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 16, 0, 4, 4);
+}
+
+.scene {
+    -fx-background-color: transparent;
+}
+
+.title-bar {
+    -fx-pref-height: 32px;
+	-fx-background-color: -fx-base;
+	-fx-background-radius: 5 5 0 0;
+}
+.window:unfocused .title-bar {
+    -fx-opacity: 0.5;
+}
+
+.title-bar .title-header {
+    -fx-alignment: center;
+    -fx-padding: 0 0 0 8;
+    -fx-spacing: 4px;
+}
+
+.title-bar .title-header .icon{
+    -fx-fit-width: 32;
+    -fx-fit-height: 32;
+}
+
+.window .title-bar .title-header .title {
+    -fx-font-size: 12px;
+}
+
+.title-bar .button-bar {
+    -fx-spacing: 0px;
+    -fx-alignment: center;
+}
+
+.title-bar .button-bar .button {
+    -fx-padding: 0px;
+    -fx-exact-width: 45px;
+    -fx-exact-height: 32px;
+
+    -fx-min-width: -fx-exact-width;
+    -fx-max-width: -fx-exact-width;
+    -fx-pref-width: -fx-exact-width;
+
+    -fx-min-height: -fx-exact-height;
+    -fx-max-height: -fx-exact-height;
+    -fx-pref-height: -fx-exact-height;
+
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
+    -fx-background-radius: 5;
+}
+
+.title-bar .button-bar .button:hover {
+    -fx-background-color: rgba(0,0,0, 0.1);
+}
+.window:focused .title-bar .button-bar .button:hover {
+    -fx-background-color: rgba(0,0,0, 0.1);
+}
+.window:focused .title-bar .button-bar .button:pressed {
+    -fx-background-color: rgba(0,0,0, .25);
+}
+
+.title-bar .button-bar .action-close:hover {
+    -fx-background-color: rgba(232,17,35, 0.5);
+}
+.window:focused .title-bar .button-bar .action-close:hover {
+    -fx-background-color: rgba(232,17,35, 0.75);
+}
+.window:focused .title-bar .button-bar .action-close:pressed {
+    -fx-background-color: rgba(232,17,35, 1);
+}

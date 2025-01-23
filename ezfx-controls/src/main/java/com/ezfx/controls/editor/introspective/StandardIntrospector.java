@@ -1,7 +1,7 @@
 package com.ezfx.controls.editor.introspective;
 
 import com.ezfx.controls.editor.Category;
-import com.ezfx.controls.editor.EditorInfo;
+import com.ezfx.controls.editor.PropertyMetadata;
 import javafx.beans.property.Property;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -68,14 +68,14 @@ public class StandardIntrospector implements Introspector {
 			Method setter = setMethods.get(name);
 			Method getter = getMethods.get(name);
 
-			Optional<EditorInfo> propertyDetails = Optional.ofNullable(property.getAnnotation(EditorInfo.class));
-			if (propertyDetails.map(EditorInfo::ignore).orElse(false)) continue;
+			Optional<PropertyMetadata> propertyDetails = Optional.ofNullable(property.getAnnotation(PropertyMetadata.class));
+			if (propertyDetails.map(PropertyMetadata::ignore).orElse(false)) continue;
 
-			String displayName = propertyDetails.map(EditorInfo::displayName)
+			String displayName = propertyDetails.map(PropertyMetadata::displayName)
 					.orElse(name);
 
 			Class<?> declaringClass = property.getDeclaringClass();
-			String categoryTitle = propertyDetails.map(EditorInfo::categoryTitle)
+			String categoryTitle = propertyDetails.map(PropertyMetadata::categoryTitle)
 					.orElse(declaringClass.getSimpleName());
 			int depth = 0;
 			Class<?> clazz = declaringClass;
@@ -83,12 +83,12 @@ public class StandardIntrospector implements Introspector {
 				depth++;
 			}
 
-			int categoryOrder = propertyDetails.map(EditorInfo::categoryOrder)
+			int categoryOrder = propertyDetails.map(PropertyMetadata::categoryOrder)
 					.orElse(depth);
 			Category category = Category.of(categoryTitle, categoryOrder);
 
-			int order = propertyDetails.map(EditorInfo::order)
-					.orElse(EditorInfo.DEFAULT_ORDER);
+			int order = propertyDetails.map(PropertyMetadata::order)
+					.orElse(PropertyMetadata.DEFAULT_ORDER);
 
 			if (setter == null && getter == null) {
 				log.debug("Ignoring {} because there is neither a get method or a set method.", name);
