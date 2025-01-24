@@ -1,18 +1,18 @@
 package com.ezfx.app.stage;
 
 import com.ezfx.base.utils.Screens;
-import com.ezfx.controls.editor.introspective.ActionIntrospector;
+import com.ezfx.controls.utils.Actions;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.event.EventType;
-import javafx.geometry.Bounds;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.*;
 import javafx.scene.control.Button;
@@ -27,7 +27,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.controlsfx.control.action.Action;
-import org.controlsfx.control.action.ActionProxy;
 import org.controlsfx.control.action.ActionUtils;
 
 import java.util.List;
@@ -51,18 +50,31 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 	protected final Button settingsButton;
 	protected final Button minimizeButton;
 	protected final Button maximizeButton;
-	protected final StackPane centerButton;
+	protected final Button resizeButton;
 	protected final Button restoreButton;
 	protected final Button closeButton;
 
 	protected final SubScene subScene;
 
-	private final DoubleBinding horizontalPadding;
-	private final DoubleBinding verticalPadding;
+	protected final DoubleBinding horizontalPadding;
+	protected final DoubleBinding verticalPadding;
+	protected ObservableValue<Double> minHeightBinding;
+	protected ObservableValue<Double> minWidthBinding;
 
+	protected Action closeAction;
+	protected Action settingsAction;
+	protected Action restoreAction;
+	protected Action resizeAction;
+	protected Action maximizeAction;
+	protected Action minimizeAction;
+
+	protected ObservableValue<Action> resizeActionDelegate;
 
 	public StageDecorationSkin(T control) {
 		super(control);
+		initializeActions();
+
+
 		stage.bind(control.sceneProperty().flatMap(Scene::windowProperty).map(window -> (Stage) window));
 
 		window = new StackPane();
@@ -77,13 +89,6 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 		stagePane.getStyleClass().add("stage");
 		window.getChildren().setAll(stagePane);
 
-		ActionIntrospector.register(this);
-		Action settingsAction = ActionIntrospector.action("settings");
-		Action minimizeAction = ActionIntrospector.action("minimize");
-		Action maximizeAction = ActionIntrospector.action("maximize");
-		Action restoreAction = ActionIntrospector.action("restore");
-		Action closeAction = ActionIntrospector.action("close");
-		closeAction.getStyleClass().add("action-close");
 		List<Action> actions = List.of(minimizeAction, maximizeAction, restoreAction, closeAction);
 
 
@@ -102,18 +107,14 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 		minimizeButton = createActionButton(minimizeAction);
 		maximizeButton = createActionButton(maximizeAction);
 		restoreButton = createActionButton(restoreAction);
+		resizeButton = createActionButton(resizeAction);
 		closeButton = createActionButton(closeAction);
-
-		centerButton = new StackPane();
-		stageProperty().flatMap(Stage::maximizedProperty).orElse(false).subscribe(maximized -> {
-			centerButton.getChildren().setAll(maximized ? restoreButton : maximizeButton);
-		});
 
 
 		contextMenu = ActionUtils.createContextMenu(actions);
 		buttonBar = new HBox();
 		buttonBar.getStyleClass().add("button-bar");
-		buttonBar.getChildren().setAll(settingsButton, minimizeButton, centerButton, closeButton);
+		buttonBar.getChildren().setAll(settingsButton, minimizeButton, resizeButton, closeButton);
 
 		titleBar = new BorderPane();
 		titleBar.setBackground(Background.fill(Color.WHITE.interpolate(Color.TRANSPARENT, 0.5)));
@@ -150,15 +151,13 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 		horizontalPadding = Bindings.createDoubleBinding(() -> window.getPadding().getLeft() + window.getPadding().getRight(), window.paddingProperty());
 		verticalPadding = Bindings.createDoubleBinding(() -> window.getPadding().getTop() + window.getPadding().getBottom(), window.paddingProperty());
 
+		minHeightBinding = titleBar.heightProperty().map(h -> (control.getShowTitleBar() ? h.doubleValue() : 0.0) + verticalPadding.get());
+		minWidthBinding = buttonBar.widthProperty().add(titleHeader.widthProperty()).add(horizontalPadding).asObject();
+
 		stage.subscribe(stage -> {
 			if (stage == null) return;
-			stage.minWidthProperty().bind(
-					buttonBar.widthProperty()
-							.add(titleHeader.widthProperty())
-							.add(horizontalPadding));
-			stage.minHeightProperty().bind(
-					titleBar.heightProperty().map(h -> (control.getShowTitleBar() ? h.doubleValue() : 0.0) + verticalPadding.get())
-			);
+			stage.minWidthProperty().bind(minWidthBinding);
+			stage.minHeightProperty().bind(minHeightBinding);
 		});
 		ObservableValue<Number> stageWidth = stage.flatMap(Stage::widthProperty).orElse(0);
 		ObservableValue<Number> stageHeight = stage.flatMap(Stage::heightProperty).orElse(0);
@@ -182,6 +181,65 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 				.subscribe(stagePane::setTop);
 
 		getChildren().setAll(window);
+
+	}
+
+	private void initializeActions() {
+		Group gearGraphic = GEAR.svg();
+		Group restoreGraphic = RESTORE.svg();
+		Group maximizeGraphic = MAXIMIZE.svg();
+		Group closeGraphic = CLOSE.svg();
+		closeAction = Actions.newBuilder()
+				.text("Close")
+				.longText("Close the window.")
+				.graphic(closeGraphic)
+				.action(this::close)
+				.styleClass("action-close")
+				.build();
+
+		settingsAction = Actions.newBuilder()
+				.text("Settings")
+				.longText("Open Application Settings.")
+				.graphic(gearGraphic)
+				.action(this::openSettings)
+				.styleClass("action-settings")
+				.build();
+
+		restoreAction = Actions.newBuilder()
+				.text("Restore")
+				.longText("Return the window to its previous size and position.")
+				.graphic(restoreGraphic)
+				.action(this::restore)
+				.styleClass("action-restore")
+				.build();
+
+		maximizeAction = Actions.newBuilder()
+				.text("Maximize")
+				.longText("Expand the window to fill the screen.")
+				.graphic(maximizeGraphic)
+				.action(this::maximize)
+				.styleClass("action-maximize")
+				.build();
+
+		minimizeAction = Actions.newBuilder()
+				.text("Minimize")
+				.longText("Minimize the window to the taskbar.")
+				.graphic(MINIMIZE.svg())
+				.action(this::minimize)
+				.styleClass("action-minimize")
+				.build();
+
+
+		resizeActionDelegate = stageProperty()
+				.flatMap(Stage::maximizedProperty)
+				.map(isMaximized -> isMaximized ? restoreAction : maximizeAction);
+		resizeAction = Actions.newBuilder()
+				.text(resizeActionDelegate.map(Action::getText))
+				.longText(resizeActionDelegate.map(Action::getLongText))
+				.graphic(resizeActionDelegate.map(Action::getGraphic))
+				.action(event -> resizeActionDelegate.orElse(restoreAction).getValue().handle(event))
+				.styleClass("action-resize")
+				.build();
 
 	}
 
@@ -236,27 +294,29 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 		window.removeEventFilter(MouseEvent.MOUSE_EXITED_TARGET, resizeListener);
 	}
 
-	@ActionProxy(id = "close", text = "Close", longText = "Close the window.", graphic = "com/ezfx/controls/icons/mycons/close.png")
 	public void close() {
 		getStage().close();
 	}
 
-
-	@ActionProxy(id = "settings", text = "Settings", longText = "Open Application Settings.", graphic = "com/ezfx/controls/icons/mycons/gear.png")
-	public void settings() {
+	public void openSettings() {
 	}
 
-	@ActionProxy(id = "restore", text = "Restore", longText = "Return the window to its previous size and position.", graphic = "com/ezfx/controls/icons/mycons/restore.png")
 	public void restore() {
 		getStage().setMaximized(false);
 	}
 
-	@ActionProxy(id = "minimize", text = "Minimize", longText = "Minimize the window to the taskbar.", graphic = "com/ezfx/controls/icons/mycons/minimize.png")
+	public void resize() {
+		if (getStage().isMaximized()) {
+			restore();
+		} else {
+			maximize();
+		}
+	}
+
 	public void minimize() {
 		getStage().setIconified(true);
 	}
 
-	@ActionProxy(id = "maximize", text = "Maximize", longText = "Expand the window to fill the screen.", graphic = "com/ezfx/controls/icons/mycons/maximize.png")
 	public void maximize() {
 		Stage stage = getStage();
 		stage.setMaximized(true);
@@ -448,4 +508,17 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 		this.descriptionProperty().setValue(value);
 	}
 
+	private final MapProperty<String, Action> actions = new SimpleMapProperty<>(this, "actions", FXCollections.observableHashMap());
+
+	public MapProperty<String, Action> actionsProperty() {
+		return this.actions;
+	}
+
+	public ObservableMap<String, Action> getActions() {
+		return this.actionsProperty().getValue();
+	}
+
+	public void setActions(ObservableMap<String, Action> value) {
+		this.actionsProperty().setValue(value);
+	}
 }

@@ -48,6 +48,10 @@ public class DecoratedApplication extends EZFXApplication {
 		DecoratedStage windowsStage = new DecoratedStage();
 		windowsStage.getDecoration().setStyle("-fx-skin:\"com.ezfx.app.stage.WindowsStageDecorationSkin\"");
 		configureStage("Decorated Stage (Windows Skin)", windowsStage);
+
+		DecoratedStage macOSStage = new DecoratedStage();
+		macOSStage.getDecoration().setStyle("-fx-skin:\"com.ezfx.app.stage.MacOSStageDecorationSkin\"");
+		configureStage("Decorated Stage (MacOS Skin)", macOSStage);
 	}
 
 	static int offset = 0;

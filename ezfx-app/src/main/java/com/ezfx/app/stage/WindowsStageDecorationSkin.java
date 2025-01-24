@@ -45,6 +45,6 @@ public class WindowsStageDecorationSkin<T extends StageDecoration> extends Stage
 	public WindowsStageDecorationSkin(T control) {
 		super(control);
 		window.getStylesheets().setAll(STYLE_SHEET);
-		buttonBar.getChildren().setAll(minimizeButton, centerButton, closeButton);
+		buttonBar.getChildren().setAll(minimizeButton, resizeButton, closeButton);
 	}
 }
