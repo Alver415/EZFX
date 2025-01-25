@@ -16,9 +16,9 @@ public class ShortFieldSkin extends EditorSkin<ShortEditor, Short> {
 		TextField ShortField = new TextField();
 		bindBidirectional(ShortField.textProperty(), control.valueProperty(), Converters.STRING_TO_SHORT);
 		Button increment = new Button("", new ImageView(Icons.PLUS));
-		increment.setOnAction(_ -> property().setValue((short) (property().getValue() + 1)));
+		increment.setOnAction(_ -> valueProperty().setValue((short) (valueProperty().getValue() + 1)));
 		Button decrement = new Button("", new ImageView(Icons.MINUS));
-		decrement.setOnAction(_ -> property().setValue((short) (property().getValue() - 1)));
+		decrement.setOnAction(_ -> valueProperty().setValue((short) (valueProperty().getValue() - 1)));
 		getChildren().setAll(new HBox(ShortField, increment, decrement));
 	}
 }

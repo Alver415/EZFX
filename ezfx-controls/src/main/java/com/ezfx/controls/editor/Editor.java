@@ -34,8 +34,6 @@ public class Editor<T> extends Control {
 
 		initialValue = value.getValue();
 		setupActions();
-
-
 	}
 
 	@ActionProxy(id = "clear", text = "Clear", longText = "Set value to null", graphic = "font>FontAwesome|TIMES")
@@ -71,7 +69,7 @@ public class Editor<T> extends Control {
 	}
 
 	public void setValue(T value) {
-		this.value.setValue(value);
+		valueProperty().setValue(value);
 	}
 
 	private final ListProperty<Action> actions = new SimpleListProperty<>(this, "actions", FXCollections.observableArrayList());

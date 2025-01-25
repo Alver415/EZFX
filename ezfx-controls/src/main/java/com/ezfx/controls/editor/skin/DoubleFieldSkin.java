@@ -16,9 +16,9 @@ public class DoubleFieldSkin extends EditorSkin<DoubleEditor, Double> {
 		super(control);
 
 		Button increment = new RepeatingButton(new ImageView(Icons.PLUS));
-		increment.setOnAction(_ -> property().setValue(property().getValue() + 1));
+		increment.setOnAction(_ -> valueProperty().setValue(valueProperty().getValue() + 1));
 		Button decrement = new RepeatingButton(new ImageView(Icons.MINUS));
-		decrement.setOnAction(_ -> property().setValue(property().getValue() - 1));
+		decrement.setOnAction(_ -> valueProperty().setValue(valueProperty().getValue() - 1));
 
 
 		TextField doubleField = new TextField();

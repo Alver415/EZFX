@@ -65,14 +65,14 @@ public class CodeEditorSkin extends EditorSkin<Editor<String>, String> {
 				.subscribe(highlighting -> codeArea.setStyleSpans(0, highlighting));
 
 		//Binding
-		codeArea.replaceText(Optional.ofNullable(editor().getValue()).orElse(""));
-		editor().valueProperty().addListener((_, _, text) -> {
+		codeArea.replaceText(Optional.ofNullable(getValue()).orElse(""));
+		valueProperty().addListener((_, _, text) -> {
 			if (codeArea.getText().equals(text)) return;
 			codeArea.replaceText(Optional.ofNullable(text).orElse(""));
 		});
 		codeArea.textProperty().addListener((_, _, text) -> {
-			if (Objects.equals(editor().valueProperty().getValue(), text)) return;
-			editor().valueProperty().setValue(text);
+			if (Objects.equals(getValue(), text)) return;
+			setValue(text);
 		});
 
 		getChildren().setAll(scrollPane);

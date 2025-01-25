@@ -36,7 +36,7 @@ public class CssEditorSkin extends EditorSkin<CssEditor, Styleable> {
 		originColumn.setCellValueFactory(cdf -> cdf.getValue().valueProperty()
 				.map(CssEditorSkin::getCssMetaData)
 				//TODO: Make sure this works with observable property(), instead of calling getValue()
-				.map(cssMetaData -> cssMetaData.getStyleableProperty(property().getValue()))
+				.map(cssMetaData -> cssMetaData.getStyleableProperty(valueProperty().getValue()))
 				.map(StyleableProperty::getStyleOrigin));
 
 
@@ -45,14 +45,14 @@ public class CssEditorSkin extends EditorSkin<CssEditor, Styleable> {
 		treeTableView.getColumns().add(originColumn);
 
 
-		CssMetaDataTreeItem root = new CssMetaDataTreeItem(null, _ -> FXCollections.observableArrayList(property().getValue().getCssMetaData()));
+		CssMetaDataTreeItem root = new CssMetaDataTreeItem(null, _ -> FXCollections.observableArrayList(valueProperty().getValue().getCssMetaData()));
 		treeTableView.setRoot(root);
 
 		getChildren().setAll(treeTableView);
 	}
 
 	private <S extends Styleable, T> StringEditor buildEditor(CssMetaData<S, T> cssMetaData) {
-		S styleable = (S) editor().valueProperty().getValue();
+		S styleable = (S) getValue();
 		StyleableProperty<T> property = cssMetaData.getStyleableProperty(styleable);
 		if (property == null) return null;
 

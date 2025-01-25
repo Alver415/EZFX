@@ -48,12 +48,12 @@ public class CSSEditorSkin extends CodeEditorSkin {
 	@Override
 	public void install() {
 		super.install();
-		editor().getStylesheets().add(STYLE_SHEET);
+		getStylesheets().add(STYLE_SHEET);
 	}
 
 	@Override
 	public void dispose() {
 		super.dispose();
-		editor().getStylesheets().remove(STYLE_SHEET);
+		getStylesheets().remove(STYLE_SHEET);
 	}
 }

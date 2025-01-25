@@ -77,7 +77,7 @@ public class ArrayEditorSkin<T> extends EditorSkin<ArrayEditor<T>, ObservableObj
 
 	private void rebuild() {
 		locked(() -> {
-			ObservableObjectArray<T> originalArray = property().getValue();
+			ObservableObjectArray<T> originalArray = valueProperty().getValue();
 //			T[] oldArray = originalArray.toArray((T[]) Array.newInstance(editor().getGenericType(), 0));
 			if (originalArray.size() == 0) {
 				wrappers.clear();
@@ -95,18 +95,18 @@ public class ArrayEditorSkin<T> extends EditorSkin<ArrayEditor<T>, ObservableObj
 					} else {
 						// Create new
 						T item = originalArray.get(index);
-						Class<T> type = editor().getGenericType();
+						Class<T> type = editor.getGenericType();
 						Property<T> property = new SimpleObjectProperty<>(item);
 						int i = index;
 						property.addListener((_, _, v) -> {
 							if (!lock){
-								Class<T> genericType = editor().getGenericType();
-								ObservableObjectArray<T> orig = property().getValue();
-								T[] intermediate = (T[]) Array.newInstance(editor().getGenericType(), orig.size());
+								Class<T> genericType = editor.getGenericType();
+								ObservableObjectArray<T> orig = valueProperty().getValue();
+								T[] intermediate = (T[]) Array.newInstance(editor.getGenericType(), orig.size());
 								ObservableObjectArrayImpl<T> newA = new ObservableObjectArrayImpl<>(genericType, intermediate);
 								orig.copyTo(0, newA, 0, orig.size());
 								newA.set(i,v);
-								property().setValue(newA);
+								valueProperty().setValue(newA);
 							}
 						});
 						Editor<T> editor = DEFAULT_FACTORY.buildEditor(type, property).orElseGet(Editor::new);;
@@ -132,7 +132,7 @@ public class ArrayEditorSkin<T> extends EditorSkin<ArrayEditor<T>, ObservableObj
 //			}
 
 			subscription.unsubscribe();
-			subscription = property().getValue().subscribe(this::rebuild);
+			subscription = valueProperty().getValue().subscribe(this::rebuild);
 		});
 	}
 

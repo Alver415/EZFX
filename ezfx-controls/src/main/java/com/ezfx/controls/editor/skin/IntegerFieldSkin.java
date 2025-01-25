@@ -16,9 +16,9 @@ public class IntegerFieldSkin extends EditorSkin<IntegerEditor, Integer> {
 		TextField integerField = new TextField();
 		bindBidirectional(integerField.textProperty(), control.valueProperty(), Converters.STRING_TO_INTEGER);
 		Button increment = new Button("", new ImageView(Icons.PLUS));
-		increment.setOnAction(a -> property().setValue(property().getValue() + 1));
+		increment.setOnAction(a -> valueProperty().setValue(valueProperty().getValue() + 1));
 		Button decrement = new Button("", new ImageView(Icons.MINUS));
-		decrement.setOnAction(a -> property().setValue(property().getValue() - 1));
+		decrement.setOnAction(a -> valueProperty().setValue(valueProperty().getValue() - 1));
 		getChildren().setAll(new HBox(integerField, increment, decrement));
 	}
 }

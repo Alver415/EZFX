@@ -1,4 +1,7 @@
 
+.scene * {
+    -fx-background-color: transparent;
+}
 .window {
     -fx-background-color: rgba(0,0,0,0.005);
     -fx-padding: 20px;

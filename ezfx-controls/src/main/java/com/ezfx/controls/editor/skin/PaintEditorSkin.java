@@ -28,7 +28,7 @@ public class PaintEditorSkin extends EditorSkin<PaintEditor, Paint> {
 
 		currentEditor.subscribe((oldValue, newValue) -> {
 			Optional.ofNullable(oldValue).map(Control::getSkin).ifPresent(Skin::dispose);
-			property().setValue(null);
+			valueProperty().setValue(null);
 		});
 		editorProperty().bind(currentEditor);
 
@@ -38,7 +38,7 @@ public class PaintEditorSkin extends EditorSkin<PaintEditor, Paint> {
 	private Editor<? extends Paint> constructEditor(Class<? extends Editor<? extends Paint>> editorClass) {
 		try {
 
-			return editorClass.getConstructor(Property.class).newInstance(property());
+			return editorClass.getConstructor(Property.class).newInstance(valueProperty());
 		} catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
 		         IllegalAccessException e) {
 			throw new RuntimeException(e);

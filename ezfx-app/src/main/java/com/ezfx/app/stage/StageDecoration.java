@@ -26,7 +26,7 @@ public class StageDecoration extends Control {
 
 	@Override
 	protected Skin<?> createDefaultSkin() {
-		return new StageDecorationSkin<>(this);
+		return new EZFXStageDecorationSkin<>(this);
 	}
 
 	private final Property<Parent> root = new SimpleObjectProperty<>(this, "root", new StackPane());

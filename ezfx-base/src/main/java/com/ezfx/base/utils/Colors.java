@@ -1,6 +1,5 @@
 package com.ezfx.base.utils;
 
-import javafx.scene.layout.Background;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
@@ -10,18 +9,30 @@ public interface Colors {
 		return Color.color(Math.random(), Math.random(), Math.random());
 	}
 
-	static String toHexFormat(Paint paint) {
+	static String toWeb(Paint paint) {
 		return paint instanceof Color color ?
-				toHexFormat(color) :
+				toWeb(color) :
 				String.valueOf(paint);
 	}
 
-	static String toHexFormat(Color color) {
-		return String.format(
-				"#%02X%02X%02X",
-				(int) (color.getRed() * 255),
-				(int) (color.getGreen() * 255),
-				(int) (color.getBlue() * 255));
+	static String toWeb(Color color) {
+		if (color == null) {
+			return null;
+		}
+		if (color.getOpacity() == 1) {
+			return String.format(
+					"#%02X%02X%02X",
+					(int) (color.getRed() * 255),
+					(int) (color.getGreen() * 255),
+					(int) (color.getBlue() * 255));
+		} else {
+			return String.format(
+					"#%02X%02X%02X%02X",
+					(int) (color.getRed() * 255),
+					(int) (color.getGreen() * 255),
+					(int) (color.getBlue() * 255),
+					(int) (color.getOpacity() * 255));
+		}
 	}
 
 	static String toRgba(Paint paint) {

@@ -21,12 +21,12 @@ public class BackgroundEditorSkin extends EditorSkin<BackgroundEditor, Backgroun
 	Subscription imagesSubscription = () -> {
 	};
 
-	public BackgroundEditorSkin(BackgroundEditor control) {
-		super(control);
+	public BackgroundEditorSkin(BackgroundEditor editor) {
+		super(editor);
 		ListProperty<BackgroundFill> fills = new SimpleListProperty<>(FXCollections.observableArrayList());
 		ListProperty<BackgroundImage> images = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-		control.valueProperty().subscribe(background -> {
+		editor.valueProperty().subscribe(background -> {
 			if (locked) return;
 			fills.setAll(background == null ? List.of() : background.getFills());
 			images.setAll(background == null ? List.of() : background.getImages());
@@ -34,7 +34,7 @@ public class BackgroundEditorSkin extends EditorSkin<BackgroundEditor, Backgroun
 
 		Runnable rebuild = () -> {
 			locked = true;
-			control.valueProperty().setValue(new Background(fills.get(), images.get()));
+			editor.setValue(new Background(fills.get(), images.get()));
 			locked = false;
 		};
 		fills.subscribe(list -> {

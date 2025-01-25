@@ -2,6 +2,7 @@ package com.ezfx.demos;
 
 import com.ezfx.app.EZFXApplication;
 import com.ezfx.app.editor.SceneEditor;
+import com.ezfx.app.stage.DecoratedStage;
 import com.ezfx.base.utils.Screens;
 import com.ezfx.controls.icons.Icons;
 import com.ezfx.filesystem.FileSystemEntry;
@@ -31,21 +32,6 @@ public class FXMLEditorApplication extends EZFXApplication {
 
 	private FileSystemFX fileSystem;
 
-	private final Property<Path> path = new SimpleObjectProperty<>(this, "path");
-	private ObservableValue<String> content;
-
-	public Property<Path> pathProperty() {
-		return this.path;
-	}
-
-	public Path getPath() {
-		return this.pathProperty().getValue();
-	}
-
-	public void setPath(Path value) {
-		this.pathProperty().setValue(value);
-	}
-
 	@Override
 	public void init() throws Exception {
 		super.init();
@@ -54,7 +40,8 @@ public class FXMLEditorApplication extends EZFXApplication {
 	}
 
 	@Override
-	public void start(Stage stage) throws Exception {
+	public void start(Stage primaryStage) throws Exception {
+		Stage stage = new DecoratedStage();
 		SceneEditor sceneEditor = new SceneEditor();
 
 		content = pathProperty().map(fileSystem::get)
@@ -103,8 +90,6 @@ public class FXMLEditorApplication extends EZFXApplication {
 		stage.setScene(scene);
 		stage.setTitle("FXML Editor");
 		stage.getIcons().add(Icons.EDIT);
-		stage.centerOnScreen();
-		stage.setMaximized(true);
 		stage.show();
 
 		// Load initial file
@@ -122,6 +107,21 @@ public class FXMLEditorApplication extends EZFXApplication {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private final Property<Path> path = new SimpleObjectProperty<>(this, "path");
+	private ObservableValue<String> content;
+
+	public Property<Path> pathProperty() {
+		return this.path;
+	}
+
+	public Path getPath() {
+		return this.pathProperty().getValue();
+	}
+
+	public void setPath(Path value) {
+		this.pathProperty().setValue(value);
 	}
 
 }

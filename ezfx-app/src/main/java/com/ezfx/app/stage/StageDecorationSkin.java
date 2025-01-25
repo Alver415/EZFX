@@ -74,7 +74,6 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 		super(control);
 		initializeActions();
 
-
 		stage.bind(control.sceneProperty().flatMap(Scene::windowProperty).map(window -> (Stage) window));
 
 		window = new StackPane();
@@ -145,7 +144,7 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 
 		subScene = new SubScene(new Pane(), 600, 400);
 		subScene.getStyleClass().add("scene");
-		subScene.fillProperty().bind(control.sceneFillProperty());
+		subScene.fillProperty().bindBidirectional(control.sceneFillProperty());
 		subScene.userAgentStylesheetProperty().bind(control.sceneProperty().flatMap(Scene::userAgentStylesheetProperty));
 
 		horizontalPadding = Bindings.createDoubleBinding(() -> window.getPadding().getLeft() + window.getPadding().getRight(), window.paddingProperty());

@@ -24,7 +24,7 @@ public class ImagePatternEditorSkin extends EditorSkin<ImagePatternEditor, Image
 		if (subscription != null){
 			subscription.unsubscribe();
 		}
-		subscription = bindBidirectional(imageSelectionEditor.valueProperty(), property(), Converter.of(
+		subscription = bindBidirectional(imageSelectionEditor.valueProperty(), valueProperty(), Converter.of(
 				image -> image == null ? null : new ImagePattern(image),
 				pattern -> pattern == null ? null : pattern.getImage()));
 	}

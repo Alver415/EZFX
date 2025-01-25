@@ -14,7 +14,7 @@ public class ColorEditorSkin extends EditorSkin<ColorEditor, Color> {
 		super(editor);
 		ColorPicker colorPicker = new ColorPicker();
 		colorPicker.setMinHeight(24);
-		subscription = bindBidirectional(colorPicker.valueProperty(), property());
+		subscription = bindBidirectional(colorPicker.valueProperty(), valueProperty());
 		setChildren(colorPicker);
 	}
 

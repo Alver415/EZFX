@@ -49,11 +49,11 @@ public class FileSelectionEditor extends ObjectEditor<File> {
 				fileChooser.setTitle("Choose a File");
 				fileChooser.setInitialDirectory(new File("."));
 				File file = fileChooser.showOpenDialog(getScene().getWindow());
-				property().setValue(file);
+				valueProperty().setValue(file);
 			});
 
 			Converter<String, File> convert = Converter.of(this::toFile, this::fromFile);
-			bindBidirectional(textField.textProperty(), property(), convert);
+			bindBidirectional(textField.textProperty(), valueProperty(), convert);
 			AnchorPane anchorPane = new AnchorPane(textField, openButton);
 			anchor(textField, 0d);
 			AnchorPane.setTopAnchor(openButton, 3d);

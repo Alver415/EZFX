@@ -66,7 +66,7 @@ public class ListEditorSkin<T> extends EditorSkin<ListEditor<T>, ObservableList<
 	private void rebuild() {
 		locked(() -> {
 			ObservableList<T> list = FXCollections.observableArrayList();
-			list.addAll(property().getValue());
+			list.addAll(valueProperty().getValue());
 			if (list.isEmpty()) {
 				wrappers.clear();
 			} else {
@@ -87,7 +87,7 @@ public class ListEditorSkin<T> extends EditorSkin<ListEditor<T>, ObservableList<
 						Property<T> property = new SimpleObjectProperty<>(item);
 						int i = index;
 						property.addListener((_, _, v) -> {
-							if (!lock) property().getValue().set(i, v);
+							if (!lock) valueProperty().getValue().set(i, v);
 						});
 						//TODO: Remove dependence on DEFAULT_FACTORY
 						Editor<T> editor = DEFAULT_FACTORY.buildEditor(type, property).orElseGet(Editor::new);;

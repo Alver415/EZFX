@@ -59,9 +59,6 @@ public abstract class EZFXApplication extends Application {
 				if (stage.getTitle() == null && getTitle() != null) {
 					stage.setTitle(getTitle());
 				}
-//				if (stage.getIcons().isEmpty() && getIcon() != null) {
-//					stage.getIcons().add(getIcon());
-//				}
 			}
 
 		}));

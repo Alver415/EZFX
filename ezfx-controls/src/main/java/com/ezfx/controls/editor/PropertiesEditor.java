@@ -30,7 +30,7 @@ public class PropertiesEditor<T> extends ObjectEditor<T> implements CategorizedM
 
 	@Override
 	protected Skin<?> createDefaultSkin() {
-		return new TitledPaneCategorizedSkin<>(this);
+		return new TabPaneCategorizedSkin<>(this);
 	}
 
 	private final ListProperty<Editor<?>> editors = new SimpleListProperty<>(

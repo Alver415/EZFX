@@ -2,6 +2,7 @@ package com.ezfx.controls.editor.impl.javafx;
 
 import com.ezfx.controls.editor.ObjectEditor;
 import com.ezfx.controls.editor.skin.ColorEditorSkin;
+import com.ezfx.controls.editor.skin.CustomColorEditorSkin;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Skin;
@@ -18,6 +19,6 @@ public class ColorEditor extends ObjectEditor<Color> {
 
 	@Override
 	protected Skin<?> createDefaultSkin() {
-		return new ColorEditorSkin(this);
+		return new CustomColorEditorSkin(this);
 	}
 }

@@ -91,6 +91,7 @@ public class ComplexBinding<A, B> implements InvalidationListener, WeakListener 
 		};
 	}
 
+
 	private static void checkParameters(Object propertyA, Object propertyB) {
 		Objects.requireNonNull(propertyA, "Both properties must be specified.");
 		Objects.requireNonNull(propertyB, "Both properties must be specified.");
