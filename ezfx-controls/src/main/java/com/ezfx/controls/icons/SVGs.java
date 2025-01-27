@@ -14,15 +14,27 @@ import javafx.scene.transform.Transform;
 import static com.ezfx.controls.icons.SVGPaths._parse;
 
 public enum SVGs {
+
+	PLUS,
+	MINUS,
+
 	MINIMIZE,
 	MAXIMIZE,
 	RESTORE,
 	CLOSE,
+
 	GEAR,
 	GEAR2;
 
 	public Group svg() {
 		return _parse(Resources.file(Icons.class, "mycons/%s.svg".formatted(name().toLowerCase())));
+	}
+
+	public Group svg(double scale) {
+		Group svg = svg();
+		svg.setScaleX(scale);
+		svg.setScaleY(scale);
+		return svg;
 	}
 
 	public Image image(int size) {

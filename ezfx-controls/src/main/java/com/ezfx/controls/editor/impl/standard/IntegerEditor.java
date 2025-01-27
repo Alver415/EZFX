@@ -1,64 +1,49 @@
 package com.ezfx.controls.editor.impl.standard;
 
+import com.ezfx.base.utils.Converter;
 import com.ezfx.base.utils.Converters;
-import com.ezfx.controls.editor.ObjectEditor;
-import com.ezfx.controls.editor.skin.EditorSkin;
-import com.ezfx.controls.editor.skin.IntegerFieldSkin;
-import com.ezfx.controls.icons.Icons;
+import com.ezfx.controls.utils.TextFormatters;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.Property;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.scene.control.Button;
-import javafx.scene.control.Skin;
-import javafx.scene.control.TextField;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.TextFormatter;
 
-import static com.ezfx.base.utils.ComplexBinding.bindBidirectional;
+import java.util.function.UnaryOperator;
 
-public class IntegerEditor extends ObjectEditor<Integer> {
+public class IntegerEditor extends NumberEditor<Integer> {
 
 	public IntegerEditor() {
-		this(new SimpleIntegerProperty());
+		this(new SimpleObjectProperty<>());
 	}
+
 	public IntegerEditor(IntegerProperty property) {
 		this(property.asObject());
 	}
 
 	public IntegerEditor(Property<Integer> property) {
-		super(property);
+		this(property, null, null);
+	}
+
+	public IntegerEditor(IntegerProperty property, Integer min, Integer max) {
+		this(property.asObject(), min, max);
+	}
+
+	public IntegerEditor(Property<Integer> property, Integer min, Integer max) {
+		super(property, min, max);
 	}
 
 	@Override
-	protected Skin<?> createDefaultSkin() {
-		return new IntegerFieldSkin(this);
+	Converter<Number, Integer> numberToValueConverter() {
+		return Converters.NUMBER_TO_INTEGER;
 	}
 
-	private final IntegerProperty maxValue = new SimpleIntegerProperty(this, "maxValue");
-
-	public IntegerProperty maxValueProperty() {
-		return this.maxValue;
+	@Override
+	Converter<String, Integer> stringToValueConverter() {
+		return Converters.STRING_TO_INTEGER;
 	}
 
-	public Integer getMaxValue() {
-		return this.maxValueProperty().getValue();
-	}
-
-	public void setMaxValue(Integer value) {
-		this.maxValueProperty().setValue(value);
-	}
-
-	private final IntegerProperty minValue = new SimpleIntegerProperty(this, "minValue");
-
-	public IntegerProperty minValueProperty() {
-		return this.minValue;
-	}
-
-	public Integer getMinValue() {
-		return this.minValueProperty().getValue();
-	}
-
-	public void setMinValue(Integer value) {
-		this.minValueProperty().setValue(value);
+	@Override
+	UnaryOperator<TextFormatter.Change> textFormatFilter() {
+		return TextFormatters.FILTER_INTEGER;
 	}
 }

@@ -110,7 +110,7 @@ public class FunctionParameterEditor<T> extends IntrospectingEditor<T> implement
 
 	@Override
 	protected Skin<?> createDefaultSkin() {
-		return new MultiEditorSkin<>(this);
+		return new MultiEditorSkin.VerticalEditorSkin<>(this);
 	}
 
 

@@ -16,7 +16,8 @@ public class StringEditorSkin extends EditorSkin<StringEditor, String> {
 		getChildren().setAll(inputControl);
 	}
 
-	private Subscription subscription = () -> {};
+	private Subscription subscription = () -> {
+	};
 
 	@Override
 	public void install() {
@@ -25,8 +26,9 @@ public class StringEditorSkin extends EditorSkin<StringEditor, String> {
 				bindBidirectional(inputControl.promptTextProperty(), editor.promptTextProperty())
 		);
 	}
+
 	@Override
-	public void dispose(){
+	public void dispose() {
 		subscription.unsubscribe();
 	}
 }

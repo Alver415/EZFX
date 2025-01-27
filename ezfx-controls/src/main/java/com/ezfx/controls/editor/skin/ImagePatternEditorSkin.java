@@ -21,7 +21,7 @@ public class ImagePatternEditorSkin extends EditorSkin<ImagePatternEditor, Image
 	@Override
 	public void install() {
 		super.install();
-		if (subscription != null){
+		if (subscription != null) {
 			subscription.unsubscribe();
 		}
 		subscription = bindBidirectional(imageSelectionEditor.valueProperty(), valueProperty(), Converter.of(
@@ -32,7 +32,7 @@ public class ImagePatternEditorSkin extends EditorSkin<ImagePatternEditor, Image
 	@Override
 	public void dispose() {
 		super.dispose();
-		if (subscription != null){
+		if (subscription != null) {
 			subscription.unsubscribe();
 		}
 	}

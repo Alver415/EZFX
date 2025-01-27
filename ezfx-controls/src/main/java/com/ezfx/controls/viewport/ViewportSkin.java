@@ -1,11 +1,8 @@
 package com.ezfx.controls.viewport;
 
 import com.ezfx.base.utils.Backgrounds;
-import com.ezfx.controls.editor.impl.standard.DoubleEditor;
-import com.ezfx.controls.editor.skin.SliderSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.SubScene;

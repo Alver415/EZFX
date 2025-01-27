@@ -1,6 +1,7 @@
 package com.ezfx.base.utils;
 
 import javafx.scene.paint.Color;
+import javafx.util.StringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,20 @@ public interface Converters {
 	Converter<Double, Float> DOUBLE_TO_FLOAT = create(Double::floatValue, Float::doubleValue);
 	//endregion Numbers
 
+
+	static <T> StringConverter<T> asStringConverter(Converter<String, T> converter){
+		return new StringConverter<>() {
+			@Override
+			public String toString(T object) {
+				return converter.from(object);
+			}
+
+			@Override
+			public T fromString(String string) {
+				return converter.to(string);
+			}
+		};
+	}
 
 	private static <A, B> Converter<A, B> create(Function<A, B> to, Function<B, A> from) {
 		return Converter.of(wrap(to), wrap(from));

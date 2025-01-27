@@ -2,7 +2,6 @@ package com.ezfx.controls.editor.skin;
 
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.EditorView;
-import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
@@ -13,8 +12,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import org.controlsfx.control.action.ActionUtils;
-
-import java.util.Objects;
 
 public class EditorViewSkin<T, C extends Editor<T>> extends SkinBase<EditorView<T, C>> {
 

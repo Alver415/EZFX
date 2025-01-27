@@ -1,89 +1,49 @@
 package com.ezfx.controls.editor.impl.standard;
 
-import com.ezfx.controls.editor.ObjectEditor;
-import com.ezfx.controls.editor.skin.DoubleFieldSkin;
-import com.ezfx.controls.editor.skin.EditorSkin;
-import com.ezfx.controls.icons.Icons;
-import com.ezfx.controls.misc.RepeatingButton;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.*;
-import javafx.geometry.Orientation;
-import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
+import com.ezfx.base.utils.Converter;
+import com.ezfx.base.utils.Converters;
+import com.ezfx.controls.utils.TextFormatters;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.TextFormatter;
 
-import static com.ezfx.base.utils.ComplexBinding.bindBidirectional;
-import static com.ezfx.base.utils.Converters.STRING_TO_DOUBLE;
+import java.util.function.UnaryOperator;
 
-public class DoubleEditor extends ObjectEditor<Double> {
+public class DoubleEditor extends NumberEditor<Double> {
 
 	public DoubleEditor() {
-		this(new SimpleDoubleProperty());
+		this(new SimpleObjectProperty<>());
 	}
+
 	public DoubleEditor(DoubleProperty property) {
 		this(property.asObject());
 	}
 
-	public DoubleEditor(DoubleProperty property, double min, double max) {
+	public DoubleEditor(Property<Double> property) {
+		this(property, null, null);
+	}
+
+	public DoubleEditor(DoubleProperty property, Double min, Double max) {
 		this(property.asObject(), min, max);
 	}
 
-	public DoubleEditor(Property<Double> property) {
-		this(property, Double.MIN_VALUE, Double.MAX_VALUE);
-	}
-
-	public DoubleEditor(Property<Double> property, double min, double max) {
-		super(property);
-		setMin(min);
-		setMax(max);
-	}
-
-	private final DoubleProperty max = new SimpleDoubleProperty(this, "max");
-
-	public DoubleProperty maxProperty() {
-		return this.max;
-	}
-
-	public Double getMax() {
-		return this.maxProperty().get();
-	}
-
-	public void setMax(Double value) {
-		this.maxProperty().set(value);
-	}
-
-	private final DoubleProperty min = new SimpleDoubleProperty(this, "min");
-
-	public DoubleProperty minProperty() {
-		return this.min;
-	}
-
-	public Double getMin() {
-		return this.minProperty().get();
-	}
-
-	public void setMin(Double value) {
-		this.minProperty().set(value);
-	}
-
-	private final ObjectProperty<Orientation> orientation = new SimpleObjectProperty<>(this, "orientation", Orientation.HORIZONTAL);
-
-	public ObjectProperty<Orientation> orientationProperty() {
-		return this.orientation;
-	}
-
-	public Orientation getOrientation() {
-		return this.orientationProperty().get();
-	}
-
-	public void setOrientation(Orientation value) {
-		this.orientationProperty().set(value);
+	public DoubleEditor(Property<Double> property, Double min, Double max) {
+		super(property, min, max);
 	}
 
 	@Override
-	protected Skin<?> createDefaultSkin() {
-		return new DoubleFieldSkin(this);
+	Converter<Number, Double> numberToValueConverter() {
+		return Converters.NUMBER_TO_DOUBLE;
 	}
 
+	@Override
+	Converter<String, Double> stringToValueConverter() {
+		return Converters.STRING_TO_DOUBLE;
+	}
 
+	@Override
+	UnaryOperator<TextFormatter.Change> textFormatFilter() {
+		return TextFormatters.FILTER_DOUBLE;
+	}
 }

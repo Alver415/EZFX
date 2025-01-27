@@ -1,6 +1,7 @@
 package com.ezfx.app.editor;
 
 import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.impl.javafx.NodeEditor;
 import com.ezfx.controls.editor.impl.standard.StringEditor;
 import com.ezfx.controls.editor.introspective.IntrospectingPropertiesEditor;
 import com.ezfx.controls.misc.FilterableTreeItem;
@@ -142,7 +143,7 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 		Node node = Optional.ofNullable(treeItem).map(TreeItem::getValue).orElse(null);
 		if (node == null) return null;
 		return cache.computeIfAbsent(node, _ -> {
-			IntrospectingPropertiesEditor<Node> editor = new IntrospectingPropertiesEditor<>(node);
+			NodeEditor editor = new NodeEditor(node);
 			editor.setVisible(false);
 			runFX(() -> editorWrapper.getChildren().add(editor));
 			return editor;

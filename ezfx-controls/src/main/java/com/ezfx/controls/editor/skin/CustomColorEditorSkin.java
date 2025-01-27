@@ -3,6 +3,7 @@ package com.ezfx.controls.editor.skin;
 import com.ezfx.base.utils.Colors;
 import com.ezfx.base.utils.Converter;
 import com.ezfx.base.utils.Converters;
+import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.impl.javafx.ColorEditor;
 import com.ezfx.controls.editor.impl.standard.IntegerEditor;
 import com.ezfx.controls.editor.impl.standard.StringEditor;
@@ -25,7 +26,7 @@ import javafx.util.Subscription;
 
 import static com.ezfx.base.utils.ComplexBinding.bindBidirectional;
 
-public class CustomColorEditorSkin extends EditorSkin<ColorEditor, Color> {
+public class CustomColorEditorSkin extends EditorSkin<Editor<Color>, Color> {
 
 	private ColorRectPane colorRectPane;
 	private ControlsPane controlsPane;
@@ -398,7 +399,6 @@ public class CustomColorEditorSkin extends EditorSkin<ColorEditor, Color> {
 
 				fields[i] = new IntegerEditor();
 				fields[i].getStyleClass().add("color-input-field");
-				fields[i].setSkin(new IntegerFieldSkin(fields[i]));
 
 				units[i] = new Label(i == 0 ? "\u00B0" : "%");
 				units[i].getStyleClass().add("settings-unit");
@@ -478,7 +478,7 @@ public class CustomColorEditorSkin extends EditorSkin<ColorEditor, Color> {
 			}
 			sliders[row].setMax(maxValue);
 			labels[row].setLabelFor(sliders[row]);
-			fields[row].setMaxValue(maxValue);
+			fields[row].setMax(maxValue);
 
 			subscriptions[row] = Subscription.combine(
 					bindBidirectional(fields[row].valueProperty(), prop, Converters.NUMBER_TO_INTEGER.inverted()),

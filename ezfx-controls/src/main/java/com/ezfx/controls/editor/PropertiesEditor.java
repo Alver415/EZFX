@@ -1,7 +1,6 @@
 package com.ezfx.controls.editor;
 
-import com.ezfx.controls.editor.skin.TabPaneCategorizedSkin;
-import com.ezfx.controls.editor.skin.TitledPaneCategorizedSkin;
+import com.ezfx.controls.editor.skin.MultiEditorSkin;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,7 +29,7 @@ public class PropertiesEditor<T> extends ObjectEditor<T> implements CategorizedM
 
 	@Override
 	protected Skin<?> createDefaultSkin() {
-		return new TabPaneCategorizedSkin<>(this);
+		return new MultiEditorSkin.VerticalEditorSkin<>(this);
 	}
 
 	private final ListProperty<Editor<?>> editors = new SimpleListProperty<>(

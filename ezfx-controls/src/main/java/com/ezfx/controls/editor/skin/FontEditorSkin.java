@@ -41,9 +41,9 @@ public class FontEditorSkin extends EditorSkin<FontEditor, Font> {
 			size.set(font.getSize());
 		});
 
-		List.of(name, size).forEach(property -> property.subscribe(_ ->{
-					if (!valueProperty().isBound()) valueProperty().setValue(new Font(name.get(), size.get()));
-				}));
+		List.of(name, size).forEach(property -> property.subscribe(_ -> {
+			if (!valueProperty().isBound()) valueProperty().setValue(new Font(name.get(), size.get()));
+		}));
 
 		SelectionEditor<String> familyEditor = new SelectionEditor<>(family, Font.getFamilies());
 		SelectionEditor<String> nameEditor = new SelectionEditor<>(name, availableNames);

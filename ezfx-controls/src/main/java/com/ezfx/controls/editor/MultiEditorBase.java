@@ -25,7 +25,7 @@ public abstract class MultiEditorBase<T> extends Editor<T> implements MultiEdito
 
 	@Override
 	protected Skin<?> createDefaultSkin() {
-		return new MultiEditorSkin<>(this);
+		return new MultiEditorSkin.VerticalEditorSkin<>(this);
 	}
 
 	private final ListProperty<Editor<?>> editors = new SimpleListProperty<>(this, "editors", FXCollections.observableArrayList());

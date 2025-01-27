@@ -8,9 +8,7 @@ import com.ezfx.controls.utils.SplitPanes;
 import javafx.application.Application;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.control.Control;
-import javafx.scene.control.Skin;
-import javafx.scene.control.SkinBase;
+import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import org.reactfx.EventStreams;
 
@@ -75,6 +73,7 @@ public class ApplicationExplorer extends Control {
 
 	public static class DefaultSkin extends SkinBase<ApplicationExplorer> {
 
+		private final ScrollPane scrollPane;
 		private final GenericTreeView<Object, Object> treeView;
 		private final PolyglotView polyglotView;
 
@@ -87,13 +86,16 @@ public class ApplicationExplorer extends Control {
 
 			polyglotView = new PolyglotView(control.getManagedContext());
 
+			scrollPane = new ScrollPane();
+			scrollPane.setFitToWidth(true);
+			scrollPane.setFitToHeight(true);
+
 			StackPane left = new StackPane(treeView);
-			StackPane right = new StackPane();
+			StackPane right = new StackPane(scrollPane);
 			StackPane bottom = new StackPane(polyglotView);
 
-			treeView.selectedItemProperty().subscribe(item -> {
-				polyglotView.getManagedContext().putPolyglotMember("selectedItem", item);
-			});
+			treeView.selectedItemProperty().subscribe(item ->
+					polyglotView.getManagedContext().putPolyglotMember("selectedItem", item));
 
 			ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 			EventStreams.valuesOf(treeView.selectedItemProperty())
@@ -104,10 +106,11 @@ public class ApplicationExplorer extends Control {
 						return factoryCache.computeIfAbsent(value, _ -> DEFAULT_FACTORY.buildEditor(value).orElseGet(Editor::new));
 					})
 					.threadBridgeToFx(executor)
-					.subscribe(editor -> right.getChildren().setAll(editor));
+					.subscribe(scrollPane::setContent);
 
 
-			getChildren().setAll(SplitPanes.vertical(SplitPanes.horizontal(left, right), bottom));
+			SplitPane top = SplitPanes.horizontal(left, right);
+			getChildren().setAll(SplitPanes.vertical(top, bottom));
 		}
 	}
 

@@ -6,7 +6,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.TextField;
-import javafx.scene.text.Text;
 
 import java.util.Collection;
 

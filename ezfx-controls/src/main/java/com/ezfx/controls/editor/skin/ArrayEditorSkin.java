@@ -2,7 +2,9 @@ package com.ezfx.controls.editor.skin;
 
 import com.ezfx.base.observable.ObservableObjectArray;
 import com.ezfx.base.observable.ObservableObjectArrayImpl;
-import com.ezfx.controls.editor.*;
+import com.ezfx.controls.editor.ArrayEditor;
+import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorView;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
@@ -99,17 +101,18 @@ public class ArrayEditorSkin<T> extends EditorSkin<ArrayEditor<T>, ObservableObj
 						Property<T> property = new SimpleObjectProperty<>(item);
 						int i = index;
 						property.addListener((_, _, v) -> {
-							if (!lock){
+							if (!lock) {
 								Class<T> genericType = editor.getGenericType();
 								ObservableObjectArray<T> orig = valueProperty().getValue();
 								T[] intermediate = (T[]) Array.newInstance(editor.getGenericType(), orig.size());
 								ObservableObjectArrayImpl<T> newA = new ObservableObjectArrayImpl<>(genericType, intermediate);
 								orig.copyTo(0, newA, 0, orig.size());
-								newA.set(i,v);
+								newA.set(i, v);
 								valueProperty().setValue(newA);
 							}
 						});
-						Editor<T> editor = DEFAULT_FACTORY.buildEditor(type, property).orElseGet(Editor::new);;
+						Editor<T> editor = DEFAULT_FACTORY.buildEditor(type, property).orElseGet(Editor::new);
+						;
 						EditorView<T, Editor<T>> wrapper = new EditorView<>(editor);
 						wrapper.nameProperty().bind(Bindings.createIntegerBinding(
 								() -> wrappers.indexOf(wrapper), wrappers).map("[%s]"::formatted));

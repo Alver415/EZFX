@@ -3,13 +3,11 @@ package com.ezfx.controls.editor.skin;
 import com.ezfx.controls.editor.impl.javafx.BlendModeEditor;
 import javafx.scene.Group;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.effect.Blend;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.ColorInput;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.util.Callback;
 
 public class BlendModeEditorSkin extends ComboBoxSelectionEditorSkin<BlendMode> {
 

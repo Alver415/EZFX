@@ -1,17 +1,26 @@
 package com.ezfx.controls.editor.skin;
 
-import com.ezfx.controls.editor.*;
+import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorView;
+import com.ezfx.controls.editor.ListEditor;
+import com.ezfx.controls.icons.SVGs;
+import com.ezfx.controls.utils.Actions;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Subscription;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionUtils;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 import static com.ezfx.controls.editor.factory.IntrospectingEditorFactory.DEFAULT_FACTORY;
 
@@ -37,29 +46,34 @@ public class ListEditorSkin<T> extends EditorSkin<ListEditor<T>, ObservableList<
 			rebuild();
 		});
 
-//		EditorAction clear = new EditorAction();
-//		clear.setName("Clear");
-//		clear.setIcon(Icons.X);
-//		clear.setAction(() -> property().getValue().clear());
-//
-//		EditorAction plus = new EditorAction();
-//		plus.setName("Add");
-//		plus.setIcon(Icons.PLUS);
-//		plus.setAction(() -> property().getValue().add(listEditor.getIntrospector().getDefaultValueForType(listEditor.getGenericType())));
-//
-//		EditorAction minus = new EditorAction();
-//		minus.setName("Remove");
-//		minus.setIcon(Icons.MINUS);
-//		minus.setAction(() -> {
-//			ObservableList<T> list = property().getValue();
-//			if (!list.isEmpty()) list.removeLast();
-//		});
+		Action clear = Actions.newBuilder()
+				.text("Clear")
+				.graphic(SVGs.CLOSE.svg())
+				.action(() -> getValue().clear())
+				.build();
+		Action plus = Actions.newBuilder()
+				.text("Add")
+				.graphic(SVGs.MAXIMIZE.svg())
+				.action(() -> getValue().add(listEditor.getIntrospector().getDefaultValueForType(listEditor.getGenericType())))
+				.build();
 
-//		List<Button> list = Stream.of(clear, plus, minus).map(this::buildActionButton).toList();
-//		HBox actions = new HBox(4, list.toArray(new Node[0]));
-//		getChildren().setAll(new VBox(actions, vBox));
+		Action minus = Actions.newBuilder()
+				.text("Remove")
+				.graphic(SVGs.MINIMIZE.svg())
+				.action(() -> {
+					if (getValue().isEmpty()) {
+						getValue();
+					} else {
+						getValue().removeLast();
+					}
+				})
+				.build();
 
-		getChildren().setAll(new VBox(vBox));
+
+		List<Button> list = Stream.of(clear, plus, minus).map(this::buildActionButton).toList();
+		HBox actions = new HBox(4, list.toArray(new Node[0]));
+		getChildren().setAll(new VBox(actions, vBox));
+
 
 	}
 
@@ -90,7 +104,8 @@ public class ListEditorSkin<T> extends EditorSkin<ListEditor<T>, ObservableList<
 							if (!lock) valueProperty().getValue().set(i, v);
 						});
 						//TODO: Remove dependence on DEFAULT_FACTORY
-						Editor<T> editor = DEFAULT_FACTORY.buildEditor(type, property).orElseGet(Editor::new);;
+						Editor<T> editor = DEFAULT_FACTORY.buildEditor(type, property).orElseGet(Editor::new);
+						;
 						EditorView<T, Editor<T>> wrapper = new EditorView<>(editor);
 						wrapper.nameProperty().bind(Bindings.createIntegerBinding(
 								() -> wrappers.indexOf(wrapper), wrappers).map("[%s]"::formatted));

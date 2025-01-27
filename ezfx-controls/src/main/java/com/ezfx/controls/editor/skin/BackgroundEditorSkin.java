@@ -1,5 +1,6 @@
 package com.ezfx.controls.editor.skin;
 
+import com.ezfx.controls.editor.Category;
 import com.ezfx.controls.editor.ListEditor;
 import com.ezfx.controls.editor.PropertiesEditor;
 import com.ezfx.controls.editor.impl.javafx.BackgroundEditor;
@@ -12,6 +13,7 @@ import javafx.scene.layout.BackgroundImage;
 import javafx.util.Subscription;
 
 import java.util.List;
+import java.util.Map;
 
 public class BackgroundEditorSkin extends EditorSkin<BackgroundEditor, Background> {
 
@@ -23,8 +25,8 @@ public class BackgroundEditorSkin extends EditorSkin<BackgroundEditor, Backgroun
 
 	public BackgroundEditorSkin(BackgroundEditor editor) {
 		super(editor);
-		ListProperty<BackgroundFill> fills = new SimpleListProperty<>(FXCollections.observableArrayList());
-		ListProperty<BackgroundImage> images = new SimpleListProperty<>(FXCollections.observableArrayList());
+		ListProperty<BackgroundFill> fills = new SimpleListProperty<>(this, "fills", FXCollections.observableArrayList());
+		ListProperty<BackgroundImage> images = new SimpleListProperty<>(this, "images", FXCollections.observableArrayList());
 
 		editor.valueProperty().subscribe(background -> {
 			if (locked) return;
@@ -54,7 +56,9 @@ public class BackgroundEditorSkin extends EditorSkin<BackgroundEditor, Backgroun
 		backgroundImagesListEditor.setGenericType(BackgroundImage.class);
 
 		PropertiesEditor<Object> beanEditor = new PropertiesEditor<>();
-		beanEditor.setSkin(new MultiEditorSkin<>(beanEditor));
+		beanEditor.editorsProperty()
+				.map(editors -> Map.of(Category.of("All"), editors))
+				.subscribe(beanEditor.categorizedEditorsProperty()::putAll);
 		beanEditor.getEditors().setAll(
 				backgroundFillsListEditor,
 				backgroundImagesListEditor);

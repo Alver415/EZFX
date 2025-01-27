@@ -1,26 +1,38 @@
 package com.ezfx.controls.editor.impl.standard;
 
-import com.ezfx.controls.editor.ObjectEditor;
-import com.ezfx.controls.editor.skin.LongFieldSkin;
-import com.ezfx.controls.editor.skin.ShortFieldSkin;
-import javafx.beans.property.LongProperty;
+import com.ezfx.base.utils.Converter;
+import com.ezfx.base.utils.Converters;
+import com.ezfx.controls.utils.TextFormatters;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.control.Skin;
+import javafx.scene.control.TextFormatter;
 
-public class ShortEditor extends ObjectEditor<Short> {
+import java.util.function.UnaryOperator;
+
+public class ShortEditor extends NumberEditor<Short> {
 
 	public ShortEditor() {
 		this(new SimpleObjectProperty<>());
 	}
 
 	public ShortEditor(Property<Short> property) {
-		super(property);
+		this(property, null, null);
+	}
+
+	public ShortEditor(Property<Short> property, Short min, Short max) {
+		super(property, min, max);
 	}
 
 	@Override
-	protected Skin<?> createDefaultSkin() {
-		return new ShortFieldSkin(this);
+	Converter<Number, Short> numberToValueConverter() {
+		return Converters.NUMBER_TO_SHORT;
 	}
 
+	@Override
+	Converter<String, Short> stringToValueConverter() {
+		return Converters.STRING_TO_SHORT;
+	}	@Override
+	UnaryOperator<TextFormatter.Change> textFormatFilter() {
+		return TextFormatters.FILTER_SHORT;
+	}
 }

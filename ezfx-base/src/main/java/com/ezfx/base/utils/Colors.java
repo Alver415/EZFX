@@ -50,7 +50,7 @@ public interface Colors {
 				color.getOpacity());
 	}
 
-	static Color withAlpha(Color white, double alpha) {
-		return white.interpolate(Color.TRANSPARENT, alpha);
+	static Color withAlpha(Color color, double alpha) {
+		return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
 	}
 }

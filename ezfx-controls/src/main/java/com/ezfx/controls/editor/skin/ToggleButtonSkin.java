@@ -1,4 +1,5 @@
 package com.ezfx.controls.editor.skin;
+
 import com.ezfx.controls.editor.impl.standard.BooleanEditor;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;

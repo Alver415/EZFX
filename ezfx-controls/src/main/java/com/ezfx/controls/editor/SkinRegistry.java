@@ -1,11 +1,7 @@
 package com.ezfx.controls.editor;
 
 import com.ezfx.controls.editor.code.CSSEditorSkin;
-import com.ezfx.controls.editor.impl.javafx.CssEditor;
-import com.ezfx.controls.editor.impl.javafx.StyleEditor;
-import com.ezfx.controls.editor.impl.standard.DoubleEditor;
 import com.ezfx.controls.editor.impl.standard.StringEditor;
-import com.ezfx.controls.editor.skin.DoubleFieldSkin;
 import com.ezfx.controls.editor.skin.TextAreaSkin;
 import com.ezfx.controls.editor.skin.TextFieldSkin;
 import javafx.beans.property.ListProperty;

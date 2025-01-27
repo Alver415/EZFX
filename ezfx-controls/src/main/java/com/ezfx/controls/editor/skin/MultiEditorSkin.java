@@ -4,23 +4,42 @@ import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.EditorView;
 import com.ezfx.controls.editor.MultiEditor;
 import javafx.collections.FXCollections;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class MultiEditorSkin<E extends Editor<T> & MultiEditor<T>, T> extends EditorSkin<E, T> {
+public interface MultiEditorSkin {
 
-	private static final Logger log = LoggerFactory.getLogger(MultiEditorSkin.class);
+	class VerticalEditorSkin<E extends Editor<T> & MultiEditor<T>, T> extends EditorSkin<E, T> {
 
-	public MultiEditorSkin(E control) {
-		super(control);
+		private final VBox vBox;
 
-		VBox vBox = new VBox();
-		getChildren().setAll(vBox);
+		public VerticalEditorSkin(E editor) {
+			super(editor);
 
-		control.editorsProperty()
-				.map(editors -> editors.stream().map(EditorView::new).toList())
-				.orElse(FXCollections.observableArrayList())
-				.subscribe(editors -> vBox.getChildren().setAll(editors));
+			vBox = new VBox();
+			getChildren().setAll(vBox);
+
+			editor.editorsProperty()
+					.map(editors -> editors.stream().map(EditorView::new).toList())
+					.orElse(FXCollections.observableArrayList())
+					.subscribe(editors -> vBox.getChildren().setAll(editors));
+		}
+	}
+
+	class HorizontalEditorSkin<E extends Editor<T> & MultiEditor<T>, T> extends EditorSkin<E, T> implements MultiEditorSkin {
+
+		private final HBox hBox;
+
+		public HorizontalEditorSkin(E editor) {
+			super(editor);
+
+			hBox = new HBox();
+			getChildren().setAll(hBox);
+
+			editor.editorsProperty()
+					.map(editors -> editors.stream().map(EditorView::new).toList())
+					.orElse(FXCollections.observableArrayList())
+					.subscribe(editors -> hBox.getChildren().setAll(editors));
+		}
 	}
 }

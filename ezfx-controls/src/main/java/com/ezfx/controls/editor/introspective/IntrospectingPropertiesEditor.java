@@ -2,11 +2,13 @@ package com.ezfx.controls.editor.introspective;
 
 import com.ezfx.controls.editor.*;
 import com.ezfx.controls.editor.factory.EditorFactory;
+import com.ezfx.controls.editor.skin.TabPaneCategorizedSkin;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.scene.control.Skin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +69,7 @@ public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
 		}));
 	}
 
-	private <R> Editor<R> buildSubEditor(T target, PropertyInfo propertyInfo) {
+	protected <R> Editor<R> buildSubEditor(T target, PropertyInfo propertyInfo) {
 		try {
 			Method propertyMethod = propertyInfo.property();
 			if (!propertyMethod.canAccess(target)) return null;
@@ -123,4 +125,8 @@ public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
 		this.editorFactoryProperty().setValue(value);
 	}
 
+	@Override
+	protected Skin<?> createDefaultSkin() {
+		return new TabPaneCategorizedSkin<>(this);
+	}
 }
