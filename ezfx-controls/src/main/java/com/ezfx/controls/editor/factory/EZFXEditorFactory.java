@@ -10,6 +10,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Point3D;
 import javafx.scene.Node;
 import javafx.scene.effect.BlendMode;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -54,6 +55,8 @@ public class EZFXEditorFactory implements EditorFactory {
 			editor = (Editor<T>) new ColorEditor((Property<Color>) property);
 		} else if (Point3D.class.equals(type)) {
 			editor = (Editor<T>) new Point3DEditor((Property<Point3D>) property);
+		} else if (Image.class.equals(type)) {
+			editor = (Editor<T>) new ImageSelectionEditor((Property<Image>) property);
 		}
 //		} else if (LinearGradient.class.equals(type)) {
 //			editor =  (Editor<T>) new LinearGradientEditor((Property<Color>) property);

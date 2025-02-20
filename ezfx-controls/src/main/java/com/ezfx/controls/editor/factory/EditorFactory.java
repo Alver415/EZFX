@@ -24,6 +24,11 @@ public interface EditorFactory {
 	default <T> Optional<Editor<T>> buildEditor(T value) {
 		return buildEditor((Class<T>) value.getClass(), new SimpleObjectProperty<>(value));
 	}
+	default <T> Optional<Editor<T>> buildEditor(Property<T> property) {
+		//TODO: Handle nullpointer of property.getValue().
+		// Wrap it in delegating editor that changes when the value changes away from null?..
+		return buildEditor((Class<T>) property.getValue().getClass(), property);
+	}
 
 	<T> Optional<Editor<T>> buildEditor(Class<T> type, Property<T> property);
 

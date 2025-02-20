@@ -25,18 +25,4 @@ public class Modena implements Theme {
 	public boolean isDarkMode() {
 		return false;
 	}
-
-	private final StringProperty example = new SimpleStringProperty(this, "example");
-
-	public StringProperty exampleProperty() {
-		return this.example;
-	}
-
-	public String getExample() {
-		return this.exampleProperty().getValue();
-	}
-
-	public void setExample(String value) {
-		this.exampleProperty().setValue(value);
-	}
 }

@@ -26,16 +26,17 @@ public class ApplicationExplorer extends Control {
 	public ApplicationExplorer(Application application) {
 		setApplication(application);
 		//TODO: Cleanup
-		try {
-			ManagedContext managedContext = ManagedContext.newBuilder()
-					.permittedLanguages("js", "python")
-					.allowAllAccess(true)
-					.build();
-			managedContext.getContext().getPolyglotBindings().putMember("application", application);
-			setManagedContext(managedContext);
-		} catch (ExecutionException | InterruptedException e) {
-			throw new RuntimeException(e);
-		}
+		//FIXME: Not working with installation
+//		try {
+//			ManagedContext managedContext = ManagedContext.newBuilder()
+//					.permittedLanguages("js", "python")
+//					.allowAllAccess(true)
+//					.build();
+//			managedContext.getContext().getPolyglotBindings().putMember("application", application);
+//			setManagedContext(managedContext);
+//		} catch (ExecutionException | InterruptedException e) {
+//			throw new RuntimeException(e);
+//		}
 	}
 
 	private final Property<Application> application = new SimpleObjectProperty<>(this, "application");
@@ -94,8 +95,9 @@ public class ApplicationExplorer extends Control {
 			StackPane right = new StackPane(scrollPane);
 			StackPane bottom = new StackPane(polyglotView);
 
-			treeView.selectedItemProperty().subscribe(item ->
-					polyglotView.getManagedContext().putPolyglotMember("selectedItem", item));
+//			treeView.selectedItemProperty().subscribe(item ->
+//					polyglotView.getManagedContext().putPolyglotMember("selectedItem", item));
+
 
 			ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 			EventStreams.valuesOf(treeView.selectedItemProperty())
@@ -110,7 +112,9 @@ public class ApplicationExplorer extends Control {
 
 
 			SplitPane top = SplitPanes.horizontal(left, right);
-			getChildren().setAll(SplitPanes.vertical(top, bottom));
+			getChildren().setAll(SplitPanes.vertical(top
+//					, bottom
+			));
 		}
 	}
 

@@ -28,23 +28,31 @@ import javafx.scene.text.Text;
 import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public abstract class EZFXApplication extends Application {
 
+	private static final Logger log = LoggerFactory.getLogger(EZFXApplication.class);
+
 	@Override
 	public void init() throws Exception {
 
-		Files.readAllLines(Path.of("ezfx-app/src/main/resources/settings.properties")).stream().forEach(string -> {
-			int splitIndex = string.indexOf("=");
-			String key = string.substring(0, splitIndex);
-			String value = string.substring(splitIndex + 1);
-			if (key.equals("theme")) {
-				setTheme(ApplicationTheme.valueOf(value));
-			}
-		});
+//		try {
+//			Files.readAllLines(Path.of("ezfx-app/src/main/resources/settings.properties")).stream().forEach(string -> {
+//				int splitIndex = string.indexOf("=");
+//				String key = string.substring(0, splitIndex);
+//				String value = string.substring(splitIndex + 1);
+//				if (key.equals("theme")) {
+//					setTheme(ApplicationTheme.valueOf(value));
+//				}
+//			});
+//		} catch (Exception e){
+//			log.warn("Failed to load settings.properties", e);
+//		}
 
 		//This is needed to ensure removeEventFilter works
 		EventHandler<KeyEvent> handleDevToolsAction = this::handleDevToolsAction;

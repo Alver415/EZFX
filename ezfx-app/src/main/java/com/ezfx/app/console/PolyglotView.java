@@ -47,6 +47,7 @@ public class PolyglotView extends Control {
 		}
 
 		private void updateView(ManagedContext managedContext) {
+			if (managedContext == null) return;
 			tabPane.getTabs().setAll(managedContext.getLanguages()
 					.values().stream()
 					.sorted(Comparator.comparing(Language::getName))

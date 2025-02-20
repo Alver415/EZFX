@@ -2,7 +2,6 @@ package com.ezfx.controls.explorer;
 
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleListProperty;
@@ -100,12 +99,18 @@ public abstract class TreeValue<T, C> {
 		public ApplicationTreeValue(Application value) {
 			super(value);
 			ObservableList<Window> windows = Window.getWindows();
-			InvalidationListener listener = _ -> getChildren().setAll(
-					windows.stream().filter(a -> a instanceof Stage).map(a -> (Stage) a).toList());
+			InvalidationListener listener = _ -> {
+				List<Stage> stages = windows.stream()
+						.filter(a -> a instanceof Stage)
+						.map(a -> (Stage) a)
+						.toList();
+				getChildren().setAll(stages);
+			};
 			windows.addListener(listener);
 			listener.invalidated(null);
 
 		}
+
 		@Override
 		protected ObservableValue<String> observableJavaType() {
 			return valueProperty().map(Application::getClass).map(Class::getSimpleName);

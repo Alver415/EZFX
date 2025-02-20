@@ -4,7 +4,6 @@ import com.ezfx.base.utils.Converter;
 import com.ezfx.controls.editor.Category;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.PropertiesEditor;
-import com.ezfx.controls.editor.impl.standard.DoubleEditor;
 import com.ezfx.controls.editor.introspective.IntrospectingPropertiesEditor;
 import com.ezfx.controls.editor.introspective.PropertyInfo;
 import com.ezfx.controls.editor.skin.MultiEditorSkin;
@@ -13,6 +12,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 
 import java.util.*;
@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 
 import static com.ezfx.base.utils.Converters.NUMBER_TO_DOUBLE;
 import static com.ezfx.base.utils.EZFX.toObservableArrayList;
-import static com.ezfx.base.utils.Properties.convert;
 import static com.ezfx.base.utils.Properties.copyWithName;
 
 public class NodeEditor extends IntrospectingPropertiesEditor<Node> {
@@ -118,7 +117,7 @@ public class NodeEditor extends IntrospectingPropertiesEditor<Node> {
 	}
 
 	private List<String> nameFilters = List.of(
-			"rotate",
+			"rotate", "rotationaxis",
 			"layoutx", "layouty",
 			"translatex", "translatey", "translatez",
 			"scalex", "scaley", "scalez"
@@ -128,30 +127,39 @@ public class NodeEditor extends IntrospectingPropertiesEditor<Node> {
 
 	private Map<Category, List<Function<Property<Node>, Editor<?>>>> additionalEditors = Map.of(
 			Category.of("Node"), List.of(
-					property -> combinedEditor(property, "Layout", List.of(
+					property -> combinedNumberEditors(property, "Layout", List.of(
 							Node::layoutXProperty,
 							Node::layoutYProperty)),
-					property -> combinedEditor(property, "Translation", List.of(
+					property -> combinedNumberEditors(property, "Translation", List.of(
 							Node::translateXProperty,
 							Node::translateYProperty,
 							Node::translateZProperty)),
-					property -> combinedEditor(property, "Scale", List.of(
+					property -> combinedNumberEditors(property, "Scale", List.of(
 							Node::scaleXProperty,
 							Node::scaleYProperty,
 							Node::scaleZProperty)),
-					RotationEditor::new
+					property -> combinedNumberEditors(property, "Rotation", Orientation.VERTICAL, List.of(
+							Node::rotateProperty,
+							Node::rotationAxisProperty))
 			));
 
-	private static PropertiesEditor<Node> combinedEditor(
-			Property<Node> property, String name, List<Function<Node, Property<Number>>> accessors) {
+	private PropertiesEditor<Node> combinedNumberEditors(
+			Property<Node> property, String name, List<Function<Node, Property<?>>> accessors) {
+		return combinedNumberEditors(property, name, Orientation.HORIZONTAL, accessors);
+	}
+
+	private PropertiesEditor<Node> combinedNumberEditors(
+			Property<Node> property, String name, Orientation orientation, List<Function<Node, Property<?>>> accessors) {
 		PropertiesEditor<Node> editor = new PropertiesEditor<>(copyWithName(property, name));
-		editor.setSkin(new MultiEditorSkin.HorizontalEditorSkin<>(editor));
-		Converter<Double, Number> converter = NUMBER_TO_DOUBLE.inverted();
+		editor.setSkin(orientation == Orientation.HORIZONTAL ?
+				new MultiEditorSkin.HorizontalEditorSkin<>(editor):
+				new MultiEditorSkin.VerticalEditorSkin<>(editor));
 		Node node = property.getValue();
 
 		editor.getEditors().addAll(accessors.stream()
-				.map(accessor -> convert(accessor.apply(node), converter))
-				.map(DoubleEditor::new)
+				.map(accessor -> getEditorFactory().buildEditor(accessor.apply(node)))
+				.filter(Optional::isPresent)
+				.map(Optional::get)
 				.toList());
 
 		return editor;

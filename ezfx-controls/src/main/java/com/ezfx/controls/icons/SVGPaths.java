@@ -18,6 +18,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import javax.xml.parsers.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -64,12 +65,12 @@ public interface SVGPaths {
 
 		return handler.getRoot();
 	}
-	static Group _parse(File file) {
+	static Group _parse(InputStream inputStream) {
 		try {
 			SAXParserFactory factory = SAXParserFactory.newDefaultInstance();
 			SAXParser parser = factory.newSAXParser();
 			SVGHandler handler = new SVGHandler();
-			parser.parse(file, handler);
+			parser.parse(inputStream, handler);
 
 			return handler.getRoot();
 		} catch (Exception e){

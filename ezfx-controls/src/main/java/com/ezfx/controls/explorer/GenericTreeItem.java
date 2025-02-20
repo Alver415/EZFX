@@ -47,14 +47,14 @@ public class GenericTreeItem<T, C> extends FilterableTreeItem<TreeValue<T, C>> {
 				if (change.wasReplaced() && change.getAddedSubList().equals(change.getRemoved())){
 					return;
 				}
-				if (change.wasAdded()) {
-					for (Object child : change.getAddedSubList()) {
-						getSourceChildren().add(new GenericTreeItem(child));
-					}
-				}
 				if (change.wasRemoved()) {
 					for (Object child : change.getRemoved()) {
 						getSourceChildren().removeIf(item -> item.getValue().getValue() == child);
+					}
+				}
+				if (change.wasAdded()) {
+					for (Object child : change.getAddedSubList()) {
+						getSourceChildren().add(new GenericTreeItem(child));
 					}
 				}
 			}

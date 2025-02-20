@@ -54,7 +54,7 @@ public class RotationEditor extends ObjectEditor<Node> {
 			Point3DEditor axisEditor = new Point3DEditor(axis);
 			getChildren().setAll(new VBox(
 					new HBox(4, new Text("rotation:"), rotationEditor),
-					new HBox(4, new Text("axis(x, y, z):"), axisEditor)));
+					new HBox(4, new Text("axis:"), axisEditor)));
 		}
 	}
 }

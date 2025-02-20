@@ -4,10 +4,7 @@ import javafx.scene.image.Image;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Objects;
 
@@ -24,11 +21,11 @@ public interface Resources {
 		return Objects.requireNonNull(clazz.getResource(name));
 	}
 
-	static File file(Class<?> clazz, String resource) {
+	static InputStream inputStream(Class<?> clazz, String resource) {
 		try {
-			return new File(Objects.requireNonNull(clazz.getResource(resource)).toURI());
+			return clazz.getResourceAsStream(resource);
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to load resource: %s %s".formatted(clazz, resource), e);
+			throw new RuntimeException("Failed to load resource: %s, %s,".formatted(clazz, resource), e);
 		}
 	}
 

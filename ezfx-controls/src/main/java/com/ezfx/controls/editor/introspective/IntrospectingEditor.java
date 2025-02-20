@@ -143,9 +143,9 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 			}
 			return actionGroups;
 		}, setValue.getActions(), setBuilder.getActions());
+
 		ActionGroup setValueGroup = new ActionGroup("Set Value");
 		items.subscribe(v -> setValueGroup.getActions().setAll(v));
-
 
 		actionsProperty().add(setValueGroup);
 

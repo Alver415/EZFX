@@ -11,10 +11,10 @@ import javafx.scene.shape.Rectangle;
 public class MacOSStageDecorationSkin<T extends StageDecoration> extends StageDecorationSkin<T> {
 	private static final String STYLE_SHEET = Resources.css(MacOSStageDecorationSkin.class, "MacOSStageDecorationSkin.css");
 
-	Group minimizeGraphic = SVGPaths._parse(Resources.file(Icons.class, "mycons/macos/minimize.svg"));
-	Group maximizeGraphic = SVGPaths._parse(Resources.file(Icons.class, "mycons/macos/maximize.svg"));
-	Group restoreGraphic = SVGPaths._parse(Resources.file(Icons.class, "mycons/macos/restore.svg"));
-	Group closeGraphic = SVGPaths._parse(Resources.file(Icons.class, "mycons/macos/close.svg"));
+	Group minimizeGraphic = SVGPaths._parse(Resources.inputStream(Icons.class, "mycons/macos/minimize.svg"));
+	Group maximizeGraphic = SVGPaths._parse(Resources.inputStream(Icons.class, "mycons/macos/maximize.svg"));
+	Group restoreGraphic = SVGPaths._parse(Resources.inputStream(Icons.class, "mycons/macos/restore.svg"));
+	Group closeGraphic = SVGPaths._parse(Resources.inputStream(Icons.class, "mycons/macos/close.svg"));
 
 	public MacOSStageDecorationSkin(T control) {
 		super(control);

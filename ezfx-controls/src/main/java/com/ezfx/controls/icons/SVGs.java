@@ -27,7 +27,7 @@ public enum SVGs {
 	GEAR2;
 
 	public Group svg() {
-		return _parse(Resources.file(Icons.class, "mycons/%s.svg".formatted(name().toLowerCase())));
+		return _parse(Resources.inputStream(Icons.class, "mycons/%s.svg".formatted(name().toLowerCase())));
 	}
 
 	public Group svg(double scale) {
