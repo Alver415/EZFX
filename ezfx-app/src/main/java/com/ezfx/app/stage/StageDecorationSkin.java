@@ -493,20 +493,6 @@ public class StageDecorationSkin<T extends StageDecoration> extends SkinBase<T> 
 		return stage.getValue();
 	}
 
-	private final StringProperty description = new SimpleStringProperty(this, "description");
-
-	public StringProperty descriptionProperty() {
-		return this.description;
-	}
-
-	public String getDescription() {
-		return this.descriptionProperty().getValue();
-	}
-
-	public void setDescription(String value) {
-		this.descriptionProperty().setValue(value);
-	}
-
 	private final MapProperty<String, Action> actions = new SimpleMapProperty<>(this, "actions", FXCollections.observableHashMap());
 
 	public MapProperty<String, Action> actionsProperty() {

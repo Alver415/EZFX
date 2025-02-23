@@ -57,7 +57,7 @@ public class EZFXPolyglotApplication extends EZFXApplication {
 		graphicsContext.fillOval(0, 0, 100, 100);
 
 		// Start with an example FXML loaded.
-		FXMLLoader loader = new FXMLLoader(Path.of("demos/src/main/resources/com/ezfx/demos/BirthdayCard.fxml").toUri().toURL());
+		FXMLLoader loader = new FXMLLoader(Path.of("demos/src/main/resources/com/ezfx/demos/Icon.fxml").toUri().toURL());
 		subScene.setRoot(loader.load());
 	}
 

@@ -1,4 +1,4 @@
-package com.ezfx.example;
+package com.ezfx;
 
 import com.ezfx.demos.ApplicationExplorerDemo;
 import javafx.application.Application;

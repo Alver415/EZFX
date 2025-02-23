@@ -4,6 +4,7 @@ import com.ezfx.app.EZFXApplication;
 import com.ezfx.app.explorer.ApplicationExplorer;
 import com.ezfx.app.stage.DecoratedStage;
 import com.ezfx.controls.icons.SVGs;
+import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.WritableImage;
 import javafx.stage.Stage;
@@ -11,6 +12,10 @@ import javafx.stage.Stage;
 public class ApplicationExplorerDemo extends EZFXApplication {
 
 	private static final WritableImage EMPTY_IMAGE = new WritableImage(16, 16);
+
+	public static void main(String... args){
+		Application.launch(ApplicationExplorerDemo.class, args);
+	}
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.SVGPath?>
+<StackPane prefWidth="256" prefHeight="256" style="-fx-background-color:transparent"
+           stylesheets="@Icon.css">
+
+    <StackPane id="icon" maxWidth="256" maxHeight="256"
+               style="-fx-background-color:white">
+        <AnchorPane styleClass="stage"
+                    translateX="-16" translateY="-16"
+                    maxWidth="192" maxHeight="192"
+                    opacity="0.5">
+            <StackPane
+                    styleClass="title-bar"
+                    AnchorPane.topAnchor="0"
+                    AnchorPane.rightAnchor="0"
+                    AnchorPane.leftAnchor="0"
+                    AnchorPane.bottomAnchor="168"/>
+        </AnchorPane>
+        <AnchorPane styleClass="stage"
+                    translateX="16" translateY="16"
+                    maxWidth="192" maxHeight="192"
+                    opacity="0.9"
+                    style="-fx-background-color:#abc;">
+            <StackPane
+                    styleClass="title-bar"
+                    AnchorPane.topAnchor="0"
+                    AnchorPane.rightAnchor="0"
+                    AnchorPane.leftAnchor="0"
+                    AnchorPane.bottomAnchor="168">
+                <SVGPath
+                        translateY="95"
+                        scaleX="10" scaleY="10"
+                        content="M 7 2 L 7 3.1015625 A 5.0000002 5.0000002 0 0 0 5.2460938 3.8320312 L 4.4648438 3.0507812 L 3.0507812 4.4648438 L 3.8320312 5.2460938 A 5.0000002 5.0000002 0 0 0 3.1054688 7 L 2 7 L 2 9 L 3.1015625 9 A 5.0000002 5.0000002 0 0 0 3.8320312 10.753906 L 3.0507812 11.535156 L 4.4648438 12.949219 L 5.2460938 12.167969 A 5.0000002 5.0000002 0 0 0 7 12.894531 L 7 14 L 9 14 L 9 12.898438 A 5.0000002 5.0000002 0 0 0 10.753906 12.167969 L 11.535156 12.949219 L 12.949219 11.535156 L 12.167969 10.753906 A 5.0000002 5.0000002 0 0 0 12.894531 9 L 14 9 L 14 7 L 12.898438 7 A 5.0000002 5.0000002 0 0 0 12.167969 5.2460938 L 12.949219 4.4648438 L 11.535156 3.0507812 L 10.753906 3.8320312 A 5.0000002 5.0000002 0 0 0 9 3.1054688 L 9 2 L 7 2 z M 8 5 A 2.9999999 2.9999999 0 0 1 11 8 A 2.9999999 2.9999999 0 0 1 8 11 A 2.9999999 2.9999999 0 0 1 5 8 A 2.9999999 2.9999999 0 0 1 8 5 z "/>
+            </StackPane>
+        </AnchorPane>
+    </StackPane>
+</StackPane>
