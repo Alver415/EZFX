@@ -19,6 +19,12 @@ public class Viewport extends Control {
 		setContent(content);
 	}
 
+	public void reset() {
+		setContentScale(1);
+		setContentPositionX(0);
+		setContentPositionY(0);
+	}
+
 	@Override
 	protected Skin<?> createDefaultSkin() {
 		return new ViewportSkin(this);
@@ -38,17 +44,17 @@ public class Viewport extends Control {
 	}
 
 
-	private final DoubleProperty contentScale = new SimpleDoubleProperty(this, "contentScale", 1.0);
+	private final DoubleProperty contentScale = new SimpleDoubleProperty(this, "contentScale", 1);
 
 	public DoubleProperty contentScaleProperty() {
 		return contentScale;
 	}
 
-	public Double getContentScale() {
+	public double getContentScale() {
 		return contentScaleProperty().getValue();
 	}
 
-	public void setContentScale(Double scale) {
+	public void setContentScale(double scale) {
 		this.contentScaleProperty().setValue(scale);
 	}
 
@@ -58,11 +64,11 @@ public class Viewport extends Control {
 		return this.contentPositionX;
 	}
 
-	public Double getContentPositionX() {
+	public double getContentPositionX() {
 		return this.contentPositionXProperty().getValue();
 	}
 
-	public void setContentPositionX(Double value) {
+	public void setContentPositionX(double value) {
 		this.contentPositionXProperty().setValue(value);
 	}
 
@@ -72,11 +78,11 @@ public class Viewport extends Control {
 		return this.contentPositionY;
 	}
 
-	public Double getContentPositionY() {
+	public double getContentPositionY() {
 		return this.contentPositionYProperty().getValue();
 	}
 
-	public void setContentPositionY(Double value) {
+	public void setContentPositionY(double value) {
 		this.contentPositionYProperty().setValue(value);
 	}
 

@@ -3,6 +3,7 @@ package com.ezfx.controls.viewport;
 import com.ezfx.base.utils.Backgrounds;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.SubScene;
@@ -16,20 +17,6 @@ import javafx.scene.paint.Color;
 import static com.ezfx.controls.utils.Clips.rectangle;
 
 public class ViewportSkin extends SkinBase<Viewport> {
-
-	private final ObjectProperty<SubScene> subScene = new SimpleObjectProperty<>(this, "subScene");
-
-	public ObjectProperty<SubScene> subSceneProperty() {
-		return this.subScene;
-	}
-
-	public SubScene getSubScene() {
-		return this.subSceneProperty().get();
-	}
-
-	public void setSubScene(SubScene value) {
-		this.subSceneProperty().set(value);
-	}
 
 	public ViewportSkin(Viewport viewport) {
 		super(viewport);
@@ -65,11 +52,19 @@ public class ViewportSkin extends SkinBase<Viewport> {
 		});
 	}
 
-	public void reset() {
-		Viewport viewport = getSkinnable();
-		viewport.setContentScale(1d);
-		viewport.setContentPositionX(0d);
-		viewport.setContentPositionY(0d);
+
+	private final ObjectProperty<SubScene> subScene = new SimpleObjectProperty<>(this, "subScene");
+
+	public ObjectProperty<SubScene> subSceneProperty() {
+		return this.subScene;
+	}
+
+	public SubScene getSubScene() {
+		return this.subSceneProperty().get();
+	}
+
+	public void setSubScene(SubScene value) {
+		this.subSceneProperty().set(value);
 	}
 
 	private static class DragContext {
@@ -118,16 +113,21 @@ public class ViewportSkin extends SkinBase<Viewport> {
 			double scale = viewport.getContentScale();
 			double oldScale = scale;
 
-			scale = event.getDeltaY() < 0 ?
-					scale / delta :
-					scale * delta;
-			scale = Math.min(Math.max(scale, MIN_SCALE), MAX_SCALE);
+			Bounds bounds = target.getBoundsInParent();
+			double width = bounds.getWidth();
+			double height = bounds.getHeight();
+			double minX = bounds.getMinX();
+			double minY = bounds.getMinY();
+			double x = event.getX();
+			double y = event.getY();
+
+			scale = event.getDeltaY() < 0 ? scale / delta : scale * delta;
+			scale = Math.clamp(scale, MIN_SCALE, MAX_SCALE);
 
 			double f = (scale / oldScale) - 1;
-			double dx = (event.getX() - (target.getBoundsInParent()
-					.getWidth() / 2 + target.getBoundsInParent().getMinX()));
-			double dy = (event.getY() - (target.getBoundsInParent()
-					.getHeight() / 2 + target.getBoundsInParent().getMinY()));
+
+			double dx = (x - (width / 2 + minX));
+			double dy = (y - (height / 2 + minY));
 
 			viewport.setContentScale(scale);
 			viewport.setContentPositionX(viewport.getContentPositionX() - (f * dx));
