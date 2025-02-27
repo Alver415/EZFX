@@ -71,6 +71,7 @@ public class ComplexBinding<A, B> implements InvalidationListener, WeakListener 
 		return false;
 	}
 
+	// TODO: Handle this memory leak. Can't store every binding forever.
 	private static List<ComplexBinding<?, ?>> list = new ArrayList<>();
 
 	public static <T> Subscription bindBidirectional(Property<T> propA, Property<T> propB) {

@@ -1,5 +1,6 @@
 package com.ezfx.app.editor;
 
+import com.ezfx.base.utils.ScreenBounds;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.impl.javafx.NodeEditor;
 import com.ezfx.controls.editor.impl.standard.StringEditor;
@@ -27,6 +28,7 @@ import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.monadic.MonadicBinding;
 import org.reactfx.EventStreams;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,13 +41,13 @@ import static javafx.beans.binding.Bindings.createObjectBinding;
 public class SceneEditorSkin extends SkinBase<SceneEditor> {
 
 	private static final BoundingBox DEFAULT_BOUNDING_BOX = new BoundingBox(0, 0, 0, 0);
-	private final Map<Node, Editor<?>> cache = new ConcurrentHashMap<>();
+	private final Map<Node, Editor<?>> cache = new ConcurrentHashMap<>(new LinkedHashMap<>(5, 0.75f, true));
 
 	private final NodeTreeView treeView;
 	private final Viewport viewport;
 	private final Canvas overlay;
 	private final StackPane editorWrapper;
-	private final MonadicBinding<Bounds> highlightedRegion;
+//	private final MonadicBinding<Bounds> highlightedRegion;
 
 	protected BorderPane borderPane = new BorderPane();
 
@@ -99,25 +101,37 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 			}
 		});
 
-		highlightedRegion = EasyBind.combine(hoveredItem, selectedItem,
-						(hovered, selected) -> hovered == null ? selected : hovered)
-				.map(this::getRegion)
-				.flatMap(region ->
-						//TODO: Cleanup binding dependencies.
-						createObjectBinding(() -> overlay.screenToLocal(region.localToScreen(region.getBoundsInLocal())),
-								region.boundsInLocalProperty(),
-								region.boundsInParentProperty(),
-								region.localToParentTransformProperty(),
-								region.localToSceneTransformProperty(),
-								viewport.contentScaleProperty(),
-								viewport.contentPositionXProperty(),
-								viewport.contentPositionYProperty(),
-								viewport.boundsInLocalProperty(),
-								viewport.boundsInParentProperty(),
-								viewport.localToParentTransformProperty(),
-								viewport.localToSceneTransformProperty()))
-				.orElse(DEFAULT_BOUNDING_BOX);
-		highlightedRegion.subscribe(this::updateOverlay);
+		overlay.widthProperty().bind(viewport.widthProperty());
+		overlay.heightProperty().bind(viewport.heightProperty());
+
+		selectedItem.flatMap(ScreenBounds::of)
+				.subscribe(screenBounds -> {
+					if (screenBounds == null) return;
+					Bounds local = overlay.screenToLocal(screenBounds);
+					GraphicsContext gc = overlay.getGraphicsContext2D();
+					gc.setFill(Color.GRAY.interpolate(Color.TRANSPARENT, 0.5));
+					gc.clearRect(0, 0, 10000, 10000);
+					gc.fillRect(0, 0, 10000, 10000);
+					gc.clearRect(local.getMinX(), local.getMinY(), local.getWidth(), local.getHeight());
+				});
+//		highlightedRegion = EasyBind.combine(hoveredItem, selectedItem,
+//						(hovered, selected) -> hovered == null ? selected : hovered)
+//				.flatMap(node ->
+//						//TODO: Cleanup binding dependencies.
+//						createObjectBinding(() -> overlay.screenToLocal(node.localToScreen(node.getBoundsInLocal())),
+//								node.boundsInLocalProperty(),
+//								node.boundsInParentProperty(),
+//								node.localToParentTransformProperty(),
+//								node.localToSceneTransformProperty(),
+//								viewport.contentScaleProperty(),
+//								viewport.contentPositionXProperty(),
+//								viewport.contentPositionYProperty(),
+//								viewport.boundsInLocalProperty(),
+//								viewport.boundsInParentProperty(),
+//								viewport.localToParentTransformProperty(),
+//								viewport.localToSceneTransformProperty()))
+//				.orElse(DEFAULT_BOUNDING_BOX);
+//		highlightedRegion.subscribe(this::updateOverlay);
 
 		treeView.rootProperty().bind(control.targetProperty().map(NodeTreeItem::new));
 		viewport.contentProperty().bind(control.targetProperty().map(t -> t instanceof Parent p ? p : new StackPane(t)).orElse(new StackPane()));
@@ -138,14 +152,9 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 	}
 
 	private void updateOverlay(Bounds bounds) {
-		double width = viewport.getWidth();
-		double height = viewport.getHeight();
-		overlay.setWidth(width);
-		overlay.setHeight(height);
-
 		GraphicsContext gc = overlay.getGraphicsContext2D();
 		gc.setFill(Color.GRAY);
-		gc.fillRect(0, 0, width, height);
+		gc.fillRect(0, 0, overlay.getWidth(), overlay.getHeight());
 		gc.clearRect(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
 	}
 
@@ -193,16 +202,5 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 
 	public void setEditor(Editor<?> value) {
 		this.editorProperty().setValue(value);
-	}
-
-	//TODO: This should be observable so as the scene graph changes, we stay updated
-	public Region getRegion(Node node) {
-		while (node != null) {
-			if (node instanceof Region region) {
-				return region;
-			}
-			node = node.getParent();
-		}
-		return null;
 	}
 }

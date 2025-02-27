@@ -7,6 +7,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
+import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -86,8 +87,11 @@ public class GenericTreeView<A, B> extends Region {
 		treeView.getRoot().setExpanded(true);
 	}
 
-	public ObservableValue<TreeItem<TreeValue<A, B>>> selectedItemProperty() {
-		return treeView.selectionModelProperty().flatMap(SelectionModel::selectedItemProperty);
+	public ObservableValue<A> selectedProperty() {
+		return treeView.selectionModelProperty()
+				.flatMap(SelectionModel::selectedItemProperty)
+				.flatMap(TreeItem::valueProperty)
+				.flatMap(TreeValue::valueProperty);
 	}
 
 	@Override
@@ -96,5 +100,9 @@ public class GenericTreeView<A, B> extends Region {
 		double height = getHeight() - getInsets().getTop() - getInsets().getBottom();
 
 		layoutInArea(borderPane, getInsets().getLeft(), getInsets().getTop(), width, height, 0, HPos.CENTER, VPos.CENTER);
+	}
+
+	public MultipleSelectionModel<TreeItem<TreeValue<A, B>>> getSelectionModel() {
+		return treeView.getSelectionModel();
 	}
 }
