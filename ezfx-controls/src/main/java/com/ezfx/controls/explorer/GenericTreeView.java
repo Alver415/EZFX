@@ -3,11 +3,13 @@ package com.ezfx.controls.explorer;
 import com.ezfx.base.utils.Resources;
 import com.ezfx.controls.editor.impl.standard.StringEditor;
 import com.ezfx.controls.misc.FilterableTreeItem;
-import javafx.beans.value.ObservableValue;
+import javafx.beans.property.Property;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
-import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -35,7 +37,19 @@ public class GenericTreeView<A, B> extends Region {
 		filterField.setPromptText("Filter...");
 
 		treeView = new TreeView<>();
-		treeView.setCellFactory(_ -> new GenericTreeCell<>());
+		treeView.setCellFactory(_ -> new GenericTreeCell<>(){
+			{
+				setOnMouseEntered(_ -> {
+					if (isEmpty() || getItem() == null || getItem().getValue() == null) return;
+					hoveredItem.setValue(getItem().getValue());
+				});
+				setOnMouseExited(_ -> {
+					if (getItem() == null  || hoveredItem.getValue() == getItem().getValue()) {
+						hoveredItem.setValue(null);
+					}
+				});
+			}
+		});
 		treeView.rootProperty().map(root -> root instanceof FilterableTreeItem<TreeValue<A, B>> filterable ? filterable : null)
 				.subscribe(root -> {
 					if (root == null) return;
@@ -57,6 +71,12 @@ public class GenericTreeView<A, B> extends Region {
 		});
 
 		getChildren().setAll(borderPane);
+
+		treeView.selectionModelProperty()
+				.flatMap(SelectionModel::selectedItemProperty)
+				.flatMap(TreeItem::valueProperty)
+				.flatMap(TreeValue::valueProperty)
+				.subscribe(selectedItem::set);
 	}
 
 
@@ -87,13 +107,6 @@ public class GenericTreeView<A, B> extends Region {
 		treeView.getRoot().setExpanded(true);
 	}
 
-	public ObservableValue<A> selectedProperty() {
-		return treeView.selectionModelProperty()
-				.flatMap(SelectionModel::selectedItemProperty)
-				.flatMap(TreeItem::valueProperty)
-				.flatMap(TreeValue::valueProperty);
-	}
-
 	@Override
 	protected void layoutChildren() {
 		double width = getWidth() - getInsets().getLeft() - getInsets().getRight();
@@ -102,7 +115,31 @@ public class GenericTreeView<A, B> extends Region {
 		layoutInArea(borderPane, getInsets().getLeft(), getInsets().getTop(), width, height, 0, HPos.CENTER, VPos.CENTER);
 	}
 
-	public MultipleSelectionModel<TreeItem<TreeValue<A, B>>> getSelectionModel() {
-		return treeView.getSelectionModel();
+	private final ReadOnlyObjectWrapper<A> hoveredItem = new ReadOnlyObjectWrapper<>(this, "hoveredItem");
+
+	public ReadOnlyObjectProperty<A> hoveredItemProperty() {
+		return this.hoveredItem.getReadOnlyProperty();
+	}
+
+	public A getHoveredItem() {
+		return this.hoveredItem.getValue();
+	}
+
+	public void setHoveredItem(A value) {
+		this.hoveredItem.setValue(value);
+	}
+
+	private final ReadOnlyObjectWrapper<A> selectedItem = new ReadOnlyObjectWrapper<>(this, "selectedItem");
+
+	public ReadOnlyObjectProperty<A> selectedItemProperty() {
+		return this.selectedItem.getReadOnlyProperty();
+	}
+
+	public A getSelectedItem() {
+		return this.selectedItem.getValue();
+	}
+
+	public void setSelectedItem(A value) {
+		this.selectedItem.setValue(value);
 	}
 }

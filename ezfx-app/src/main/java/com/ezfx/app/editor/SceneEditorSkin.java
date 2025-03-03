@@ -22,10 +22,11 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.TreeItem;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import org.fxmisc.easybind.EasyBind;
-import org.fxmisc.easybind.monadic.MonadicBinding;
 import org.reactfx.EventStreams;
 
 import java.util.LinkedHashMap;
@@ -36,7 +37,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.ezfx.base.utils.EZFX.runFX;
-import static javafx.beans.binding.Bindings.createObjectBinding;
 
 public class SceneEditorSkin extends SkinBase<SceneEditor> {
 
@@ -104,7 +104,7 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 		overlay.widthProperty().bind(viewport.widthProperty());
 		overlay.heightProperty().bind(viewport.heightProperty());
 
-		selectedItem.flatMap(ScreenBounds::of)
+		selectedItem.flatMap(ScreenBounds.CACHED::of)
 				.subscribe(screenBounds -> {
 					if (screenBounds == null) return;
 					Bounds local = overlay.screenToLocal(screenBounds);
@@ -114,24 +114,7 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 					gc.fillRect(0, 0, 10000, 10000);
 					gc.clearRect(local.getMinX(), local.getMinY(), local.getWidth(), local.getHeight());
 				});
-//		highlightedRegion = EasyBind.combine(hoveredItem, selectedItem,
-//						(hovered, selected) -> hovered == null ? selected : hovered)
-//				.flatMap(node ->
-//						//TODO: Cleanup binding dependencies.
-//						createObjectBinding(() -> overlay.screenToLocal(node.localToScreen(node.getBoundsInLocal())),
-//								node.boundsInLocalProperty(),
-//								node.boundsInParentProperty(),
-//								node.localToParentTransformProperty(),
-//								node.localToSceneTransformProperty(),
-//								viewport.contentScaleProperty(),
-//								viewport.contentPositionXProperty(),
-//								viewport.contentPositionYProperty(),
-//								viewport.boundsInLocalProperty(),
-//								viewport.boundsInParentProperty(),
-//								viewport.localToParentTransformProperty(),
-//								viewport.localToSceneTransformProperty()))
-//				.orElse(DEFAULT_BOUNDING_BOX);
-//		highlightedRegion.subscribe(this::updateOverlay);
+
 
 		treeView.rootProperty().bind(control.targetProperty().map(NodeTreeItem::new));
 		viewport.contentProperty().bind(control.targetProperty().map(t -> t instanceof Parent p ? p : new StackPane(t)).orElse(new StackPane()));

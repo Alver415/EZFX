@@ -1,4 +1,4 @@
-package com.ezfx.controls.editor.introspective;
+package com.ezfx.base.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,7 +34,7 @@ public class CachedProxy<T> implements InvocationHandler {
 	private final List<Object> NULL = List.of();
 
 	@Override
-	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+	public Object invoke(Object proxy, Method method, Object[] args) {
 		List<Object> argList = args == null ? NULL : Arrays.asList(args);
 		return cachedResults
 				.computeIfAbsent(method, _ -> new ConcurrentHashMap<>())
@@ -51,5 +52,7 @@ public class CachedProxy<T> implements InvocationHandler {
 			throw new RuntimeException(e);
 		}
 	}
+
+
 
 }

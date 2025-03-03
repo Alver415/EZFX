@@ -1,5 +1,6 @@
 package com.ezfx.controls.explorer;
 
+import com.ezfx.controls.info.NodeInfo;
 import com.ezfx.controls.misc.FilterableTreeItem;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
@@ -8,31 +9,21 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.TreeCell;
+import javafx.scene.control.TreeItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class GenericTreeCell<T> extends TreeCell<T> {
 
-	private static final Map<Class<?>, Image> ICON_CACHE = new HashMap<>();
-	private static final Map<Class<?>, String> JAVA_TYPE_CACHE = new HashMap<>();
 	public static final PseudoClass FILTERED = PseudoClass.getPseudoClass("filtered");
 
 	private final BorderPane borderPane;
 
-	private final HBox left;
-	private final ImageView icon;
-
-	private final HBox center;
-	private final Label styleClassLabel;
-	private final Label nodeIdLabel;
-	private final Label javaTypeLabel;
+	private final NodeInfo center;
 
 	private final HBox right;
 	private final CheckBox visibleCheckBox;
@@ -41,25 +32,14 @@ public class GenericTreeCell<T> extends TreeCell<T> {
 		setContentDisplay(ContentDisplay.LEFT);
 
 		// Build Structure
-		icon = new ImageView();
-		icon.getStyleClass().add("icon");
-		left = new HBox(icon);
-
-		javaTypeLabel = new Label();
-		javaTypeLabel.getStyleClass().add("java-type");
-		nodeIdLabel = new Label();
-		nodeIdLabel.getStyleClass().add("node-id");
-		styleClassLabel = new Label();
-		styleClassLabel.getStyleClass().add("style-class");
-		center = new HBox(javaTypeLabel, nodeIdLabel, styleClassLabel);
-		center.setAlignment(Pos.CENTER_LEFT);
+		center = new NodeInfo();
+		center.subjectProperty().bind(currentItem.map(object -> object instanceof TreeValue.NodeTreeValue ntv ? ntv.getValue() : null));
 
 		visibleCheckBox = new CheckBox();
 		right = new HBox(visibleCheckBox);
 		right.setAlignment(Pos.CENTER_RIGHT);
 
 		borderPane = new BorderPane();
-		borderPane.setLeft(left);
 		borderPane.setCenter(center);
 		borderPane.setRight(right);
 
@@ -68,10 +48,6 @@ public class GenericTreeCell<T> extends TreeCell<T> {
 				.flatMap(TreeItem::valueProperty)
 				.map(cast -> (TreeValue<?, ?>) cast);
 
-		icon.imageProperty().bind(treeValue.flatMap(TreeValue::observableIcon));
-		javaTypeLabel.textProperty().bind(treeValue.flatMap(TreeValue::observableJavaType));
-		nodeIdLabel.textProperty().bind(treeValue.flatMap(TreeValue::observableNodeId));
-		styleClassLabel.textProperty().bind(treeValue.map(TreeValue::observableStyleClass).map(v -> String.join(", ", v)));
 		visibleCheckBox.selectedProperty().bind(treeValue.flatMap(TreeValue::observableVisibility));
 
 		treeItemProperty()
@@ -79,6 +55,8 @@ public class GenericTreeCell<T> extends TreeCell<T> {
 						filterableTreeItem.predicateProperty() : null)
 				.flatMap(filter -> currentItemProperty().map(filter::test).map(b -> !b))
 				.subscribe(filtered -> pseudoClassStateChanged(FILTERED, filtered != null && filtered));
+
+		setOnMouseEntered(e -> treeViewProperty().flatMap(Node::hoverProperty).getValue());
 
 	}
 

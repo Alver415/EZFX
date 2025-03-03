@@ -1,5 +1,6 @@
 package com.ezfx.controls.editor.introspective;
 
+import com.ezfx.base.utils.CachedProxy;
 import com.ezfx.base.utils.EZFXCollections;
 import com.ezfx.controls.editor.Category;
 import javafx.beans.NamedArg;

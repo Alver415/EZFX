@@ -1,7 +1,9 @@
-package com.ezfx.demos;
+package com.ezfx.dev;
 
 import com.ezfx.app.EZFXApplication;
+import com.ezfx.app.stage.DecoratedStage;
 import com.ezfx.base.utils.ScreenBounds;
+import com.ezfx.controls.info.NodeInfo;
 import javafx.animation.TranslateTransition;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
@@ -9,12 +11,12 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 public class BoundsTestingApplication extends EZFXApplication {
@@ -49,21 +51,32 @@ public class BoundsTestingApplication extends EZFXApplication {
 
 
 		Label stageBoundsLabel = new Label();
-		ObservableValue<Bounds> stageBounds = ScreenBounds.of(stage);
+		ObservableValue<Bounds> stageBounds = ScreenBounds.CACHED.of(stage);
 		ObservableValue<String> stageBoundsText = stageBounds.map(this::toString).map(b -> "Stage: " + b);
 		stageBoundsLabel.textProperty().bind(stageBoundsText);
 
 		Label sceneBoundsLabel = new Label();
-		ObservableValue<Bounds> sceneBounds = ScreenBounds.of(scene);
+		ObservableValue<Bounds> sceneBounds = ScreenBounds.CACHED.of(scene);
 		ObservableValue<String> sceneBoundsText = sceneBounds.map(this::toString).map(b -> "Scene: " + b);
 		sceneBoundsLabel.textProperty().bind(sceneBoundsText);
 
 		Label buttonBoundsLabel = new Label();
-		ObservableValue<Bounds> buttonBounds = ScreenBounds.of(rectangle);
+		ObservableValue<Bounds> buttonBounds = ScreenBounds.CACHED.of(rectangle);
 		ObservableValue<String> buttonBoundsText = buttonBounds.map(this::toString).map(b -> "Button: " + b);
 		buttonBoundsLabel.textProperty().bind(buttonBoundsText);
 
 		root.getChildren().addAll(stageBoundsLabel, sceneBoundsLabel, buttonBoundsLabel);
+
+		Stage second = new DecoratedStage();
+		second.setTitle("Second");
+		second.setWidth(400);
+		second.setHeight(600);
+		NodeInfo info = new NodeInfo();
+		info.setId("testtesttesttesttesttesttesttesttest");
+		info.getStyleClass().addAll("first", "second", "third");
+		info.setSubject(info);
+		second.setScene(new Scene(new VBox(new Button("test"), new Slider(), info)));
+		second.show();
 
 	}
 
