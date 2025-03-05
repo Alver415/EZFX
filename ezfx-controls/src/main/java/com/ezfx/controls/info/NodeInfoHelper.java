@@ -25,11 +25,11 @@ public class NodeInfoHelper implements INodeInfoHelper {
 	private NodeInfoHelper() {
 	}
 
-	public Image icon(Node item) {
-		Class<?> type = item.getClass();
+	public Image icon(Object object) {
+		Class<?> type = object.getClass();
 		do {
 			Image icon = Resources.image(Icons.class, "fx-icons/%s%s.png"
-					.formatted(type.getSimpleName(), getOrientationSuffix(item)));
+					.formatted(type.getSimpleName(), getOrientationSuffix(object)));
 			if (icon != null) {
 				return icon;
 			}
@@ -38,8 +38,8 @@ public class NodeInfoHelper implements INodeInfoHelper {
 		return MISSING_ICON;
 	}
 
-	public String typeName(Node node) {
-		Class<?> type = node.getClass();
+	public String typeName(Object object) {
+		Class<?> type = object.getClass();
 		while (type.isAnonymousClass()) {
 			type = type.getSuperclass();
 		}
@@ -71,12 +71,12 @@ public class NodeInfoHelper implements INodeInfoHelper {
 	}
 
 
-	private static String getOrientationSuffix(Node item) {
+	private static String getOrientationSuffix(Object object) {
 		//Special cases for orientation of Separator and ScrollBar
-		if (item instanceof Separator separator) {
+		if (object instanceof Separator separator) {
 			return getOrientationSuffix(separator.getOrientation());
 		}
-		if (item instanceof ScrollBar scrollBar) {
+		if (object instanceof ScrollBar scrollBar) {
 			return getOrientationSuffix(scrollBar.getOrientation());
 		}
 		return "";

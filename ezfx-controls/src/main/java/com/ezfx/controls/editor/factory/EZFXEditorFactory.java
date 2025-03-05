@@ -32,11 +32,11 @@ public class EZFXEditorFactory implements EditorFactory {
 		// Special case for css style property.
 		if (Node.class.isAssignableFrom(type)) {
 			editor = (Editor<T>) new NodeEditor((Property<Node>) property);
-		} else if (String.class.equals(type) && "style".equals(property.getName())) {
-			StringEditor stringEditor = new StringEditor((Property<String>) property);
-			stringEditor.setSkin(new CSSEditorSkin(stringEditor));
-			stringEditor.setMinHeight(64);
-			editor = (Editor<T>) stringEditor;
+//		} else if (String.class.equals(type) && "style".equals(property.getName())) {
+//			StringEditor stringEditor = new StringEditor((Property<String>) property);
+//			stringEditor.setSkin(new CSSEditorSkin(stringEditor));
+//			stringEditor.setMinHeight(64);
+//			editor = (Editor<T>) stringEditor;
 		} else if (Font.class.equals(type)) {
 			editor = (Editor<T>) new FontEditor((Property<Font>) property);
 		} else if (Background.class.equals(type)) {

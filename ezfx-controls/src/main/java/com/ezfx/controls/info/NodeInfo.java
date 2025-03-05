@@ -1,11 +1,18 @@
 package com.ezfx.controls.info;
 
 import com.ezfx.base.utils.Resources;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.Skin;
+import javafx.scene.control.SkinBase;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -44,6 +51,7 @@ public class NodeInfo extends Control {
 
 		public DefaultSkin(NodeInfo control) {
 			super(control);
+			consumeMouseEvents(false);
 
 			// Build Structure
 			iconView = new ImageView();
@@ -69,12 +77,21 @@ public class NodeInfo extends Control {
 			getChildren().setAll(borderPane);
 
 			// Setup Bindings
+
+			ObservableValue<String> override = control.subjectProperty()
+					.map(Node::getProperties)
+					.flatMap(map -> (ObservableValue<? extends String>) map.get("NAME_OVERRIDE"));
+			ObservableValue<String> typeName = control.subjectProperty().map(NodeInfoHelper.CACHING::typeName);
+
+			ObjectBinding<String> nameText = Bindings.createObjectBinding(() -> {
+				String o = override.getValue();
+				String t = typeName.getValue();
+				return o == null ? t : o;
+			}, override, typeName);
 			iconView.imageProperty().bind(control.subjectProperty().map(NodeInfoHelper.CACHING::icon));
-			typeNameLabel.textProperty().bind(control.subjectProperty().map(NodeInfoHelper.CACHING::typeName));
+			typeNameLabel.textProperty().bind(nameText);
 			nodeIdLabel.textProperty().bind(control.subjectProperty().flatMap(NodeInfoHelper.CACHING::nodeId));
 			styleClassLabel.textProperty().bind(control.subjectProperty().flatMap(NodeInfoHelper.CACHING::styleClass));
-
 		}
-
 	}
 }

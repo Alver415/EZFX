@@ -1,6 +1,5 @@
 package com.ezfx.controls.editor.impl.javafx;
 
-import com.ezfx.base.utils.Converter;
 import com.ezfx.controls.editor.Category;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.PropertiesEditor;
@@ -14,6 +13,8 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.BinaryOperator;
@@ -21,12 +22,13 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static com.ezfx.base.utils.Converters.NUMBER_TO_DOUBLE;
-import static com.ezfx.base.utils.EZFX.toObservableArrayList;
 import static com.ezfx.base.utils.Properties.copyWithName;
 
 public class NodeEditor extends IntrospectingPropertiesEditor<Node> {
+
+	private static final Logger log = LoggerFactory.getLogger(NodeEditor.class);
 
 	public NodeEditor() {
 		this(new SimpleObjectProperty<>());
@@ -45,7 +47,12 @@ public class NodeEditor extends IntrospectingPropertiesEditor<Node> {
 				.map(this::filterPropertyInfo)
 				.map(this::categorizePropertyInfo)
 				.map(this::convertToEditors)
-				.map(this::addAdditionalEditors));
+				.map(this::addAdditionalEditors)
+				.map(v -> {
+					ObservableMap<Category, ObservableList<Editor<?>>> map = FXCollections.observableMap(new LinkedHashMap<>());
+					v.forEach((key, value) -> map.put(key, FXCollections.observableArrayList(value)));
+					return map;
+				}));
 
 		editorsProperty().bind(categorizedEditorsProperty().map(map -> {
 			ObservableList<Editor<?>> list = FXCollections.observableArrayList();
@@ -55,14 +62,16 @@ public class NodeEditor extends IntrospectingPropertiesEditor<Node> {
 	}
 
 	private List<PropertyInfo> introspectPropertyInfo(Class<?> aClass) {
+		log.info("1 introspectPropertyInfo");
 		return getIntrospector().getPropertyInfo(aClass);
 	}
 
-	private ObservableMap<Category, ObservableList<Editor<?>>> addAdditionalEditors(
-			ObservableMap<Category, ObservableList<Editor<?>>> categorizedEditors) {
+	private Map<Category, List<Editor<?>>> addAdditionalEditors(
+			Map<Category, List<Editor<?>>> categorizedEditors) {
+		log.info("5 addAdditionalEditors");
 
 		for (Category category : categorizedEditors.keySet()) {
-			ObservableList<Editor<?>> list = categorizedEditors.get(category);
+			List<Editor<?>> list = categorizedEditors.get(category);
 			for (Category c : additionalEditors.keySet()) {
 				if (c.title().equals(category.title())) {
 					list.addAll(0, additionalEditors.getOrDefault(c, List.of()).stream().map(f -> f.apply(valueProperty())).toList());
@@ -73,28 +82,38 @@ public class NodeEditor extends IntrospectingPropertiesEditor<Node> {
 		return categorizedEditors;
 	}
 
-	private ObservableMap<Category, ObservableList<Editor<?>>> convertToEditors(
-			ObservableMap<Category, ObservableList<PropertyInfo>> categorizedProperties) {
-		return categorizedProperties.entrySet().stream()
-				.collect(Collectors.toMap(
-						Map.Entry::getKey,
-						entry -> entry.getValue()
-								.stream()
-								.map(info -> buildSubEditor(getValue(), info))
-								.collect(toObservableArrayList()),
-						accumulating(),
-						toObservableLinkedHashMap()));
+	private Map<Category, List<Editor<?>>> convertToEditors(
+			Map<Category, List<PropertyInfo>> categorizedProperties) {
+		log.info("4 convertToEditors");
+		Stream<Map.Entry<Category, List<PropertyInfo>>> stream = categorizedProperties.entrySet().stream();
+		Function<Map.Entry<Category, List<PropertyInfo>>, Category> keyMapper = entry -> entry.getKey();
+		Function<Map.Entry<Category, List<PropertyInfo>>, List<Editor<?>>> valueMapper = entry -> {
+			List<PropertyInfo> value = entry.getValue();
+			List<Editor<?>> list = new ArrayList<>();
+			value.forEach(info -> list.add(buildSubEditor(getValue(), info)));
+			return list;
+		};
+		return stream.collect(Collectors.toMap(
+				keyMapper,
+				valueMapper,
+				(a, b) -> {
+					a.addAll(b);
+					return a;
+				},
+				LinkedHashMap::new));
 	}
 
-	private ObservableMap<Category, ObservableList<PropertyInfo>> categorizePropertyInfo(List<PropertyInfo> filtered) {
+	private Map<Category, List<PropertyInfo>> categorizePropertyInfo(List<PropertyInfo> filtered) {
+		log.info("3 categorizePropertyInfo");
 		return filtered.stream()
 				.collect(Collectors.groupingBy(
 						PropertyInfo::category,
-						toObservableTreeMap(),
-						toObservableArrayList()));
+						TreeMap::new,
+						Collectors.toList()));
 	}
 
 	private List<PropertyInfo> filterPropertyInfo(List<PropertyInfo> infoList) {
+		log.info("2 filterPropertyInfo");
 		return infoList.stream().filter(info -> filters.stream()
 				.map(filter1 -> filter1.test(info))
 				.reduce(true, (a, b) -> a && b)).toList();
@@ -152,7 +171,7 @@ public class NodeEditor extends IntrospectingPropertiesEditor<Node> {
 			Property<Node> property, String name, Orientation orientation, List<Function<Node, Property<?>>> accessors) {
 		PropertiesEditor<Node> editor = new PropertiesEditor<>(copyWithName(property, name));
 		editor.setSkin(orientation == Orientation.HORIZONTAL ?
-				new MultiEditorSkin.HorizontalEditorSkin<>(editor):
+				new MultiEditorSkin.HorizontalEditorSkin<>(editor) :
 				new MultiEditorSkin.VerticalEditorSkin<>(editor));
 		Node node = property.getValue();
 

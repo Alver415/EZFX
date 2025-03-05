@@ -1,10 +1,9 @@
 open module ezfx.controls {
 	exports com.ezfx.controls.console;
-	exports com.ezfx.controls.explorer;
 	exports com.ezfx.controls.utils;
 	exports com.ezfx.controls.viewport;
 	exports com.ezfx.controls.icons;
-	exports com.ezfx.controls.nodetree;
+	exports com.ezfx.controls.tree;
 	exports com.ezfx.controls.misc;
 	exports com.ezfx.controls.editor;
 	exports com.ezfx.controls.editor.introspective;

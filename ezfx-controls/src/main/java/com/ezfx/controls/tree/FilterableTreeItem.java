@@ -1,7 +1,6 @@
-package com.ezfx.controls.misc;
+package com.ezfx.controls.tree;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -13,8 +12,8 @@ import javafx.scene.control.TreeItem;
 import java.util.function.Predicate;
 
 public class FilterableTreeItem<T> extends TreeItem<T> {
-	private final ObservableList<TreeItem<T>> sourceChildren = FXCollections.observableArrayList();
-	private final FilteredList<TreeItem<T>> filteredChildren = new FilteredList<>(sourceChildren);
+	protected final ObservableList<TreeItem<T>> sourceChildren = FXCollections.observableArrayList();
+	protected final FilteredList<TreeItem<T>> filteredChildren = new FilteredList<>(sourceChildren);
 
 	public FilterableTreeItem(T value) {
 		super(value);
@@ -27,7 +26,7 @@ public class FilterableTreeItem<T> extends TreeItem<T> {
 				return true;
 			}
 			return getPredicate().test(child.getValue());
-		}, predicateProperty()));
+		}, valueProperty(), predicateProperty()));
 
 		filteredChildren.addListener((ListChangeListener<TreeItem<T>>) c -> {
 			while (c.next()) {

@@ -20,7 +20,7 @@ public class ApplicationExplorerDemo extends EZFXApplication {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		setTitle("Application");
-		Stage stage = new DecoratedStage();
+		Stage stage = primaryStage;
 		stage.getIcons().add(SVGs.GEAR.image(32));
 		iconProperty().subscribe(icon -> stage.getIcons().setAll(icon == null ? EMPTY_IMAGE : icon));
 		stage.setScene(buildScene());

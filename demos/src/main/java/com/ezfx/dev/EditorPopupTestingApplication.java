@@ -13,7 +13,7 @@ public class EditorPopupTestingApplication extends EZFXApplication {
 
 		NodeMiniEditor editor = new NodeMiniEditor();
 
-		OverlayPopup editorPopup = new OverlayPopup();
+		OverlayPopup editorPopup = new OverlayPopup(stage);
 //		editorPopup.titleProperty().bind(editor.valueProperty().flatMap(NodeInfoImpl.CACHING::info));
 
 		Button button = new Button("Testing");
