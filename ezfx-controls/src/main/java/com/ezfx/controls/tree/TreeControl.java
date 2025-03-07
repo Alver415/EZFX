@@ -2,10 +2,7 @@ package com.ezfx.controls.tree;
 
 import com.ezfx.base.utils.Resources;
 import com.ezfx.controls.editor.impl.standard.StringEditor;
-import javafx.beans.property.Property;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -41,6 +38,7 @@ public class TreeControl<T> extends Control {
 			filterField.setPromptText("Filter...");
 
 			treeView = new TreeView<>();
+			treeView.showRootProperty().bindBidirectional(control.showRootProperty());
 			treeView.cellFactoryProperty().bind(control.cellFactoryProperty().map(cellFactory -> view -> {
 				TreeCell<T> cell = cellFactory.call(view);
 				cell.setOnMouseEntered(_ -> {
@@ -67,7 +65,7 @@ public class TreeControl<T> extends Control {
 					.map(root -> root instanceof FilterableTreeItem<T> filterable ? filterable : null)
 					.subscribe(root -> {
 						if (root == null) return;
-						recursiveExpand(root, 3, true);
+						recursiveExpand(root, 5, true);
 						root.predicateProperty().bind(filterField.valueProperty().map(
 								filterText -> treeValue -> filterFunction.map(ff -> ff.apply(filterText, treeValue)).getValue()));
 					});
@@ -90,6 +88,20 @@ public class TreeControl<T> extends Control {
 
 	public void setRoot(T value) {
 		this.rootProperty().setValue(value);
+	}
+
+	private final BooleanProperty showRoot = new SimpleBooleanProperty(this, "showRoot", true);
+
+	public BooleanProperty showRootProperty() {
+		return this.showRoot;
+	}
+
+	public Boolean getShowRoot() {
+		return this.showRootProperty().getValue();
+	}
+
+	public void setShowRoot(Boolean value) {
+		this.showRootProperty().setValue(value);
 	}
 
 	// region Functional Properties

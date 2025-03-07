@@ -1,4 +1,4 @@
-package com.ezfx.demos;
+package com.ezfx.dev;
 
 import com.ezfx.base.utils.Screens;
 import com.ezfx.controls.editor.impl.javafx.StyleEditor;
@@ -11,11 +11,11 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-public class StyleEditorApplication extends Application {
+public class StyleEditorDemo extends Application {
 
 
 	public static void main(String... args) {
-		Application.launch(StyleEditorApplication.class);
+		Application.launch(StyleEditorDemo.class);
 	}
 
 	@Override

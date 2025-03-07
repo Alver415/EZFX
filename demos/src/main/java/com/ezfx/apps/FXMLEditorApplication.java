@@ -1,4 +1,4 @@
-package com.ezfx.demos;
+package com.ezfx.apps;
 
 import com.ezfx.app.EZFXApplication;
 import com.ezfx.app.editor.SceneEditor;

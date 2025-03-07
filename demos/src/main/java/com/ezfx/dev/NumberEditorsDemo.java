@@ -1,22 +1,14 @@
-package com.ezfx.demos;
+package com.ezfx.dev;
 
 import com.ezfx.app.EZFXApplication;
 import com.ezfx.app.stage.DecoratedStage;
-import com.ezfx.base.utils.Colors;
-import com.ezfx.controls.editor.impl.javafx.BackgroundEditor;
 import com.ezfx.controls.editor.impl.standard.*;
 import com.ezfx.controls.icons.SVGs;
-import com.ezfx.controls.utils.SplitPanes;
 import javafx.scene.Scene;
-import javafx.scene.control.SplitPane;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-public class NumberEditorsEditorApplication extends EZFXApplication {
+public class NumberEditorsDemo extends EZFXApplication {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {

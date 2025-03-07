@@ -1,6 +1,7 @@
 open module ezfx.demo{
 	exports com.ezfx.demos;
 	exports com.ezfx.dev;
+	exports com.ezfx.apps;
 
 	// EZFX
 	requires transitive ezfx.base;

@@ -18,7 +18,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class EZFXPolyglotApplication extends EZFXApplication {
+public class EZFXPolyglotDemo extends EZFXApplication {
 	private ManagedContext managedContext;
 	private SubScene subScene;
 	private Canvas canvas;

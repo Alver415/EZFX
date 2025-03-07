@@ -3,6 +3,7 @@ package com.ezfx.controls.editor.impl.javafx;
 import com.ezfx.controls.editor.Category;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.PropertiesEditor;
+import com.ezfx.controls.editor.factory.EditorFactory;
 import com.ezfx.controls.editor.introspective.IntrospectingPropertiesEditor;
 import com.ezfx.controls.editor.introspective.PropertyInfo;
 import com.ezfx.controls.editor.skin.MultiEditorSkin;
@@ -40,19 +41,22 @@ public class NodeEditor extends IntrospectingPropertiesEditor<Node> {
 
 	public NodeEditor(Property<Node> property) {
 		super(property);
-
+	}
+	protected void init(){
 		categorizedEditorsProperty().bind(valueProperty()
-				.map(Node::getClass)
-				.map(this::introspectPropertyInfo)
-				.map(this::filterPropertyInfo)
-				.map(this::categorizePropertyInfo)
-				.map(this::convertToEditors)
-				.map(this::addAdditionalEditors)
-				.map(v -> {
-					ObservableMap<Category, ObservableList<Editor<?>>> map = FXCollections.observableMap(new LinkedHashMap<>());
-					v.forEach((key, value) -> map.put(key, FXCollections.observableArrayList(value)));
-					return map;
-				}));
+				.map(n -> Optional.ofNullable(n)
+						.map(Node::getClass)
+						.map(this::introspectPropertyInfo)
+						.map(this::filterPropertyInfo)
+						.map(this::categorizePropertyInfo)
+						.map(this::convertToEditors)
+						.map(this::addAdditionalEditors)
+						.map(v -> {
+							ObservableMap<Category, ObservableList<Editor<?>>> map = FXCollections.observableMap(new LinkedHashMap<>());
+							v.forEach((key, value) -> map.put(key, FXCollections.observableArrayList(value)));
+							return map;
+						}).orElse(FXCollections.emptyObservableMap())
+				));
 
 		editorsProperty().bind(categorizedEditorsProperty().map(map -> {
 			ObservableList<Editor<?>> list = FXCollections.observableArrayList();
@@ -66,20 +70,20 @@ public class NodeEditor extends IntrospectingPropertiesEditor<Node> {
 		return getIntrospector().getPropertyInfo(aClass);
 	}
 
-	private Map<Category, List<Editor<?>>> addAdditionalEditors(
-			Map<Category, List<Editor<?>>> categorizedEditors) {
-		log.info("5 addAdditionalEditors");
+	private List<PropertyInfo> filterPropertyInfo(List<PropertyInfo> infoList) {
+		log.info("2 filterPropertyInfo");
+		return infoList.stream().filter(info -> filters.stream()
+				.map(filter1 -> filter1.test(info))
+				.reduce(true, (a, b) -> a && b)).toList();
+	}
 
-		for (Category category : categorizedEditors.keySet()) {
-			List<Editor<?>> list = categorizedEditors.get(category);
-			for (Category c : additionalEditors.keySet()) {
-				if (c.title().equals(category.title())) {
-					list.addAll(0, additionalEditors.getOrDefault(c, List.of()).stream().map(f -> f.apply(valueProperty())).toList());
-				}
-			}
-		}
-
-		return categorizedEditors;
+	private Map<Category, List<PropertyInfo>> categorizePropertyInfo(List<PropertyInfo> filtered) {
+		log.info("3 categorizePropertyInfo");
+		return filtered.stream()
+				.collect(Collectors.groupingBy(
+						PropertyInfo::category,
+						TreeMap::new,
+						Collectors.toList()));
 	}
 
 	private Map<Category, List<Editor<?>>> convertToEditors(
@@ -103,20 +107,20 @@ public class NodeEditor extends IntrospectingPropertiesEditor<Node> {
 				LinkedHashMap::new));
 	}
 
-	private Map<Category, List<PropertyInfo>> categorizePropertyInfo(List<PropertyInfo> filtered) {
-		log.info("3 categorizePropertyInfo");
-		return filtered.stream()
-				.collect(Collectors.groupingBy(
-						PropertyInfo::category,
-						TreeMap::new,
-						Collectors.toList()));
-	}
+	private Map<Category, List<Editor<?>>> addAdditionalEditors(
+			Map<Category, List<Editor<?>>> categorizedEditors) {
+		log.info("5 addAdditionalEditors");
 
-	private List<PropertyInfo> filterPropertyInfo(List<PropertyInfo> infoList) {
-		log.info("2 filterPropertyInfo");
-		return infoList.stream().filter(info -> filters.stream()
-				.map(filter1 -> filter1.test(info))
-				.reduce(true, (a, b) -> a && b)).toList();
+		for (Category category : categorizedEditors.keySet()) {
+			List<Editor<?>> list = categorizedEditors.get(category);
+			for (Category c : additionalEditors.keySet()) {
+				if (c.title().equals(category.title())) {
+					list.addAll(0, additionalEditors.getOrDefault(c, List.of()).stream().map(f -> f.apply(valueProperty())).toList());
+				}
+			}
+		}
+
+		return categorizedEditors;
 	}
 
 	private static <T> BinaryOperator<ObservableList<T>> accumulating() {
@@ -135,16 +139,16 @@ public class NodeEditor extends IntrospectingPropertiesEditor<Node> {
 		return () -> FXCollections.observableMap(new TreeMap<>());
 	}
 
-	private List<String> nameFilters = List.of(
+	private static List<String> nameFilters = List.of(
 			"rotate", "rotationaxis",
 			"layoutx", "layouty",
 			"translatex", "translatey", "translatez",
 			"scalex", "scaley", "scalez"
 	);
-	private List<Predicate<PropertyInfo>> filters = List.of(
+	private static List<Predicate<PropertyInfo>> filters = List.of(
 			info -> !nameFilters.contains(info.name()));
 
-	private Map<Category, List<Function<Property<Node>, Editor<?>>>> additionalEditors = Map.of(
+	private static Map<Category, List<Function<Property<Node>, Editor<?>>>> additionalEditors = Map.of(
 			Category.of("Node"), List.of(
 					property -> combinedNumberEditors(property, "Layout", List.of(
 							Node::layoutXProperty,
@@ -162,12 +166,12 @@ public class NodeEditor extends IntrospectingPropertiesEditor<Node> {
 							Node::rotationAxisProperty))
 			));
 
-	private PropertiesEditor<Node> combinedNumberEditors(
+	private static PropertiesEditor<Node> combinedNumberEditors(
 			Property<Node> property, String name, List<Function<Node, Property<?>>> accessors) {
 		return combinedNumberEditors(property, name, Orientation.HORIZONTAL, accessors);
 	}
 
-	private PropertiesEditor<Node> combinedNumberEditors(
+	private static PropertiesEditor<Node> combinedNumberEditors(
 			Property<Node> property, String name, Orientation orientation, List<Function<Node, Property<?>>> accessors) {
 		PropertiesEditor<Node> editor = new PropertiesEditor<>(copyWithName(property, name));
 		editor.setSkin(orientation == Orientation.HORIZONTAL ?
@@ -176,7 +180,7 @@ public class NodeEditor extends IntrospectingPropertiesEditor<Node> {
 		Node node = property.getValue();
 
 		editor.getEditors().addAll(accessors.stream()
-				.map(accessor -> getEditorFactory().buildEditor(accessor.apply(node)))
+				.map(accessor -> EditorFactory.DEFAULT_FACTORY.buildEditor(accessor.apply(node)))
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.toList());

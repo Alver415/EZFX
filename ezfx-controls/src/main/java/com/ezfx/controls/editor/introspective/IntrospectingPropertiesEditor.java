@@ -1,6 +1,9 @@
 package com.ezfx.controls.editor.introspective;
 
-import com.ezfx.controls.editor.*;
+import com.ezfx.controls.editor.Category;
+import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.ListEditor;
+import com.ezfx.controls.editor.PropertiesEditor;
 import com.ezfx.controls.editor.factory.EditorFactory;
 import com.ezfx.controls.editor.skin.TabPaneCategorizedSkin;
 import javafx.beans.property.Property;
@@ -44,7 +47,10 @@ public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
 		super(property);
 		setIntrospector(introspector);
 		setEditorFactory(factory);
+		init();
+	}
 
+	protected void init() {
 		categorizedEditorsProperty().bind(valueProperty()
 				.map(T::getClass)
 				.map(getIntrospector()::getPropertyInfo)
@@ -52,7 +58,7 @@ public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
 					ObservableMap<Category, ObservableList<Editor<?>>> categorized =
 							FXCollections.observableMap(new TreeMap<>());
 					for (PropertyInfo propertyInfo : propertyInfoList) {
-						Editor<?> subEditor = buildSubEditor(property.getValue(), propertyInfo);
+						Editor<?> subEditor = buildSubEditor(valueProperty().getValue(), propertyInfo);
 						if (subEditor == null) continue;
 						Category category = propertyInfo.category();
 						ObservableList<Editor<?>> list = categorized.computeIfAbsent(category,

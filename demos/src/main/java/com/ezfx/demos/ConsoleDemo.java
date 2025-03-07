@@ -29,13 +29,13 @@ import java.util.stream.Stream;
 import static com.ezfx.base.utils.EZFX.runFX;
 import static java.lang.Thread.sleep;
 
-public class SimpleConsoleApplication extends EZFXApplication {
+public class ConsoleDemo extends EZFXApplication {
 
 
 	public static void main(String[] args) {
 		//Replaces System in/out/err with read/write capable IOStreams.
 		SystemIO.overrideSystemDefaults();
-		Application.launch(SimpleConsoleApplication.class, args);
+		Application.launch(ConsoleDemo.class, args);
 	}
 
 	private final TabPane tabPane = new TabPane();
@@ -96,7 +96,7 @@ public class SimpleConsoleApplication extends EZFXApplication {
 
 			// ProcessView
 			Stream.of("cmd", "powershell")
-					.map(SimpleConsoleApplication::startProcess)
+					.map(ConsoleDemo::startProcess)
 					.map(ProcessView::new)
 					.map(program -> Tabs.create(
 							"ProcessPane - " + program.getProcess().info().command().orElse(""),

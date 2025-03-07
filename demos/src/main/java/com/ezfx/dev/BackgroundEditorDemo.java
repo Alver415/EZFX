@@ -1,10 +1,9 @@
-package com.ezfx.demos;
+package com.ezfx.dev;
 
 import com.ezfx.app.EZFXApplication;
 import com.ezfx.app.stage.DecoratedStage;
 import com.ezfx.base.utils.Colors;
-import com.ezfx.base.utils.Converter;
-import com.ezfx.controls.editor.impl.javafx.ColorEditor;
+import com.ezfx.controls.editor.impl.javafx.BackgroundEditor;
 import com.ezfx.controls.icons.SVGs;
 import com.ezfx.controls.utils.SplitPanes;
 import javafx.scene.Scene;
@@ -17,11 +16,11 @@ import javafx.stage.Stage;
 
 import static com.ezfx.base.utils.ComplexBinding.bindBidirectional;
 
-public class ColorPickerApplication extends EZFXApplication {
+public class BackgroundEditorDemo extends EZFXApplication {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		setTitle("Color Picker");
+		setTitle("Background Editor");
 		Stage stage = new DecoratedStage();
 		stage.getIcons().add(SVGs.GEAR.image(32));
 		stage.setScene(buildScene());
@@ -32,22 +31,13 @@ public class ColorPickerApplication extends EZFXApplication {
 	}
 
 	private static Scene buildScene() {
-		ColorEditor colorEditor = new ColorEditor();
 		StackPane canvas = new StackPane();
-		bindBidirectional(colorEditor.valueProperty(), canvas.backgroundProperty(),
-				Converter.of(Background::fill, background -> {
-					try {
-						return (Color) background.getFills().getFirst().getFill();
-					} catch (Exception e) {
-						return null;
-					}
-				}));
-
+		BackgroundEditor backgroundEditor = new BackgroundEditor(canvas.backgroundProperty());
 
 		BorderPane right = new BorderPane(canvas);
-		BorderPane left = new BorderPane(colorEditor);
+		BorderPane left = new BorderPane(backgroundEditor);
 		SplitPane root = SplitPanes.horizontal(left, right);
-		root.setBackground(Background.fill(Colors.withAlpha(Color.WHITE, 0.5)));
+		root.setBackground(Background.fill(Colors.withAlpha(Color.WHITE, 0.9)));
 		return new Scene(root);
 	}
 }

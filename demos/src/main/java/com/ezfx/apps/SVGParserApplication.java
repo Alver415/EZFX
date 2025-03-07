@@ -1,4 +1,4 @@
-package com.ezfx.demos;
+package com.ezfx.apps;
 
 import com.ezfx.app.EZFXApplication;
 import com.ezfx.app.stage.DecoratedStage;
@@ -25,7 +25,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 public class SVGParserApplication extends EZFXApplication {
 

@@ -1,4 +1,4 @@
-package com.ezfx.demos;
+package com.ezfx.apps;
 
 import com.ezfx.app.EZFXApplication;
 import com.ezfx.app.console.ProcessView;
@@ -6,7 +6,7 @@ import com.ezfx.app.stage.DecoratedStage;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class EZFZConsoleApplication extends EZFXApplication {
+public class ConsoleApplication extends EZFXApplication {
 	@Override
 	public void start(Stage stage) throws Exception {
 		stage = new DecoratedStage();

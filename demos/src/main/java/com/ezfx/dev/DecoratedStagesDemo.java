@@ -1,24 +1,11 @@
-package com.ezfx.demos;
+package com.ezfx.dev;
 
 import com.ezfx.app.EZFXApplication;
 import com.ezfx.app.stage.DecoratedStage;
-import com.ezfx.app.stage.EZFXStageDecorationSkin;
-import com.ezfx.app.stage.StageDecoration;
-import com.ezfx.app.stage.WindowsStageDecorationSkin;
-import com.ezfx.base.utils.Colors;
-import com.ezfx.base.utils.Resources;
-import com.ezfx.controls.icons.Icons;
-import com.ezfx.controls.icons.SVGPaths;
 import com.ezfx.controls.icons.SVGs;
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.PixelReader;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.StackPane;
@@ -29,9 +16,9 @@ import javafx.stage.Stage;
 
 import static com.ezfx.controls.icons.SVGs.GEAR;
 
-public class DecoratedApplication extends EZFXApplication {
+public class DecoratedStagesDemo extends EZFXApplication {
 	public static void main(String... args) {
-		Application.launch(DecoratedApplication.class, args);
+		Application.launch(DecoratedStagesDemo.class, args);
 	}
 
 	@Override
