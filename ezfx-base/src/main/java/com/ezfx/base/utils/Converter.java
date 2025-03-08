@@ -46,7 +46,7 @@ public interface Converter<A, B> {
 		};
 	}
 
-	static <A, B> Simple<A, B> of(Function<A, B> to, Function<B, A> from) {
+	static <A, B> Converter<A, B> of(Function<A, B> to, Function<B, A> from) {
 		return new Simple<>(to, from);
 	}
 

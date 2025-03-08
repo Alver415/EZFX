@@ -1,23 +1,17 @@
 package com.ezfx.controls.editor.impl.standard;
 
-import com.ezfx.base.utils.Colors;
 import com.ezfx.base.utils.Converter;
 import com.ezfx.controls.editor.ObjectEditor;
-import com.ezfx.controls.editor.skin.EditorSkin;
+import com.ezfx.controls.editor.EditorSkinBase;
 import com.ezfx.controls.icons.SVGs;
 import com.ezfx.controls.misc.RepeatingButton;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.Group;
 import javafx.scene.control.*;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.util.StringConverter;
 
 import java.util.function.UnaryOperator;
-import java.util.stream.Stream;
 
 import static com.ezfx.base.utils.ComplexBinding.bindBidirectional;
 import static com.ezfx.base.utils.Converters.NUMBER_TO_DOUBLE;
@@ -92,7 +86,7 @@ public abstract class NumberEditor<T extends Number> extends ObjectEditor<T> {
 		return new TextFieldWithButtonsSkin<>(this);
 	}
 
-	public static class TextFieldSkin<T extends Number> extends EditorSkin<NumberEditor<T>, T> {
+	public static class TextFieldSkin<T extends Number> extends EditorSkinBase<NumberEditor<T>, T> {
 		public TextFieldSkin(NumberEditor<T> editor) {
 			super(editor);
 			TextField textField = new TextField();
@@ -101,7 +95,7 @@ public abstract class NumberEditor<T extends Number> extends ObjectEditor<T> {
 		}
 	}
 
-	public static class TextFieldWithButtonsSkin<T extends Number> extends EditorSkin<NumberEditor<T>, T> {
+	public static class TextFieldWithButtonsSkin<T extends Number> extends EditorSkinBase<NumberEditor<T>, T> {
 
 		private final Converter<T, Double> incrementConverter =
 				editor.numberToValueConverter().inverted().compound(NUMBER_TO_DOUBLE);
@@ -149,7 +143,7 @@ public abstract class NumberEditor<T extends Number> extends ObjectEditor<T> {
 		}
 	}
 
-	public static class SliderSkin<T extends Number> extends EditorSkin<NumberEditor<T>, T> {
+	public static class SliderSkin<T extends Number> extends EditorSkinBase<NumberEditor<T>, T> {
 		public SliderSkin(NumberEditor<T> editor) {
 			super(editor);
 			Slider slider = new Slider();

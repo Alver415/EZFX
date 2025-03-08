@@ -1,13 +1,15 @@
 package com.ezfx.controls.editor.impl.standard;
 
 import com.ezfx.controls.editor.ObjectEditor;
-import com.ezfx.controls.editor.skin.ComboBoxSelectionEditorSkin;
+import com.ezfx.controls.editor.EditorSkinBase;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
+import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
@@ -93,7 +95,22 @@ public class SelectionEditor<T> extends ObjectEditor<T> {
 
 	@Override
 	protected Skin<?> createDefaultSkin() {
-		return new ComboBoxSelectionEditorSkin<>(this);
+		return new DefaultSkin<>(this);
 	}
 
+	public static class DefaultSkin<T> extends EditorSkinBase<SelectionEditor<T>, T> {
+
+		public DefaultSkin(SelectionEditor<T> control) {
+			super(control);
+			ComboBox<T> comboBox = new ComboBox<>();
+			comboBox.converterProperty().bindBidirectional(control.converterProperty());
+			comboBox.itemsProperty().bindBidirectional(control.itemsProperty());
+			comboBox.cellFactoryProperty().bindBidirectional(control.cellFactoryProperty());
+			comboBox.buttonCellProperty().bindBidirectional(control.buttonCellProperty());
+			comboBox.valueProperty().bindBidirectional(control.valueProperty());
+
+			HBox hBox = new HBox(comboBox);
+			getChildren().setAll(hBox);
+		}
+	}
 }

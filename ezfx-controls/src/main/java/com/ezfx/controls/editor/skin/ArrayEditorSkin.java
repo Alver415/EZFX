@@ -2,20 +2,15 @@ package com.ezfx.controls.editor.skin;
 
 import com.ezfx.base.observable.ObservableObjectArray;
 import com.ezfx.base.observable.ObservableObjectArrayImpl;
-import com.ezfx.controls.editor.ArrayEditor;
-import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.EditorView;
+import com.ezfx.controls.editor.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.util.Subscription;
-import org.controlsfx.control.action.Action;
-import org.controlsfx.control.action.ActionUtils;
 
 import java.lang.reflect.Array;
 
@@ -23,7 +18,7 @@ import static com.ezfx.controls.editor.factory.IntrospectingEditorFactory.DEFAUL
 
 
 @SuppressWarnings("unchecked")
-public class ArrayEditorSkin<T> extends EditorSkin<ArrayEditor<T>, ObservableObjectArray<T>> {
+public class ArrayEditorSkin<T> extends EditorSkinBase<ArrayEditor<T>, ObservableObjectArray<T>> {
 
 	private final ObservableList<EditorView<T, Editor<T>>> wrappers = FXCollections.observableArrayList();
 
@@ -44,35 +39,6 @@ public class ArrayEditorSkin<T> extends EditorSkin<ArrayEditor<T>, ObservableObj
 			rebuild();
 		});
 
-//		EditorAction clear = new EditorAction();
-//		clear.setName("Clear");
-//		clear.setIcon(Icons.X);
-//		clear.setAction(() -> property().getValue().clear());
-//
-//		EditorAction plus = new EditorAction();
-//		plus.setName("Add");
-//		plus.setIcon(Icons.PLUS);
-//		plus.setAction(() -> {
-//			T newValue = listEditor.getIntrospector().getDefaultValueForType(listEditor.getGenericType());
-//			ObservableObjectArray<T> array = property().getValue();
-//			int newSize = array.size() + 1;
-//			array.resize(newSize);
-//			array.ensureCapacity(newSize);
-//			array.set(newSize - 1, newValue);
-//		});
-//
-//		EditorAction minus = new EditorAction();
-//		minus.setName("Remove");
-//		minus.setIcon(Icons.MINUS);
-//		minus.setAction(() -> {
-//			ObservableObjectArray<T> array = property().getValue();
-//			if (array.size() > 0) {
-//				array.resize(array.size() - 1);
-//			}
-//		});
-//
-//		List<Button> list = Stream.of(clear, plus, minus).map(this::buildActionButton).toList();
-//		HBox actions = new HBox(4, list.toArray(new Node[0]));
 		getChildren().setAll(new VBox(vBox));
 
 	}
@@ -80,7 +46,6 @@ public class ArrayEditorSkin<T> extends EditorSkin<ArrayEditor<T>, ObservableObj
 	private void rebuild() {
 		locked(() -> {
 			ObservableObjectArray<T> originalArray = valueProperty().getValue();
-//			T[] oldArray = originalArray.toArray((T[]) Array.newInstance(editor().getGenericType(), 0));
 			if (originalArray.size() == 0) {
 				wrappers.clear();
 			} else {
@@ -111,8 +76,7 @@ public class ArrayEditorSkin<T> extends EditorSkin<ArrayEditor<T>, ObservableObj
 								valueProperty().setValue(newA);
 							}
 						});
-						Editor<T> editor = DEFAULT_FACTORY.buildEditor(type, property).orElseGet(Editor::new);
-						;
+						Editor<T> editor = DEFAULT_FACTORY.buildEditor(type, property).orElseGet(EditorBase::new);
 						EditorView<T, Editor<T>> wrapper = new EditorView<>(editor);
 						wrapper.nameProperty().bind(Bindings.createIntegerBinding(
 								() -> wrappers.indexOf(wrapper), wrappers).map("[%s]"::formatted));
@@ -124,15 +88,6 @@ public class ArrayEditorSkin<T> extends EditorSkin<ArrayEditor<T>, ObservableObj
 					wrappers.remove(index);
 				}
 			}
-
-//			T[] newArray = originalArray.toArray((T[]) Array.newInstance(editor().getGenericType(), 0));
-//
-//			boolean equals = Arrays.equals(oldArray, newArray);
-//			if (!equals) {
-//				Class<T> genericType = editor().getGenericType();
-//				ObservableObjectArrayImpl<T> value = new ObservableObjectArrayImpl<>(genericType, originalArray);
-//				property().setValue(value);
-//			}
 
 			subscription.unsubscribe();
 			subscription = valueProperty().getValue().subscribe(this::rebuild);
@@ -146,15 +101,5 @@ public class ArrayEditorSkin<T> extends EditorSkin<ArrayEditor<T>, ObservableObj
 		} finally {
 			lock = false;
 		}
-	}
-
-	private Button buildActionButton(Action action) {
-		return ActionUtils.createButton(action);
-//		Button button = new Button();
-//		button.getStyleClass().add("icon-button");
-//		button.setGraphic(new ImageView(action.getIcon()));
-//		button.setTooltip(new Tooltip(action.getName()));
-//		button.onActionProperty().bind(action.actionProperty().map(a -> _ -> a.run()));
-//		return button;
 	}
 }

@@ -1,21 +1,17 @@
 package com.ezfx.controls.editor.impl.javafx;
 
-import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.ObjectEditor;
 import com.ezfx.controls.editor.impl.standard.DoubleEditor;
-import com.ezfx.controls.editor.skin.EditorSkin;
+import com.ezfx.controls.editor.EditorSkinBase;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.geometry.Point3D;
 import javafx.scene.Node;
 import javafx.scene.control.Skin;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
-
-import java.util.function.Consumer;
 
 public class ScaleEditor extends ObjectEditor<Node> {
 	public ScaleEditor() {
@@ -31,13 +27,13 @@ public class ScaleEditor extends ObjectEditor<Node> {
 		return new DefaultSkin(this);
 	}
 
-	public static class DefaultSkin extends EditorSkin<Editor<Node>, Node> {
+	public static class DefaultSkin extends EditorSkinBase<EditorBase<Node>, Node> {
 
 		private final DoubleProperty x = new SimpleDoubleProperty(this, "x");
 		private final DoubleProperty y = new SimpleDoubleProperty(this, "y");
 		private final DoubleProperty z = new SimpleDoubleProperty(this, "z");
 
-		public DefaultSkin(Editor<Node> editor) {
+		public DefaultSkin(EditorBase<Node> editor) {
 			super(editor);
 
 			valueProperty().map(Node::translateXProperty).subscribe(property -> property.bindBidirectional(x));

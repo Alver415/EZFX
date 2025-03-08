@@ -1,7 +1,7 @@
 package com.ezfx.app.editor;
 
 import com.ezfx.base.utils.ScreenBounds;
-import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.impl.javafx.NodeEditor;
 import com.ezfx.controls.tree.SceneGraphTreeControl;
 import com.ezfx.controls.viewport.Viewport;
@@ -9,7 +9,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -35,7 +34,7 @@ import static com.ezfx.base.utils.EZFX.runFX;
 
 public class SceneEditorSkin extends SkinBase<SceneEditor> {
 
-	private final Map<Node, Editor<?>> cache = new ConcurrentHashMap<>(new LinkedHashMap<>(5, 0.75f, true));
+	private final Map<Node, EditorBase<?>> cache = new ConcurrentHashMap<>(new LinkedHashMap<>(5, 0.75f, true));
 
 	private final SceneGraphTreeControl treeControl;
 	private final Viewport viewport;
@@ -105,7 +104,7 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 	}
 
 
-	private Editor<?> getEditorByTreeItem(Node node) {
+	private EditorBase<?> getEditorByTreeItem(Node node) {
 		if (node == null) return null;
 		return cache.computeIfAbsent(node, _ -> {
 			NodeEditor editor = new NodeEditor(node);
@@ -115,17 +114,17 @@ public class SceneEditorSkin extends SkinBase<SceneEditor> {
 		});
 	}
 
-	private final Property<Editor<?>> editor = new SimpleObjectProperty<>(this, "editor");
+	private final Property<EditorBase<?>> editor = new SimpleObjectProperty<>(this, "editor");
 
-	public Property<Editor<?>> editorProperty() {
+	public Property<EditorBase<?>> editorProperty() {
 		return this.editor;
 	}
 
-	public Editor<?> getEditor() {
+	public EditorBase<?> getEditor() {
 		return this.editorProperty().getValue();
 	}
 
-	public void setEditor(Editor<?> value) {
+	public void setEditor(EditorBase<?> value) {
 		this.editorProperty().setValue(value);
 	}
 }

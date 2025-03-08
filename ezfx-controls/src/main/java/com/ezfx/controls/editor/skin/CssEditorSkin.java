@@ -1,5 +1,6 @@
 package com.ezfx.controls.editor.skin;
 
+import com.ezfx.controls.editor.EditorSkinBase;
 import com.ezfx.controls.editor.impl.javafx.CssEditor;
 import com.ezfx.controls.editor.impl.standard.StringEditor;
 import com.ezfx.controls.utils.LazyTreeItem;
@@ -15,7 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
-public class CssEditorSkin extends EditorSkin<CssEditor, Styleable> {
+public class CssEditorSkin extends EditorSkinBase<CssEditor, Styleable> {
 
 	private TreeTableView<CssMetaData<? extends Styleable, ?>> treeTableView;
 

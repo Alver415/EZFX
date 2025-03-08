@@ -1,8 +1,8 @@
-package com.ezfx.controls.editor.impl.standard;
+package com.ezfx.controls.editor.impl.filesystem;
 
 import com.ezfx.base.utils.Converter;
 import com.ezfx.controls.editor.ObjectEditor;
-import com.ezfx.controls.editor.skin.EditorSkin;
+import com.ezfx.controls.editor.EditorSkinBase;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
@@ -36,7 +36,7 @@ public class FileSelectionEditor extends ObjectEditor<File> {
 		return new DialogSkin();
 	}
 
-	private class DialogSkin extends EditorSkin<FileSelectionEditor, File> {
+	private class DialogSkin extends EditorSkinBase<FileSelectionEditor, File> {
 
 		protected DialogSkin() {
 			super(FileSelectionEditor.this);

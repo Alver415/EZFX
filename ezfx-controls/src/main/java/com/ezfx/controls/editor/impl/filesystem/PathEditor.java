@@ -1,9 +1,8 @@
 package com.ezfx.controls.editor.impl.filesystem;
 
 import com.ezfx.base.utils.Converter;
-import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.skin.EditorSkin;
-import com.ezfx.controls.editor.skin.TextFieldSkin;
+import com.ezfx.controls.editor.EditorBase;
+import com.ezfx.controls.editor.EditorSkinBase;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -15,26 +14,13 @@ import java.nio.file.Path;
 
 import static com.ezfx.base.utils.ComplexBinding.bindBidirectional;
 
-public class PathEditor extends Editor<Path> {
+public class PathEditor extends EditorBase<Path> {
 	public PathEditor() {
 		this(new SimpleObjectProperty<>());
 	}
 
 	public PathEditor(Property<Path> property) {
 		super(property);
-	}
-
-	@Override
-	protected Skin<?> createDefaultSkin() {
-		return new EditorSkin<>(this){
-			{
-				TextField textField = new TextField();
-				Converter<String, Path> converter = Converter.of(Path::of, Path::toString);
-				bindBidirectional(textField.textProperty(), PathEditor.this.valueProperty(), converter);
-				textField.promptTextProperty().bindBidirectional(PathEditor.this.promptTextProperty());
-				getChildren().setAll(textField);
-			}
-		};
 	}
 
 	private final StringProperty promptText = new SimpleStringProperty(this, "promptText");
@@ -49,6 +35,28 @@ public class PathEditor extends Editor<Path> {
 
 	public void setPromptText(String value) {
 		this.promptTextProperty().setValue(value);
+	}
+
+	@Override
+	protected Skin<?> createDefaultSkin() {
+		return new DefaultSkin(this);
+	}
+
+	public static class DefaultSkin extends EditorSkinBase<PathEditor, Path> {
+		private final TextField textField;
+		public DefaultSkin(PathEditor editor) {
+			super(editor);
+			textField = new TextField();
+			getChildren().setAll(textField);
+		}
+
+		@Override
+		public void install() {
+			super.install();
+			bindBidirectional(textField.promptTextProperty(), editor.promptTextProperty());
+			bindBidirectional(textField.textProperty(), editor.valueProperty(),
+					Converter.of(Path::of, Path::toString));
+		}
 	}
 
 }

@@ -1,13 +1,13 @@
 package com.ezfx.controls.popup;
 
-import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.impl.standard.StringEditor;
-import com.ezfx.controls.editor.skin.EditorSkin;
+import com.ezfx.controls.editor.EditorSkinBase;
 import javafx.scene.Node;
 
-public class NodeMiniEditor extends Editor<Node> {
+public class NodeMiniEditor extends EditorBase<Node> {
 
-	public static class NodeMiniEditorSkin extends EditorSkin<NodeMiniEditor, Node> {
+	public static class NodeMiniEditorSkin extends EditorSkinBase<NodeMiniEditor, Node> {
 
 		private final StringEditor idEditor;
 		public NodeMiniEditorSkin(NodeMiniEditor editor) {

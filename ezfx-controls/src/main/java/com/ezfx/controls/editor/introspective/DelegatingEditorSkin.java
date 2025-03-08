@@ -1,9 +1,9 @@
 package com.ezfx.controls.editor.introspective;
 
-import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.skin.EditorSkin;
+import com.ezfx.controls.editor.EditorBase;
+import com.ezfx.controls.editor.EditorSkinBase;
 
-public class DelegatingEditorSkin<E extends Editor<T> & DelegatingEditor<T>, T> extends EditorSkin<E, T> {
+public class DelegatingEditorSkin<E extends EditorBase<T> & DelegatingEditor<T>, T> extends EditorSkinBase<E, T> {
 
 	public DelegatingEditorSkin(E control) {
 		super(control);

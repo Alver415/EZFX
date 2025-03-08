@@ -2,7 +2,6 @@ package com.ezfx.controls.editor.impl.javafx;
 
 import com.ezfx.controls.editor.ObjectEditor;
 import com.ezfx.controls.editor.skin.CssEditorSkin;
-import com.ezfx.controls.editor.skin.StyleEditorSkin;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.css.Styleable;

@@ -7,7 +7,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
-public abstract class ObjectEditor<T> extends Editor<T> {
+public abstract class ObjectEditor<T> extends EditorBase<T> {
 
 	public ObjectEditor() {
 		this(new SimpleObjectProperty<>());

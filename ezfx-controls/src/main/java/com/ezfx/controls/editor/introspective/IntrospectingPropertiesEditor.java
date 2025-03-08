@@ -1,13 +1,11 @@
 package com.ezfx.controls.editor.introspective;
 
-import com.ezfx.controls.editor.Category;
-import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.ListEditor;
-import com.ezfx.controls.editor.PropertiesEditor;
+import com.ezfx.controls.editor.*;
 import com.ezfx.controls.editor.factory.EditorFactory;
 import com.ezfx.controls.editor.skin.TabPaneCategorizedSkin;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -51,7 +49,7 @@ public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
 	}
 
 	protected void init() {
-		categorizedEditorsProperty().bind(valueProperty()
+		ObservableValue<ObservableMap<Category, ObservableList<Editor<?>>>> mapped = valueProperty()
 				.map(T::getClass)
 				.map(getIntrospector()::getPropertyInfo)
 				.map(propertyInfoList -> {
@@ -66,7 +64,8 @@ public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
 						list.add(subEditor);
 					}
 					return categorized;
-				}));
+				});
+		categorizedEditorsProperty().bind(mapped);
 
 		editorsProperty().bind(categorizedEditorsProperty().map(map -> {
 			ObservableList<Editor<?>> list = FXCollections.observableArrayList();
@@ -95,12 +94,12 @@ public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
 			if (rawType instanceof Class clazz && genericType instanceof Class genericClazz && List.class.isAssignableFrom(clazz)) {
 				ListEditor<R> listEditor = new ListEditor<>((Property<ObservableList<R>>) property);
 				listEditor.setGenericType(genericClazz);
-				return (Editor<R>) listEditor;
+				return (EditorBase<R>) listEditor;
 			}
-			return getEditorFactory().buildEditor((Class<R>) rawType, property).orElseGet(Editor::new);
+			return getEditorFactory().buildEditor((Class<R>) rawType, property).orElseGet(EditorBase::new);
 		} else if (type instanceof Class clazz) {
-			return getEditorFactory().buildEditor((Class<R>) clazz, property).orElseGet(Editor::new);
-		} else return new Editor<>();
+			return getEditorFactory().buildEditor((Class<R>) clazz, property).orElseGet(EditorBase::new);
+		} else return new EditorBase<>();
 	}
 
 	private final Property<Introspector> introspector = new SimpleObjectProperty<>(this, "introspector");

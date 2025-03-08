@@ -72,8 +72,6 @@ public class ComplexListBinding<A, B> implements InvalidationListener, WeakListe
 		return false;
 	}
 
-	private static List<ComplexListBinding<?, ?>> list = new ArrayList<>();
-
 	public static <A, B> void bindBidirectional(ListProperty<A> propA, ListProperty<B> propB, Converter<A, B> converter) {
 		checkParameters(propA, propB);
 		final ComplexListBinding<A, B> binding = new ComplexListBinding<>(propA, propB, converter);
@@ -82,7 +80,6 @@ public class ComplexListBinding<A, B> implements InvalidationListener, WeakListe
 		propA.getValue();
 		propA.addListener(binding);
 		propB.addListener(binding);
-		list.add(binding);
 	}
 
 	private static <A, B> void setTo(ListProperty<A> propA, ListProperty<B> propB, Function<B, A> converter) {

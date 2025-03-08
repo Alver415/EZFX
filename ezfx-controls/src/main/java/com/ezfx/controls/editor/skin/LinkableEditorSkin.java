@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class LinkableEditorSkin<T, C extends Editor<T>> extends EditorViewSkin<T, C> {
+public class LinkableEditorSkin<T, C extends Editor<T>> extends EditorView.DefaultSkin<T, C> {
 
 	private static final Insets INSETS = new Insets(2);
 	private static final ObjectProperty<LinkableProperty<?>> selected = new SimpleObjectProperty<>();
@@ -58,7 +58,6 @@ public class LinkableEditorSkin<T, C extends Editor<T>> extends EditorViewSkin<T
 		ObservableValue<Background> background = color.map(Color::desaturate).map(Background::fill);
 		linkButton.backgroundProperty().bind(background);
 
-		control.disableProperty().bind(linkable.isLinkedToProperty());
 
 		BooleanBinding disabled = Bindings.createBooleanBinding(() -> linkable == selected.get(), selected);
 		linkButton.disableProperty().bind(disabled);
@@ -127,9 +126,12 @@ public class LinkableEditorSkin<T, C extends Editor<T>> extends EditorViewSkin<T
 		borderPane.setLeft(name);
 		borderPane.setRight(buttons);
 
-		HBox hBox = new HBox(control);
-		HBox.setHgrow(control, Priority.ALWAYS);
+		HBox hBox = new HBox(control.getNode());
+		HBox.setHgrow(control.getNode(), Priority.ALWAYS);
 		VBox vBox = new VBox(borderPane, hBox);
 		getChildren().setAll(vBox);
+
+
+		hBox.disableProperty().bind(linkable.isLinkedToProperty());
 	}
 }

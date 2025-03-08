@@ -44,7 +44,7 @@ public class ListEditorView<T> extends ListView<T> {
 		DoubleBinding height = Bindings.createDoubleBinding(() -> {
 			double sum = 0;
 			for (int i = 0; i < editors.size() && i < getItems().size(); i++) {
-				sum += editors.get(i).getHeight();
+				sum += editors.get(i).getNode().getBoundsInLocal().getHeight();
 			}
 			return Math.max(20, sum + addButton.getHeight());
 		}, editors, addButton.heightProperty(), itemsProperty());
@@ -110,7 +110,9 @@ public class ListEditorView<T> extends ListView<T> {
 			property.addListener((_, oldValue, newValue) -> {
 				if (!lock) editor.valueProperty().getValue().set(index, newValue);
 			});
-			Editor<T> editor = DEFAULT_FACTORY.buildEditor(clazz, property).orElseGet(Editor::new);
+			Editor<T> editor = DEFAULT_FACTORY
+					.buildEditor(clazz, property)
+					.orElseGet(EditorBase::new);
 
 			editors.put(index, editor);
 			return editor;
@@ -146,7 +148,7 @@ public class ListEditorView<T> extends ListView<T> {
 				} else if (editorProperty.get() != null) {
 					Text label = new Text();
 					label.textProperty().bind(indexProperty().map("[%d]"::formatted));
-					return new HBox(label, editorProperty.get());
+					return new HBox(label, editorProperty.get().getNode());
 				} else {
 					return null;
 				}

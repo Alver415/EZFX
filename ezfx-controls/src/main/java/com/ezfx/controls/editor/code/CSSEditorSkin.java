@@ -1,7 +1,7 @@
 package com.ezfx.controls.editor.code;
 
 import com.ezfx.base.utils.Resources;
-import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 
@@ -17,7 +17,7 @@ public class CSSEditorSkin extends CodeEditorSkin {
 			(?<SELECTOR>[.#]?[a-zA-Z_][\\w\\-]*)|(?<PROPERTY>[a-zA-Z\\-]+)(?=\\s*:)|(?<VALUE>#[0-9a-fA-F]{3,6}|\\b[0-9.]+(px|em|%|rem)?\\b|\"[^\"]*\"|'.*?')|(?<COMMENT>/\\*.*?\\*/)
 			""", Pattern.DOTALL);
 
-	public CSSEditorSkin(Editor<String> editor) {
+	public CSSEditorSkin(EditorBase<String> editor) {
 		super(editor);
 	}
 

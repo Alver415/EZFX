@@ -1,10 +1,8 @@
 package com.ezfx.controls.editor.impl.javafx;
 
-import com.ezfx.base.io.SystemIO;
-import com.ezfx.controls.console.ConsoleView;
-import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.introspective.IntrospectingPropertiesEditor;
-import com.ezfx.controls.editor.skin.EditorSkin;
+import com.ezfx.controls.editor.EditorSkinBase;
 import com.ezfx.controls.icons.Icons;
 import com.ezfx.controls.misc.ProgressView;
 import javafx.application.Application;
@@ -19,9 +17,7 @@ import javafx.scene.layout.VBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
-
-public class ApplicationEditorSkin extends EditorSkin<Editor<Application>, Application> {
+public class ApplicationEditorSkin extends EditorSkinBase<EditorBase<Application>, Application> {
 
 	private static final Logger log = LoggerFactory.getLogger(ApplicationEditorSkin.class);
 
@@ -60,7 +56,7 @@ public class ApplicationEditorSkin extends EditorSkin<Editor<Application>, Appli
 
 	private void forceClose() {
 		try {
-			Editor<Application> editor = getSkinnable();
+			EditorBase<Application> editor = getSkinnable();
 			Application application = editor.getValue();
 			application.stop();
 			Platform.exit();

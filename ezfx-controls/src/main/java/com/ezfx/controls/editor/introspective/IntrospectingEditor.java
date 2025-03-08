@@ -1,7 +1,6 @@
 package com.ezfx.controls.editor.introspective;
 
-import com.ezfx.base.utils.EZFX;
-import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.factory.EditorFactory;
 import com.ezfx.controls.editor.ObjectEditor;
 import com.ezfx.controls.editor.option.*;
@@ -14,12 +13,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Bounds;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.Skin;
-import javafx.stage.PopupWindow;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.action.ActionGroup;
 import org.fxmisc.easybind.EasyBind;
@@ -123,7 +117,7 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 				.map(option -> new Action(option.getName(), _ -> {
 					if (option instanceof ConstructorOption<T> constructorOption) {
 						if (constructorOption.getConstructor().getParameterCount() == 0) {
-							property.setValue(option.buildEditor().getValue());
+							property.setValue((T) option.buildEditor().getValue());
 							return;
 						}
 					}
@@ -166,7 +160,7 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 			} else if (!getIntrospector().getPropertyInfo(value.getClass()).isEmpty()) {
 				setDelegate(new IntrospectingPropertiesEditor<>(value));
 			} else if (!constructorOptions.getValue().isEmpty()){
-				setDelegate((Editor<T>) constructorOptions.getValue().getFirst().buildEditor());
+				setDelegate((EditorBase<T>) constructorOptions.getValue().getFirst().buildEditor());
 			}
 		});
 
@@ -271,18 +265,18 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 				.orElse(true);
 	}
 
-	private final Property<Editor<T>> delegate = new SimpleObjectProperty<>(this, "delegate");
+	private final Property<EditorBase<T>> delegate = new SimpleObjectProperty<>(this, "delegate");
 
 	@Override
-	public Property<Editor<T>> delegateProperty() {
+	public Property<EditorBase<T>> delegateProperty() {
 		return this.delegate;
 	}
 
-	public Editor<T> getDelegate() {
+	public EditorBase<T> getDelegate() {
 		return this.delegateProperty().getValue();
 	}
 
-	public void setDelegate(Editor<T> value) {
+	public void setDelegate(EditorBase<T> value) {
 		this.delegateProperty().setValue(value);
 	}
 

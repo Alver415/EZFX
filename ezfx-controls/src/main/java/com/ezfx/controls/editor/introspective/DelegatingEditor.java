@@ -1,17 +1,17 @@
 package com.ezfx.controls.editor.introspective;
 
-import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
 import javafx.beans.property.Property;
 
 public interface DelegatingEditor<T> {
 
-	Property<Editor<T>> delegateProperty();
+	Property<EditorBase<T>> delegateProperty();
 
-	default Editor<T> getDelegate() {
+	default EditorBase<T> getDelegate() {
 		return this.delegateProperty().getValue();
 	}
 
-	default void setDelegate(Editor<T> value) {
+	default void setDelegate(EditorBase<T> value) {
 		this.delegateProperty().setValue(value);
 	}
 }

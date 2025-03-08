@@ -1,6 +1,7 @@
 package com.ezfx.controls.editor.factory;
 
 import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 

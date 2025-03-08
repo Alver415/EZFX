@@ -9,7 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Skin;
 
-public abstract class MultiEditorBase<T> extends Editor<T> implements MultiEditor<T> {
+public abstract class MultiEditorBase<T> extends EditorBase<T> implements MultiEditor<T> {
 
 	public MultiEditorBase() {
 		this(new SimpleObjectProperty<>());

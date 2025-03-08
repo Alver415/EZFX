@@ -1,11 +1,9 @@
 package com.ezfx.controls.editor.skin;
 
-import com.ezfx.controls.editor.CategorizedMultiEditor;
-import com.ezfx.controls.editor.Category;
-import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.EditorView;
+import com.ezfx.controls.editor.*;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.scene.control.Control;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -15,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TabPaneCategorizedSkin<E extends Editor<T> & CategorizedMultiEditor<T>, T> extends EditorSkin<E, T> {
+public class TabPaneCategorizedSkin<E extends Control & Editor<T> & CategorizedMultiEditor<T>, T> extends EditorSkinBase<E, T> {
 
 	private final TabPane tabPane = new TabPane();
 	private final Map<Category, Tab> tabMap = new HashMap<>();

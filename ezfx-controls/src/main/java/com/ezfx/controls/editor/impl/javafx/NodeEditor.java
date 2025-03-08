@@ -14,6 +14,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.layout.Region;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,7 +144,9 @@ public class NodeEditor extends IntrospectingPropertiesEditor<Node> {
 			"rotate", "rotationaxis",
 			"layoutx", "layouty",
 			"translatex", "translatey", "translatez",
-			"scalex", "scaley", "scalez"
+			"scalex", "scaley", "scalez",
+			"prefwidth", "minwidth", "maxwidth",
+			"prefheight", "minheight", "maxheight"
 	);
 	private static List<Predicate<PropertyInfo>> filters = List.of(
 			info -> !nameFilters.contains(info.name()));
@@ -164,20 +167,30 @@ public class NodeEditor extends IntrospectingPropertiesEditor<Node> {
 					property -> combinedNumberEditors(property, "Rotation", Orientation.VERTICAL, List.of(
 							Node::rotateProperty,
 							Node::rotationAxisProperty))
+			),
+			Category.of("Region"), List.of(
+					property -> combinedNumberEditors((Property<Region>) (Property<?>) property, "Width", List.of(
+							Region::prefWidthProperty,
+							Region::minWidthProperty,
+							Region::maxWidthProperty)),
+					property -> combinedNumberEditors((Property<Region>) (Property<?>) property, "Height", List.of(
+							Region::prefHeightProperty,
+							Region::minHeightProperty,
+							Region::maxHeightProperty))
 			));
 
-	private static PropertiesEditor<Node> combinedNumberEditors(
-			Property<Node> property, String name, List<Function<Node, Property<?>>> accessors) {
+	private static <T extends Node> PropertiesEditor<T> combinedNumberEditors(
+			Property<T> property, String name, List<Function<T, Property<?>>> accessors) {
 		return combinedNumberEditors(property, name, Orientation.HORIZONTAL, accessors);
 	}
 
-	private static PropertiesEditor<Node> combinedNumberEditors(
-			Property<Node> property, String name, Orientation orientation, List<Function<Node, Property<?>>> accessors) {
-		PropertiesEditor<Node> editor = new PropertiesEditor<>(copyWithName(property, name));
+	private static <T extends Node> PropertiesEditor<T> combinedNumberEditors(
+			Property<T> property, String name, Orientation orientation, List<Function<T, Property<?>>> accessors) {
+		PropertiesEditor<T> editor = new PropertiesEditor<>(copyWithName(property, name));
 		editor.setSkin(orientation == Orientation.HORIZONTAL ?
 				new MultiEditorSkin.HorizontalEditorSkin<>(editor) :
 				new MultiEditorSkin.VerticalEditorSkin<>(editor));
-		Node node = property.getValue();
+		T node = property.getValue();
 
 		editor.getEditors().addAll(accessors.stream()
 				.map(accessor -> EditorFactory.DEFAULT_FACTORY.buildEditor(accessor.apply(node)))

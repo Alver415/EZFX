@@ -1,10 +1,11 @@
 package com.ezfx.controls.editor.impl.javafx;
 
-import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.ObjectEditor;
 import com.ezfx.controls.editor.PropertiesEditor;
 import com.ezfx.controls.editor.impl.standard.DoubleEditor;
-import com.ezfx.controls.editor.skin.EditorSkin;
+import com.ezfx.controls.editor.EditorSkinBase;
+import com.ezfx.controls.editor.skin.MultiEditorSkin;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -29,13 +30,13 @@ public class InsetsEditor extends ObjectEditor<Insets> {
 	}
 
 
-	public static class DefaultSkin extends EditorSkin<Editor<Insets>, Insets> {
+	public static class DefaultSkin extends EditorSkinBase<EditorBase<Insets>, Insets> {
 		private final DoubleProperty top = new SimpleDoubleProperty(this, "top");
 		private final DoubleProperty bottom = new SimpleDoubleProperty(this, "bottom");
 		private final DoubleProperty right = new SimpleDoubleProperty(this, "right");
 		private final DoubleProperty left = new SimpleDoubleProperty(this, "left");
 
-		public DefaultSkin(Editor<Insets> control) {
+		public DefaultSkin(EditorBase<Insets> control) {
 			super(control);
 
 			control.valueProperty().subscribe(insets -> {
@@ -50,6 +51,7 @@ public class InsetsEditor extends ObjectEditor<Insets> {
 					control.valueProperty().setValue(new Insets(top.get(), right.get(), bottom.get(), left.get()))));
 
 			PropertiesEditor<?> beanEditor = new PropertiesEditor<>();
+			beanEditor.setSkin(new MultiEditorSkin.HorizontalEditorSkin<>(beanEditor));
 			beanEditor.editorsProperty().setAll(
 					new DoubleEditor(top),
 					new DoubleEditor(right),

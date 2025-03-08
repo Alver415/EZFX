@@ -1,6 +1,7 @@
 package com.ezfx.controls.editor.factory;
 
 import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.introspective.IntrospectingEditor;
 import com.ezfx.controls.editor.introspective.IntrospectingPropertiesEditor;
 import javafx.beans.property.Property;

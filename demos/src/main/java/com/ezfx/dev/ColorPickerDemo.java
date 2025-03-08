@@ -10,10 +10,14 @@ import com.ezfx.controls.utils.SplitPanes;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
+import java.util.Collection;
+import java.util.Optional;
 
 import static com.ezfx.base.utils.ComplexBinding.bindBidirectional;
 
@@ -34,14 +38,7 @@ public class ColorPickerDemo extends EZFXApplication {
 	private static Scene buildScene() {
 		ColorEditor colorEditor = new ColorEditor();
 		StackPane canvas = new StackPane();
-		bindBidirectional(colorEditor.valueProperty(), canvas.backgroundProperty(),
-				Converter.of(Background::fill, background -> {
-					try {
-						return (Color) background.getFills().getFirst().getFill();
-					} catch (Exception e) {
-						return null;
-					}
-				}));
+		bindBidirectional(colorEditor.valueProperty(), canvas.backgroundProperty(), converter);
 
 
 		BorderPane right = new BorderPane(canvas);
@@ -50,4 +47,14 @@ public class ColorPickerDemo extends EZFXApplication {
 		root.setBackground(Background.fill(Colors.withAlpha(Color.WHITE, 0.5)));
 		return new Scene(root);
 	}
+
+
+	private static final Converter<Color, Background> converter = Converter.of(
+			Background::fill,
+			background -> (Color) Optional.ofNullable(background).stream()
+					.map(Background::getFills)
+					.flatMap(Collection::stream)
+					.map(BackgroundFill::getFill)
+					.findFirst()
+					.orElse(Color.WHITE));
 }

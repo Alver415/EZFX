@@ -1,9 +1,8 @@
 package com.ezfx.controls.editor.code;
 
 import com.ezfx.base.utils.Resources;
-import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.impl.standard.StringEditor;
-import com.ezfx.controls.editor.skin.EditorSkin;
+import com.ezfx.controls.editor.EditorBase;
+import com.ezfx.controls.editor.EditorSkinBase;
 import javafx.concurrent.Task;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 
@@ -23,7 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class JavaEditorSkin extends EditorSkin<Editor<String>, String> {
+public class JavaEditorSkin extends EditorSkinBase<EditorBase<String>, String> {
 	private static final String STYLE_SHEET = Resources.css(JavaEditorSkin.class, "JavaEditorSkin.css");
 
 	private static final String[] KEYWORDS = new String[]{
@@ -55,7 +54,7 @@ public class JavaEditorSkin extends EditorSkin<Editor<String>, String> {
 	private final CodeArea codeArea;
 	private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-	public JavaEditorSkin(Editor<String> editor) {
+	public JavaEditorSkin(EditorBase<String> editor) {
 		super(editor);
 		codeArea = new CodeArea();
 		codeArea.getStylesheets().add(STYLE_SHEET);

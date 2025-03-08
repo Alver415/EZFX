@@ -3,7 +3,8 @@ package com.ezfx.controls.editor.skin;
 import com.ezfx.base.utils.Colors;
 import com.ezfx.base.utils.Converter;
 import com.ezfx.base.utils.Converters;
-import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
+import com.ezfx.controls.editor.EditorSkinBase;
 import com.ezfx.controls.editor.impl.javafx.ColorEditor;
 import com.ezfx.controls.editor.impl.standard.IntegerEditor;
 import com.ezfx.controls.editor.impl.standard.StringEditor;
@@ -26,7 +27,7 @@ import javafx.util.Subscription;
 
 import static com.ezfx.base.utils.ComplexBinding.bindBidirectional;
 
-public class CustomColorEditorSkin extends EditorSkin<Editor<Color>, Color> {
+public class CustomColorEditorSkin extends EditorSkinBase<EditorBase<Color>, Color> {
 
 	private ColorRectPane colorRectPane;
 	private ControlsPane controlsPane;

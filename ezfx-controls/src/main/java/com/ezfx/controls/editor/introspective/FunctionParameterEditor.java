@@ -2,6 +2,7 @@ package com.ezfx.controls.editor.introspective;
 
 import com.ezfx.base.observable.ObservableObjectArrayImpl;
 import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.ListEditor;
 import com.ezfx.controls.editor.MultiEditor;
 import com.ezfx.controls.editor.skin.MultiEditorSkin;
@@ -43,7 +44,8 @@ public class FunctionParameterEditor<T> extends IntrospectingEditor<T> implement
 		setEditors(Arrays.stream(parameters)
 				.map(this::buildEditor)
 				.collect(toObservableArrayList()));
-		getChildren().setAll(getEditors());
+		editorsProperty().subscribe(editors ->
+				getChildren().setAll(editors.stream().map(Editor::getNode).toList()));
 
 		MonadicBinding<T> defaultValue = EasyBind.combine(introspectorProperty(), typeProperty(), Introspector::getDefaultValueForType);
 
@@ -81,7 +83,9 @@ public class FunctionParameterEditor<T> extends IntrospectingEditor<T> implement
 		String name = "%s (%s)".formatted(parameterName, parameterType);
 		R value = getIntrospector().getDefaultValueForType(type);
 		Property<R> property = new SimpleObjectProperty<>(this, name, value);
-		Editor<R> editor = getEditorFactory().buildEditor(type, property).orElseGet(Editor::new);;
+		Editor<R> editor = getEditorFactory()
+				.buildEditor(type, property)
+				.orElseGet(EditorBase::new);
 
 		//TODO: Cleanup
 		handleList(parameter, editor);

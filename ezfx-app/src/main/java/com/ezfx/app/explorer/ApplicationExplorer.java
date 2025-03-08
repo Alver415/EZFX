@@ -4,6 +4,7 @@ import com.ezfx.app.console.ManagedContext;
 import com.ezfx.app.console.PolyglotView;
 import com.ezfx.base.utils.Nodes;
 import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.info.NodeInfoHelper;
 import com.ezfx.controls.popup.OverlayPopup;
 import com.ezfx.controls.tree.SceneGraphTreeControl;
@@ -139,9 +140,10 @@ public class ApplicationExplorer extends Control {
 								if (selected instanceof FakeNode<?> fakeNode) {
 									object = fakeNode.getActual();
 								}
-								return DEFAULT_FACTORY.buildEditor(object).orElseGet(Editor::new);
+								return DEFAULT_FACTORY.buildEditor(object).orElseGet(EditorBase::new);
 							}))
 					.threadBridgeToFx(executor)
+					.map(Editor::getNode)
 					.subscribe(scrollPane::setContent);
 
 

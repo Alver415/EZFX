@@ -1,6 +1,6 @@
 package com.ezfx.controls.editor.option;
 
-import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.introspective.FunctionParameterEditor;
 
 import java.lang.reflect.Method;
@@ -16,7 +16,7 @@ public class MethodOption<T> extends BuilderOption<T> {
 	}
 
 	@Override
-	public Editor<T> buildEditor() {
+	public EditorBase<T> buildEditor() {
 		Function<Object[], T> buildFunction = args -> {
 			try {
 				return (T) method.invoke(null, args);

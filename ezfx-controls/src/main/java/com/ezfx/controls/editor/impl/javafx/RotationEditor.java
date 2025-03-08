@@ -1,9 +1,9 @@
 package com.ezfx.controls.editor.impl.javafx;
 
-import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.ObjectEditor;
 import com.ezfx.controls.editor.impl.standard.DoubleEditor;
-import com.ezfx.controls.editor.skin.EditorSkin;
+import com.ezfx.controls.editor.EditorSkinBase;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -32,13 +32,13 @@ public class RotationEditor extends ObjectEditor<Node> {
 		return new DefaultSkin(this);
 	}
 
-	public static class DefaultSkin extends EditorSkin<Editor<Node>, Node> {
+	public static class DefaultSkin extends EditorSkinBase<EditorBase<Node>, Node> {
 		private final DoubleProperty rotation = new SimpleDoubleProperty(this, "rotation");
 		private final Property<Point3D> axis = new SimpleObjectProperty<>(this, "axis");
 
 		private Subscription subscription = Subscription.EMPTY;
 
-		public DefaultSkin(Editor<Node> editor) {
+		public DefaultSkin(EditorBase<Node> editor) {
 			super(editor);
 
 			editor.valueProperty().subscribe(node -> {

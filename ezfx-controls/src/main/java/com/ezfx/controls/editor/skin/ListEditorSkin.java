@@ -1,8 +1,7 @@
 package com.ezfx.controls.editor.skin;
 
+import com.ezfx.controls.editor.*;
 import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.EditorView;
-import com.ezfx.controls.editor.ListEditor;
 import com.ezfx.controls.icons.SVGs;
 import com.ezfx.controls.utils.Actions;
 import javafx.beans.binding.Bindings;
@@ -25,7 +24,7 @@ import java.util.stream.Stream;
 import static com.ezfx.controls.editor.factory.IntrospectingEditorFactory.DEFAULT_FACTORY;
 
 
-public class ListEditorSkin<T> extends EditorSkin<ListEditor<T>, ObservableList<T>> {
+public class ListEditorSkin<T> extends EditorSkinBase<ListEditor<T>, ObservableList<T>> {
 
 	private final ObservableList<EditorView<T, Editor<T>>> wrappers = FXCollections.observableArrayList();
 
@@ -104,8 +103,7 @@ public class ListEditorSkin<T> extends EditorSkin<ListEditor<T>, ObservableList<
 							if (!lock) valueProperty().getValue().set(i, v);
 						});
 						//TODO: Remove dependence on DEFAULT_FACTORY
-						Editor<T> editor = DEFAULT_FACTORY.buildEditor(type, property).orElseGet(Editor::new);
-						;
+						Editor<T> editor = DEFAULT_FACTORY.buildEditor(type, property).orElseGet(EditorBase::new);
 						EditorView<T, Editor<T>> wrapper = new EditorView<>(editor);
 						wrapper.nameProperty().bind(Bindings.createIntegerBinding(
 								() -> wrappers.indexOf(wrapper), wrappers).map("[%s]"::formatted));

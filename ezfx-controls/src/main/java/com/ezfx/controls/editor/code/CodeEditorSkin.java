@@ -1,7 +1,7 @@
 package com.ezfx.controls.editor.code;
 
-import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.skin.EditorSkin;
+import com.ezfx.controls.editor.EditorBase;
+import com.ezfx.controls.editor.EditorSkinBase;
 import javafx.concurrent.Task;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class CodeEditorSkin extends EditorSkin<Editor<String>, String> {
+public class CodeEditorSkin extends EditorSkinBase<EditorBase<String>, String> {
 	private static final Logger log = LoggerFactory.getLogger(CodeEditorSkin.class);
 
 	private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -28,7 +28,7 @@ public class CodeEditorSkin extends EditorSkin<Editor<String>, String> {
 	private VirtualizedScrollPane<CodeArea> scrollPane;
 	private CodeArea codeArea;
 
-	public CodeEditorSkin(Editor<String> editor) {
+	public CodeEditorSkin(EditorBase<String> editor) {
 		super(editor);
 	}
 

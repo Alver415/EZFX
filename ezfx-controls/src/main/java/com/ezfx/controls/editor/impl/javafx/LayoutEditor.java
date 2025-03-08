@@ -1,9 +1,9 @@
 package com.ezfx.controls.editor.impl.javafx;
 
-import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.ObjectEditor;
 import com.ezfx.controls.editor.impl.standard.DoubleEditor;
-import com.ezfx.controls.editor.skin.EditorSkin;
+import com.ezfx.controls.editor.EditorSkinBase;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -13,8 +13,6 @@ import javafx.scene.control.Skin;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.util.Subscription;
-
-import java.util.List;
 
 import static com.ezfx.base.utils.ComplexBinding.bindBidirectional;
 
@@ -32,7 +30,7 @@ public class LayoutEditor extends ObjectEditor<Node> {
 		return new DefaultSkin(this);
 	}
 
-	public static class DefaultSkin extends EditorSkin<Editor<Node>, Node> {
+	public static class DefaultSkin extends EditorSkinBase<EditorBase<Node>, Node> {
 		private final DoubleProperty layoutX = new SimpleDoubleProperty(this, "x");
 		private final DoubleProperty layoutY = new SimpleDoubleProperty(this, "y");
 		private final DoubleEditor xEditor = new DoubleEditor(layoutX);
@@ -43,7 +41,7 @@ public class LayoutEditor extends ObjectEditor<Node> {
 
 		private Subscription subscription = () -> {};
 
-		public DefaultSkin(Editor<Node> editor) {
+		public DefaultSkin(EditorBase<Node> editor) {
 			super(editor);
 
 			editor.valueProperty().subscribe(node -> {

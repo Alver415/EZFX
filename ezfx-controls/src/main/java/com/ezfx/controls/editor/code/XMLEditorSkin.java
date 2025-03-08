@@ -1,8 +1,8 @@
 package com.ezfx.controls.editor.code;
 
 import com.ezfx.base.utils.Resources;
-import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.skin.EditorSkin;
+import com.ezfx.controls.editor.EditorBase;
+import com.ezfx.controls.editor.EditorSkinBase;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 
 import org.fxmisc.richtext.LineNumberFactory;
@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 import static com.ezfx.base.utils.EZFX.runFX;
 import static com.ezfx.base.utils.EZFX.runOnVirtualThread;
 
-public class XMLEditorSkin extends EditorSkin<Editor<String>, String> {
+public class XMLEditorSkin extends EditorSkinBase<EditorBase<String>, String> {
 	private static final String STYLE_SHEET = Resources.css(XMLEditorSkin.class, "XMLEditorSkin.css");
 
 	private static final Pattern XML_TAG = Pattern.compile(
@@ -38,7 +38,7 @@ public class XMLEditorSkin extends EditorSkin<Editor<String>, String> {
 	private final VirtualizedScrollPane<CodeArea> scrollPane;
 	private final CodeArea codeArea;
 
-	public XMLEditorSkin(Editor<String> editor) {
+	public XMLEditorSkin(EditorBase<String> editor) {
 		super(editor);
 		codeArea = new CodeArea();
 		codeArea.getStylesheets().add(STYLE_SHEET);

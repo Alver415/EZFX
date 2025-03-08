@@ -1,6 +1,7 @@
 package com.ezfx.controls.editor.introspective;
 
 import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.impl.standard.BooleanEditor;
 import com.ezfx.controls.icons.Icons;
 import javafx.beans.property.Property;
@@ -48,7 +49,7 @@ public class EditorDialog<T> extends Dialog<T> {
 		BorderPane top = new BorderPane();
 		borderPane.setTop(top);
 		dialogPane.setContent(borderPane);
-		borderPane.setCenter(editor);
+		borderPane.setCenter(editor.getNode());
 
 		ButtonType apply = new ButtonType("Apply", ButtonData.LEFT);
 		ButtonType reset = new ButtonType("Reset", ButtonData.LEFT);

@@ -1,6 +1,7 @@
 package com.ezfx.controls.editor.option;
 
 import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.introspective.FunctionParameterEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ public class ConstructorOption<T> extends BuilderOption<T> {
 				return constructor.newInstance(args);
 			} catch (Exception e) {
 				log.debug(e.getMessage(), e);
-				return (T) new Editor<>();
+				return (T) new EditorBase<>();
 //				throw new RuntimeException(e);
 			}
 		};

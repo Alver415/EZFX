@@ -5,7 +5,7 @@ import com.ezfx.app.stage.DecoratedStage;
 import com.ezfx.base.utils.Colors;
 import com.ezfx.controls.editor.code.CodeEditor;
 import com.ezfx.controls.editor.impl.standard.DoubleEditor;
-import com.ezfx.controls.editor.impl.standard.FileSelectionEditor;
+import com.ezfx.controls.editor.impl.filesystem.FileSelectionEditor;
 import com.ezfx.controls.editor.impl.standard.StringEditor;
 import com.ezfx.controls.icons.SVGPaths;
 import com.ezfx.controls.icons.SVGs;

@@ -1,6 +1,7 @@
 package com.ezfx.controls.editor.skin;
 
-import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.EditorBase;
+import com.ezfx.controls.editor.EditorSkinBase;
 import com.ezfx.controls.editor.EditorView;
 import com.ezfx.controls.editor.MultiEditor;
 import javafx.collections.FXCollections;
@@ -9,7 +10,7 @@ import javafx.scene.layout.VBox;
 
 public interface MultiEditorSkin {
 
-	class VerticalEditorSkin<E extends Editor<T> & MultiEditor<T>, T> extends EditorSkin<E, T> {
+	class VerticalEditorSkin<E extends EditorBase<T> & MultiEditor<T>, T> extends EditorSkinBase<E, T> {
 
 		private final VBox vBox;
 
@@ -26,7 +27,7 @@ public interface MultiEditorSkin {
 		}
 	}
 
-	class HorizontalEditorSkin<E extends Editor<T> & MultiEditor<T>, T> extends EditorSkin<E, T> implements MultiEditorSkin {
+	class HorizontalEditorSkin<E extends EditorBase<T> & MultiEditor<T>, T> extends EditorSkinBase<E, T> implements MultiEditorSkin {
 
 		private final HBox hBox;
 
