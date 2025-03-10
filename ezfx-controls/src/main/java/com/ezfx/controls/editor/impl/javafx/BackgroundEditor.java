@@ -1,10 +1,7 @@
 package com.ezfx.controls.editor.impl.javafx;
 
-import com.ezfx.controls.editor.Category;
-import com.ezfx.controls.editor.ListEditor;
-import com.ezfx.controls.editor.ObjectEditor;
-import com.ezfx.controls.editor.PropertiesEditor;
-import com.ezfx.controls.editor.EditorSkinBase;
+import com.ezfx.base.utils.Converter;
+import com.ezfx.controls.editor.*;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleListProperty;
@@ -14,10 +11,15 @@ import javafx.scene.control.Skin;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BackgroundImage;
+import javafx.scene.paint.Color;
 import javafx.util.Subscription;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import static com.ezfx.base.utils.ComplexBinding.bindBidirectional;
 
 public class BackgroundEditor extends ObjectEditor<Background> {
 	public BackgroundEditor() {
@@ -30,10 +32,30 @@ public class BackgroundEditor extends ObjectEditor<Background> {
 
 	@Override
 	protected Skin<?> createDefaultSkin() {
-		return new DefaultSkin(this);
+		return new BackgroundColorSkin(this);
 	}
 
-	public static class DefaultSkin extends EditorSkinBase<BackgroundEditor, Background> {
+	public static class BackgroundColorSkin extends EditorSkinBase<BackgroundEditor, Background> {
+		private static final Converter<Color, Background> converter = Converter.of(
+				Background::fill,
+				background -> (Color) Optional.ofNullable(background).stream()
+						.map(Background::getFills)
+						.flatMap(Collection::stream)
+						.map(BackgroundFill::getFill)
+						.filter(a -> a instanceof Color)
+						.findFirst()
+						.orElse(Color.WHITE));
+
+		public BackgroundColorSkin(BackgroundEditor editor) {
+			super(editor);
+			ColorEditor colorEditor = new ColorEditor();
+			colorEditor.setTitle("Background Color");
+			bindBidirectional(colorEditor.valueProperty(), editor.valueProperty(), converter);
+			setChildren(colorEditor);
+		}
+	}
+
+	public static class BackgroundEditorSkin extends EditorSkinBase<BackgroundEditor, Background> {
 
 		boolean locked = false;
 		Subscription fillsSubscription = () -> {
@@ -41,7 +63,7 @@ public class BackgroundEditor extends ObjectEditor<Background> {
 		Subscription imagesSubscription = () -> {
 		};
 
-		public DefaultSkin(BackgroundEditor editor) {
+		public BackgroundEditorSkin(BackgroundEditor editor) {
 			super(editor);
 			ListProperty<BackgroundFill> fills = new SimpleListProperty<>(this, "fills", FXCollections.observableArrayList());
 			ListProperty<BackgroundImage> images = new SimpleListProperty<>(this, "images", FXCollections.observableArrayList());

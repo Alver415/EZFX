@@ -1,203 +1,116 @@
 package com.ezfx.controls.editor.impl.javafx;
 
-import com.ezfx.controls.editor.Category;
+import com.ezfx.base.utils.Converter;
+import com.ezfx.base.utils.Converters;
 import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.PropertiesEditor;
+import com.ezfx.controls.editor.Editors;
 import com.ezfx.controls.editor.factory.EditorFactory;
-import com.ezfx.controls.editor.introspective.IntrospectingPropertiesEditor;
-import com.ezfx.controls.editor.introspective.PropertyInfo;
-import com.ezfx.controls.editor.skin.MultiEditorSkin;
+import com.ezfx.controls.editor.impl.standard.DoubleEditor;
+import com.ezfx.controls.editor.introspective.ClassBasedEditor;
+import com.ezfx.controls.editor.introspective.ClassHierarchyEditor;
 import javafx.beans.property.Property;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.layout.Region;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static com.ezfx.base.utils.Properties.copyWithName;
+import static com.ezfx.base.utils.ComplexBinding.bindBidirectional;
+import static com.ezfx.base.utils.Properties.convert;
+import static com.ezfx.controls.editor.Editors.key;
 
-public class NodeEditor extends IntrospectingPropertiesEditor<Node> {
-
-	private static final Logger log = LoggerFactory.getLogger(NodeEditor.class);
+public class NodeEditor extends ClassHierarchyEditor<Node> {
 
 	public NodeEditor() {
-		this(new SimpleObjectProperty<>());
-	}
-
-	public NodeEditor(Node node) {
-		this(new SimpleObjectProperty<>(node));
-	}
-
-	public NodeEditor(Property<Node> property) {
-		super(property);
-	}
-	protected void init(){
-		categorizedEditorsProperty().bind(valueProperty()
-				.map(n -> Optional.ofNullable(n)
-						.map(Node::getClass)
-						.map(this::introspectPropertyInfo)
-						.map(this::filterPropertyInfo)
-						.map(this::categorizePropertyInfo)
-						.map(this::convertToEditors)
-						.map(this::addAdditionalEditors)
-						.map(v -> {
-							ObservableMap<Category, ObservableList<Editor<?>>> map = FXCollections.observableMap(new LinkedHashMap<>());
-							v.forEach((key, value) -> map.put(key, FXCollections.observableArrayList(value)));
-							return map;
-						}).orElse(FXCollections.emptyObservableMap())
-				));
-
-		editorsProperty().bind(categorizedEditorsProperty().map(map -> {
-			ObservableList<Editor<?>> list = FXCollections.observableArrayList();
-			map.values().forEach(list::addAll);
-			return list;
-		}));
-	}
-
-	private List<PropertyInfo> introspectPropertyInfo(Class<?> aClass) {
-		log.info("1 introspectPropertyInfo");
-		return getIntrospector().getPropertyInfo(aClass);
-	}
-
-	private List<PropertyInfo> filterPropertyInfo(List<PropertyInfo> infoList) {
-		log.info("2 filterPropertyInfo");
-		return infoList.stream().filter(info -> filters.stream()
-				.map(filter1 -> filter1.test(info))
-				.reduce(true, (a, b) -> a && b)).toList();
-	}
-
-	private Map<Category, List<PropertyInfo>> categorizePropertyInfo(List<PropertyInfo> filtered) {
-		log.info("3 categorizePropertyInfo");
-		return filtered.stream()
-				.collect(Collectors.groupingBy(
-						PropertyInfo::category,
-						TreeMap::new,
-						Collectors.toList()));
-	}
-
-	private Map<Category, List<Editor<?>>> convertToEditors(
-			Map<Category, List<PropertyInfo>> categorizedProperties) {
-		log.info("4 convertToEditors");
-		Stream<Map.Entry<Category, List<PropertyInfo>>> stream = categorizedProperties.entrySet().stream();
-		Function<Map.Entry<Category, List<PropertyInfo>>, Category> keyMapper = entry -> entry.getKey();
-		Function<Map.Entry<Category, List<PropertyInfo>>, List<Editor<?>>> valueMapper = entry -> {
-			List<PropertyInfo> value = entry.getValue();
-			List<Editor<?>> list = new ArrayList<>();
-			value.forEach(info -> list.add(buildSubEditor(getValue(), info)));
-			return list;
-		};
-		return stream.collect(Collectors.toMap(
-				keyMapper,
-				valueMapper,
-				(a, b) -> {
-					a.addAll(b);
-					return a;
-				},
-				LinkedHashMap::new));
-	}
-
-	private Map<Category, List<Editor<?>>> addAdditionalEditors(
-			Map<Category, List<Editor<?>>> categorizedEditors) {
-		log.info("5 addAdditionalEditors");
-
-		for (Category category : categorizedEditors.keySet()) {
-			List<Editor<?>> list = categorizedEditors.get(category);
-			for (Category c : additionalEditors.keySet()) {
-				if (c.title().equals(category.title())) {
-					list.addAll(0, additionalEditors.getOrDefault(c, List.of()).stream().map(f -> f.apply(valueProperty())).toList());
+		setEditorFactory(new EditorFactory() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public <T> Optional<Editor<T>> buildEditor(Type type) {
+				if (type.equals(Node.class)) {
+					return Optional.of((Editor<T>) new NodeClassEditor());
+				} else if (type.equals(Region.class)) {
+					return Optional.of((Editor<T>) new RegionClassEditor());
+				} else if (type instanceof Class<?> clazz) {
+					return Optional.of((Editor<T>) new ClassBasedEditor<>(clazz));
+				} else {
+					return Optional.empty();
 				}
 			}
+		});
+	}
+
+	private static final Converter<Double, Number> DOUBLE_TO_NUMBER = Converters.NUMBER_TO_DOUBLE.inverted();
+
+	public static class NodeClassEditor extends ClassBasedEditor<Node> {
+
+		private final Predicate<Editor<?>> filter = editor ->
+				editor.getTitle().startsWith("on") ||
+						editor.getTitle().startsWith("accessible") ||
+						List.of("layoutx", "layouty", "rotate", "rotationaxis",
+										"translatex", "translatey", "translatez",
+										"scalex", "scaley", "scalez")
+								.contains(editor.getTitle().toLowerCase());
+
+		public NodeClassEditor() {
+			super(Node.class);
+			Editor<Node> layoutEditor = Editors.group(valueProperty(), "Layout", List.of(
+					key(new DoubleEditor("x"), node -> convert(node.layoutXProperty(), DOUBLE_TO_NUMBER)),
+					key(new DoubleEditor("y"), node -> convert(node.layoutYProperty(), DOUBLE_TO_NUMBER))));
+
+			Editor<Node> translateEditor1 = Editors.group(valueProperty(), "Translate", List.of(
+					key(new DoubleEditor("x"), node -> convert(node.translateXProperty(), DOUBLE_TO_NUMBER)),
+					key(new DoubleEditor("y"), node -> convert(node.translateYProperty(), DOUBLE_TO_NUMBER)),
+					key(new DoubleEditor("z"), node -> convert(node.translateZProperty(), DOUBLE_TO_NUMBER))));
+
+			Editor<Node> scaleEditor = Editors.group(valueProperty(), "Scale", List.of(
+					key(new DoubleEditor("x"), node -> convert(node.scaleXProperty(), DOUBLE_TO_NUMBER)),
+					key(new DoubleEditor("y"), node -> convert(node.scaleYProperty(), DOUBLE_TO_NUMBER)),
+					key(new DoubleEditor("z"), node -> convert(node.scaleZProperty(), DOUBLE_TO_NUMBER))));
+
+			Editor<Node> rotationEditor = Editors.group(valueProperty(), "Rotation", Orientation.VERTICAL, List.of(
+					key(new DoubleEditor("angle"), node -> convert(node.rotateProperty(), DOUBLE_TO_NUMBER)),
+					key(new Point3DEditor("axis"), Node::rotationAxisProperty)));
+
+			ObservableList<Editor<?>> editors = getEditors();
+			editors.removeIf(filter);
+
+			editors.addFirst(rotationEditor);
+			editors.addFirst(scaleEditor);
+			editors.addFirst(translateEditor1);
+			editors.addFirst(layoutEditor);
+
+			Property<Node> translateEditor = translateEditor1.valueProperty();
+			bindBidirectional(translateEditor, valueProperty());
 		}
-
-		return categorizedEditors;
 	}
 
-	private static <T> BinaryOperator<ObservableList<T>> accumulating() {
-		return (a, b) -> {
-			a.addAll(b);
-			return a;
-		};
-	}
+	public static class RegionClassEditor extends ClassBasedEditor<Region> {
 
-	private static <T, R> Supplier<ObservableMap<T, ObservableList<R>>> toObservableLinkedHashMap() {
-		return () -> FXCollections.observableMap(new LinkedHashMap<>());
-	}
+		private final Predicate<Editor<?>> filter = editor ->
+				List.of("prefwidth", "minwidth", "maxwidth", "prefheight", "minheight", "maxheight")
+						.contains(editor.getTitle().toLowerCase());
 
-	private static <T, R> Supplier<ObservableMap<T, ObservableList<R>>> toObservableTreeMap() {
-		//noinspection SortedCollectionWithNonComparableKeys
-		return () -> FXCollections.observableMap(new TreeMap<>());
-	}
+		public RegionClassEditor() {
+			super(Region.class);
 
-	private static List<String> nameFilters = List.of(
-			"rotate", "rotationaxis",
-			"layoutx", "layouty",
-			"translatex", "translatey", "translatez",
-			"scalex", "scaley", "scalez",
-			"prefwidth", "minwidth", "maxwidth",
-			"prefheight", "minheight", "maxheight"
-	);
-	private static List<Predicate<PropertyInfo>> filters = List.of(
-			info -> !nameFilters.contains(info.name()));
+			Editor<Region> widthEditor = Editors.group(valueProperty(), "Width", List.of(
+					key(new DoubleEditor("Pref"), region -> convert(region.prefWidthProperty(), DOUBLE_TO_NUMBER)),
+					key(new DoubleEditor("Min"), region -> convert(region.minWidthProperty(), DOUBLE_TO_NUMBER)),
+					key(new DoubleEditor("Max"), region -> convert(region.maxWidthProperty(), DOUBLE_TO_NUMBER))));
 
-	private static Map<Category, List<Function<Property<Node>, Editor<?>>>> additionalEditors = Map.of(
-			Category.of("Node"), List.of(
-					property -> combinedNumberEditors(property, "Layout", List.of(
-							Node::layoutXProperty,
-							Node::layoutYProperty)),
-					property -> combinedNumberEditors(property, "Translation", List.of(
-							Node::translateXProperty,
-							Node::translateYProperty,
-							Node::translateZProperty)),
-					property -> combinedNumberEditors(property, "Scale", List.of(
-							Node::scaleXProperty,
-							Node::scaleYProperty,
-							Node::scaleZProperty)),
-					property -> combinedNumberEditors(property, "Rotation", Orientation.VERTICAL, List.of(
-							Node::rotateProperty,
-							Node::rotationAxisProperty))
-			),
-			Category.of("Region"), List.of(
-					property -> combinedNumberEditors((Property<Region>) (Property<?>) property, "Width", List.of(
-							Region::prefWidthProperty,
-							Region::minWidthProperty,
-							Region::maxWidthProperty)),
-					property -> combinedNumberEditors((Property<Region>) (Property<?>) property, "Height", List.of(
-							Region::prefHeightProperty,
-							Region::minHeightProperty,
-							Region::maxHeightProperty))
-			));
+			Editor<Region> heightEditor = Editors.group(valueProperty(), "Height", List.of(
+					key(new DoubleEditor("Pref"), region -> convert(region.prefHeightProperty(), DOUBLE_TO_NUMBER)),
+					key(new DoubleEditor("Min"), region -> convert(region.minHeightProperty(), DOUBLE_TO_NUMBER)),
+					key(new DoubleEditor("Max"), region -> convert(region.maxHeightProperty(), DOUBLE_TO_NUMBER))));
 
-	private static <T extends Node> PropertiesEditor<T> combinedNumberEditors(
-			Property<T> property, String name, List<Function<T, Property<?>>> accessors) {
-		return combinedNumberEditors(property, name, Orientation.HORIZONTAL, accessors);
-	}
-
-	private static <T extends Node> PropertiesEditor<T> combinedNumberEditors(
-			Property<T> property, String name, Orientation orientation, List<Function<T, Property<?>>> accessors) {
-		PropertiesEditor<T> editor = new PropertiesEditor<>(copyWithName(property, name));
-		editor.setSkin(orientation == Orientation.HORIZONTAL ?
-				new MultiEditorSkin.HorizontalEditorSkin<>(editor) :
-				new MultiEditorSkin.VerticalEditorSkin<>(editor));
-		T node = property.getValue();
-
-		editor.getEditors().addAll(accessors.stream()
-				.map(accessor -> EditorFactory.DEFAULT_FACTORY.buildEditor(accessor.apply(node)))
-				.filter(Optional::isPresent)
-				.map(Optional::get)
-				.toList());
-
-		return editor;
+			ObservableList<Editor<?>> editors = getEditors();
+			editors.removeIf(filter);
+			editors.addFirst(heightEditor);
+			editors.addFirst(widthEditor);
+		}
 	}
 }

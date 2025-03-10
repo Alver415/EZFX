@@ -1,7 +1,7 @@
 package com.ezfx.apps;
 
 import com.ezfx.app.EZFXApplication;
-import com.ezfx.app.editor.SceneEditor;
+import com.ezfx.app.editor.SceneGraphEditor;
 import com.ezfx.app.stage.DecoratedStage;
 import com.ezfx.base.utils.Screens;
 import com.ezfx.controls.icons.Icons;
@@ -42,12 +42,12 @@ public class FXMLEditorApplication extends EZFXApplication {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		Stage stage = new DecoratedStage();
-		SceneEditor sceneEditor = new SceneEditor();
+		SceneGraphEditor sceneEditor = new SceneGraphEditor();
 
 		content = pathProperty().map(fileSystem::get)
 				.flatMap(FileSystemEntry::contentProperty)
 				.map(STRING_TO_BYTE_BUFFER::from);
-		content.addListener((_, _, value) -> sceneEditor.setTarget(loadSceneTarget(getPath())));
+		content.addListener((_, _, value) -> sceneEditor.setValue(loadSceneTarget(getPath())));
 
 		MenuBar menuBar = new MenuBar();
 		Menu fileMenu = new Menu("File");
@@ -64,7 +64,7 @@ public class FXMLEditorApplication extends EZFXApplication {
 		MenuItem save = new MenuItem("Save");
 		save.setOnAction(_ -> {
 			FXMLSaver saver = new FXMLSaver();
-			saver.save(getPath().toFile(), sceneEditor.getTarget());
+			saver.save(getPath().toFile(), sceneEditor.getValue());
 		});
 
 		MenuItem saveAs = new MenuItem("Save As...");
@@ -74,7 +74,7 @@ public class FXMLEditorApplication extends EZFXApplication {
 			Optional.ofNullable(fileChooser.showOpenDialog(stage))
 					.ifPresent(file -> {
 						FXMLSaver saver = new FXMLSaver();
-						saver.save(file, sceneEditor.getTarget());
+						saver.save(file, sceneEditor.getValue());
 					});
 		});
 
@@ -109,8 +109,9 @@ public class FXMLEditorApplication extends EZFXApplication {
 		}
 	}
 
-	private final Property<Path> path = new SimpleObjectProperty<>(this, "path");
 	private ObservableValue<String> content;
+
+	private final Property<Path> path = new SimpleObjectProperty<>(this, "path");
 
 	public Property<Path> pathProperty() {
 		return this.path;

@@ -1,19 +1,17 @@
 package com.ezfx.controls.editor.introspective;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.*;
 import java.util.List;
 
 public interface Introspector {
-	<T> T getDefaultValueForType(Class<T> type);
+	<T> T getDefaultValueForType(Type type);
 
-	<T> List<PropertyInfo> getPropertyInfo(Class<T> type);
+	List<PropertyInfo> getDeclaredPropertyInfo(Type type);
+	List<PropertyInfo> getPropertyInfo(Type type);
 
-	<T> List<Field> getFields(Class<T> type);
-	<T> List<Method> getMethods(Class<T> type);
-	<T> List<Constructor<T>> getConstructors(Class<T> type);
+	List<Field> getFields(Type type);
+	List<Method> getMethods(Type type);
+	<T> List<Constructor<T>> getConstructors(Type type);
 
 	String getParameterName(Parameter parameter);
 	String getParameterTypeName(Parameter parameter);

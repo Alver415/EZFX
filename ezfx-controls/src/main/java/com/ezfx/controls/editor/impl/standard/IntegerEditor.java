@@ -33,17 +33,17 @@ public class IntegerEditor extends NumberEditor<Integer> {
 	}
 
 	@Override
-	Converter<Number, Integer> numberToValueConverter() {
+	protected Converter<Number, Integer> numberToValueConverter() {
 		return Converters.NUMBER_TO_INTEGER;
 	}
 
 	@Override
-	Converter<String, Integer> stringToValueConverter() {
+	protected Converter<String, Integer> stringToValueConverter() {
 		return Converters.STRING_TO_INTEGER;
 	}
 
 	@Override
-	UnaryOperator<TextFormatter.Change> textFormatFilter() {
+	protected UnaryOperator<TextFormatter.Change> textFormatFilter() {
 		return TextFormatters.FILTER_INTEGER;
 	}
 }

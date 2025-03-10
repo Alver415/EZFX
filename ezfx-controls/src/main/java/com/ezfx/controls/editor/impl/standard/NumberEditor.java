@@ -33,11 +33,11 @@ public abstract class NumberEditor<T extends Number> extends ObjectEditor<T> {
 		setMax(max);
 	}
 
-	abstract Converter<Number, T> numberToValueConverter();
+	protected abstract Converter<Number, T> numberToValueConverter();
 
-	abstract Converter<String, T> stringToValueConverter();
+	protected abstract Converter<String, T> stringToValueConverter();
 
-	abstract UnaryOperator<TextFormatter.Change> textFormatFilter();
+	protected abstract UnaryOperator<TextFormatter.Change> textFormatFilter();
 
 	private final Property<T> defaultValue = new SimpleObjectProperty<>(this, "defaultValue");
 
@@ -83,24 +83,15 @@ public abstract class NumberEditor<T extends Number> extends ObjectEditor<T> {
 
 	@Override
 	protected Skin<?> createDefaultSkin() {
-		return new TextFieldWithButtonsSkin<>(this);
+		return new DefaultSkin<>(this);
 	}
 
-	public static class TextFieldSkin<T extends Number> extends EditorSkinBase<NumberEditor<T>, T> {
-		public TextFieldSkin(NumberEditor<T> editor) {
-			super(editor);
-			TextField textField = new TextField();
-			bindBidirectional(textField.textProperty(), editor.valueProperty(), editor.stringToValueConverter());
-			getChildren().setAll(textField);
-		}
-	}
-
-	public static class TextFieldWithButtonsSkin<T extends Number> extends EditorSkinBase<NumberEditor<T>, T> {
+	public static class DefaultSkin<T extends Number> extends EditorSkinBase<NumberEditor<T>, T> {
 
 		private final Converter<T, Double> incrementConverter =
 				editor.numberToValueConverter().inverted().compound(NUMBER_TO_DOUBLE);
 
-		public TextFieldWithButtonsSkin(NumberEditor<T> editor) {
+		public DefaultSkin(NumberEditor<T> editor) {
 			super(editor);
 			TextField textField = new TextField();
 
@@ -140,6 +131,15 @@ public abstract class NumberEditor<T extends Number> extends ObjectEditor<T> {
 			Double doubleValue = incrementConverter.to(getValue());
 			if (doubleValue == null) return;
 			setValue(incrementConverter.from(doubleValue + amount));
+		}
+	}
+
+	public static class TextFieldSkin<T extends Number> extends EditorSkinBase<NumberEditor<T>, T> {
+		public TextFieldSkin(NumberEditor<T> editor) {
+			super(editor);
+			TextField textField = new TextField();
+			bindBidirectional(textField.textProperty(), editor.valueProperty(), editor.stringToValueConverter());
+			getChildren().setAll(textField);
 		}
 	}
 

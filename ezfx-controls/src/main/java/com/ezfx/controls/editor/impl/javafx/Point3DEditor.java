@@ -21,6 +21,11 @@ public class Point3DEditor extends ObjectEditor<Point3D> {
 		super(new SimpleObjectProperty<>());
 	}
 
+	public Point3DEditor(String title) {
+		this();
+		setTitle(title);
+	}
+
 	public Point3DEditor(Property<Point3D> property) {
 		super(property);
 	}

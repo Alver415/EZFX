@@ -19,11 +19,24 @@ public class StandardIntrospector implements Introspector {
 	private static final Logger log = LoggerFactory.getLogger(StandardIntrospector.class);
 
 	private static final Reflections reflections = new Reflections(new ConfigurationBuilder()
-			.forPackages("com") // Scan the root of the classpath
+			.forPackages("com") // TODO: Scan all packages instead of just 'com'
 			.addScanners(Scanners.values()));
 
 	@Override
-	public <T> List<PropertyInfo> getPropertyInfo(Class<T> type) {
+	public List<PropertyInfo> getDeclaredPropertyInfo(Type type) {
+		return type instanceof Class<?> clazz ?
+				_getPropertyInfo(type, clazz.getDeclaredMethods()) :
+				List.of();
+	}
+
+	@Override
+	public List<PropertyInfo> getPropertyInfo(Type type) {
+		return type instanceof Class<?> clazz ?
+				_getPropertyInfo(type, clazz.getMethods()) :
+				List.of();
+	}
+
+	private List<PropertyInfo> _getPropertyInfo(Type type, Method[] methods) {
 		if (type == null) {
 			return List.of();
 		}
@@ -33,7 +46,7 @@ public class StandardIntrospector implements Introspector {
 		Map<String, Method> getMethods = new HashMap<>();
 		Map<String, Method> propertyMethods = new HashMap<>();
 
-		for (Method method : type.getMethods()) {
+		for (Method method : methods) {
 			String methodName = method.getName();
 			boolean endsWithProperty = methodName.endsWith("Property");
 			boolean assignableFromProperty = Property.class.isAssignableFrom(method.getReturnType());
@@ -75,15 +88,13 @@ public class StandardIntrospector implements Introspector {
 					.orElse(name);
 
 			Class<?> declaringClass = property.getDeclaringClass();
-			String categoryTitle = propertyDetails.map(PropertyMetadata::categoryTitle)
+			String categoryTitle = propertyDetails
+					.map(PropertyMetadata::categoryTitle)
 					.orElse(declaringClass.getSimpleName());
-			int depth = 0;
-			Class<?> clazz = declaringClass;
-			while ((clazz = clazz.getSuperclass()) != null) {
-				depth++;
-			}
 
-			int categoryOrder = propertyDetails.map(PropertyMetadata::categoryOrder)
+			int depth = getSuperClassesCount(declaringClass);
+			int categoryOrder = propertyDetails
+					.map(PropertyMetadata::categoryOrder)
 					.orElse(depth);
 			Category category = Category.of(categoryTitle, categoryOrder);
 
@@ -103,6 +114,15 @@ public class StandardIntrospector implements Introspector {
 		return propertyInfoList;
 	}
 
+	private static int getSuperClassesCount(Class<?> declaringClass) {
+		int depth = 0;
+		Class<?> clazz = declaringClass;
+		while ((clazz = clazz.getSuperclass()) != null) {
+			depth++;
+		}
+		return depth;
+	}
+
 	public boolean checkModifiers(Member member, int... modifiers) {
 		return checkModifiers(member.getModifiers(), modifiers);
 	}
@@ -115,29 +135,35 @@ public class StandardIntrospector implements Introspector {
 	}
 
 	@Override
-	public <T> List<Field> getFields(Class<T> type) {
-		return Arrays.stream(type.getFields()).toList();
+	public List<Field> getFields(Type type) {
+		return type instanceof Class<?> clazz ?
+				Arrays.stream(clazz.getFields()).toList() :
+				List.of();
 	}
 
 	@Override
-	public <T> List<Method> getMethods(Class<T> type) {
-		return Arrays.stream(type.getMethods()).toList();
+	public List<Method> getMethods(Type type) {
+		return type instanceof Class<?> clazz ?
+				Arrays.stream(clazz.getMethods()).toList() :
+				List.of();
 	}
 
 	@Override
-	public <T> List<Constructor<T>> getConstructors(Class<T> type) {
-		return Stream.concat(Stream.of(type), reflections.getSubTypesOf(type).stream()
-						.filter(c -> Modifier.isPublic(c.getModifiers()))
-						.filter(c -> !c.isMemberClass() || Modifier.isStatic(c.getModifiers())))
-				.map(Class::getConstructors)
-				.flatMap(Arrays::stream)
-				.map(constructor -> (Constructor<T>) constructor)
-				.toList();
+	public <T> List<Constructor<T>> getConstructors(Type type) {
+		return type instanceof Class<?> clazz ?
+				Stream.concat(Stream.of(clazz), reflections.getSubTypesOf(clazz).stream()
+								.filter(c -> Modifier.isPublic(c.getModifiers()))
+								.filter(c -> !c.isMemberClass() || Modifier.isStatic(c.getModifiers())))
+						.map(Class::getConstructors)
+						.flatMap(Arrays::stream)
+						.map(constructor -> (Constructor<T>) constructor)
+						.toList() :
+				List.of();
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <S> S getDefaultValueForType(Class<S> type) {
+	public <S> S getDefaultValueForType(Type type) {
 		if (byte.class.equals(type) || Byte.class.equals(type)) {
 			return (S) (Byte) (byte) 0;
 		} else if (short.class.equals(type) || Short.class.equals(type)) {
@@ -156,8 +182,8 @@ public class StandardIntrospector implements Introspector {
 			return (S) (Character) '\u0000';
 		} else if (String.class.equals(type)) {
 			return (S) "";
-		} else if (type.isEnum()) {
-			S[] constants = type.getEnumConstants();
+		} else if (type instanceof Class<?> clazz && clazz.isEnum()) {
+			S[] constants = (S[]) clazz.getEnumConstants();
 			return constants.length == 0 ? null : constants[0];
 		}
 		return null;

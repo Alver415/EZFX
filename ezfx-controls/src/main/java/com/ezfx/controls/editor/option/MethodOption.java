@@ -4,13 +4,14 @@ import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.introspective.FunctionParameterEditor;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.function.Function;
 
 public class MethodOption<T> extends BuilderOption<T> {
 
 	private final Method method;
 
-	public MethodOption(String name, Class<T> type, Method method) {
+	public MethodOption(String name, Type type, Method method) {
 		super(name, type);
 		this.method = method;
 	}

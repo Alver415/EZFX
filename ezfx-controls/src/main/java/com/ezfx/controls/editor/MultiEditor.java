@@ -4,9 +4,7 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.Property;
 import javafx.collections.ObservableList;
 
-public interface MultiEditor<T> {
-
-	Property<T> valueProperty();
+public interface MultiEditor<T> extends Editor<T> {
 
 	ListProperty<Editor<?>> editorsProperty();
 

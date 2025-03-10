@@ -140,7 +140,7 @@ public class ApplicationExplorer extends Control {
 								if (selected instanceof FakeNode<?> fakeNode) {
 									object = fakeNode.getActual();
 								}
-								return DEFAULT_FACTORY.buildEditor(object).orElseGet(EditorBase::new);
+								return DEFAULT_FACTORY.buildEditor(object.getClass()).orElseGet(EditorBase::new);
 							}))
 					.threadBridgeToFx(executor)
 					.map(Editor::getNode)

@@ -1,10 +1,12 @@
 package com.ezfx.controls.editor.option;
 
+import java.lang.reflect.Type;
+
 public abstract class Option<T> {
 	protected final String name;
-	protected final Class<T> type;
+	protected final Type type;
 
-	public Option(String name, Class<T> type) {
+	public Option(String name, Type type) {
 		this.name = name;
 		this.type = type;
 	}
@@ -13,7 +15,7 @@ public abstract class Option<T> {
 		return name;
 	}
 
-	public Class<T> getType() {
+	public Type getType() {
 		return type;
 	}
 

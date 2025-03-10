@@ -24,15 +24,15 @@ public class ShortEditor extends NumberEditor<Short> {
 	}
 
 	@Override
-	Converter<Number, Short> numberToValueConverter() {
+	protected Converter<Number, Short> numberToValueConverter() {
 		return Converters.NUMBER_TO_SHORT;
 	}
 
 	@Override
-	Converter<String, Short> stringToValueConverter() {
+	protected Converter<String, Short> stringToValueConverter() {
 		return Converters.STRING_TO_SHORT;
 	}	@Override
-	UnaryOperator<TextFormatter.Change> textFormatFilter() {
+	protected UnaryOperator<TextFormatter.Change> textFormatFilter() {
 		return TextFormatters.FILTER_SHORT;
 	}
 }

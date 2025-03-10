@@ -5,21 +5,23 @@ import com.ezfx.controls.editor.factory.EditorFactory;
 import com.ezfx.controls.editor.skin.TabPaneCategorizedSkin;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.scene.control.Skin;
+import javafx.util.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
+import static com.ezfx.base.utils.ComplexBinding.bindBidirectional;
 import static com.ezfx.controls.editor.factory.IntrospectingEditorFactory.DEFAULT_FACTORY;
 import static com.ezfx.controls.editor.introspective.EZFXIntrospector.DEFAULT_INTROSPECTOR;
 
@@ -45,27 +47,21 @@ public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
 		super(property);
 		setIntrospector(introspector);
 		setEditorFactory(factory);
-		init();
-	}
 
-	protected void init() {
-		ObservableValue<ObservableMap<Category, ObservableList<Editor<?>>>> mapped = valueProperty()
-				.map(T::getClass)
-				.map(getIntrospector()::getPropertyInfo)
-				.map(propertyInfoList -> {
-					ObservableMap<Category, ObservableList<Editor<?>>> categorized =
-							FXCollections.observableMap(new TreeMap<>());
-					for (PropertyInfo propertyInfo : propertyInfoList) {
-						Editor<?> subEditor = buildSubEditor(valueProperty().getValue(), propertyInfo);
-						if (subEditor == null) continue;
-						Category category = propertyInfo.category();
-						ObservableList<Editor<?>> list = categorized.computeIfAbsent(category,
-								_ -> FXCollections.observableArrayList());
-						list.add(subEditor);
-					}
-					return categorized;
-				});
-		categorizedEditorsProperty().bind(mapped);
+		categorizedEditorsProperty().bind(valueProperty().map(value -> {
+			subscription.unsubscribe();
+			subscription = Subscription.EMPTY;
+			Class<?> type = value.getClass();
+			List<PropertyInfo> propertyInfoList = getIntrospector().getPropertyInfo(type);
+			ObservableMap<Category, ObservableList<Editor<?>>> categorized = FXCollections.observableMap(new TreeMap<>());
+			for (PropertyInfo propertyInfo : propertyInfoList) {
+				Editor<?> subEditor = getEditor(propertyInfo);
+				Category category = propertyInfo.category();
+				ObservableList<Editor<?>> list = categorized.computeIfAbsent(category, _ -> FXCollections.observableArrayList());
+				list.add(subEditor);
+			}
+			return categorized;
+		}));
 
 		editorsProperty().bind(categorizedEditorsProperty().map(map -> {
 			ObservableList<Editor<?>> list = FXCollections.observableArrayList();
@@ -74,32 +70,46 @@ public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
 		}));
 	}
 
-	protected <R> Editor<R> buildSubEditor(T target, PropertyInfo propertyInfo) {
+	private Subscription subscription = Subscription.EMPTY;
+
+	private <R> Property<R> getProperty(PropertyInfo propertyInfo) {
+		Property<R> property;
 		try {
-			Method propertyMethod = propertyInfo.property();
-			if (!propertyMethod.canAccess(target)) return null;
-			Property<R> subProperty = (Property<R>) propertyMethod.invoke(target);
-			return buildEditor(propertyInfo, subProperty);
+			property = (Property<R>) propertyInfo.property().invoke(getValue());
 		} catch (IllegalAccessException | InvocationTargetException e) {
-			log.warn(e.getMessage(), e);
-			return buildEditor(propertyInfo, new SimpleObjectProperty<>(target, propertyInfo.name(), null));
+			log.warn("Failed to access: %s".formatted(propertyInfo), e);
+			property = new SimpleObjectProperty<>(this, propertyInfo.name(), null);
 		}
+		return property;
 	}
 
-	public <R> Editor<R> buildEditor(PropertyInfo propertyInfo, Property<R> property) {
+
+	private final Map<PropertyInfo, Editor<?>> editorMap = new HashMap<>();
+
+	private <R> Editor<R> getEditor(PropertyInfo propertyInfo) {
+		return (Editor<R>) editorMap.computeIfAbsent(propertyInfo, this::buildEditor);
+	}
+
+	private <R> Editor<R> buildEditor(PropertyInfo propertyInfo) {
+		Editor<R> editor;
 		Type type = propertyInfo.getter().getGenericReturnType();
 		if (type instanceof ParameterizedType parameterizedType) {
 			Type rawType = parameterizedType.getRawType();
 			Type genericType = parameterizedType.getActualTypeArguments()[0];
 			if (rawType instanceof Class clazz && genericType instanceof Class genericClazz && List.class.isAssignableFrom(clazz)) {
-				ListEditor<R> listEditor = new ListEditor<>((Property<ObservableList<R>>) property);
+				ListEditor<R> listEditor = new ListEditor<>();
 				listEditor.setGenericType(genericClazz);
-				return (EditorBase<R>) listEditor;
+				editor = (EditorBase<R>) listEditor;
+			} else {
+				editor = (Editor<R>) getEditorFactory().buildEditor(rawType).orElseGet(EditorBase::new);
 			}
-			return getEditorFactory().buildEditor((Class<R>) rawType, property).orElseGet(EditorBase::new);
 		} else if (type instanceof Class clazz) {
-			return getEditorFactory().buildEditor((Class<R>) clazz, property).orElseGet(EditorBase::new);
-		} else return new EditorBase<>();
+			editor = (Editor<R>) getEditorFactory().buildEditor((Class<R>) clazz).orElseGet(EditorBase::new);
+		} else {
+			editor = new EditorBase<>();
+		}
+		editor.setTitle(propertyInfo.displayName());
+		return editor;
 	}
 
 	private final Property<Introspector> introspector = new SimpleObjectProperty<>(this, "introspector");

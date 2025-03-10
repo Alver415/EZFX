@@ -6,7 +6,6 @@ import javafx.collections.ObservableMap;
 
 public interface CategorizedMultiEditor<T> extends MultiEditor<T> {
 
-
 	MapProperty<Category, ObservableList<Editor<?>>> categorizedEditorsProperty();
 
 	default ObservableMap<Category, ObservableList<Editor<?>>> getCategorizedEditors() {

@@ -30,7 +30,7 @@ public class LinkableEditorSkin<T, C extends Editor<T>> extends EditorView.Defau
 	public LinkableEditorSkin(EditorView<T, C> editor) {
 		super(editor);
 		Label name = new Label();
-		name.textProperty().bind(editor.nameProperty());
+		name.textProperty().bind(editor.titleProperty());
 
 		Editor<T> control = editor.getEditor();
 		LinkableProperty<T> linkable = LinkableProperty.wrap(control.valueProperty());

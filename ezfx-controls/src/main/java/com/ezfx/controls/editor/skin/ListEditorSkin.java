@@ -103,9 +103,9 @@ public class ListEditorSkin<T> extends EditorSkinBase<ListEditor<T>, ObservableL
 							if (!lock) valueProperty().getValue().set(i, v);
 						});
 						//TODO: Remove dependence on DEFAULT_FACTORY
-						Editor<T> editor = DEFAULT_FACTORY.buildEditor(type, property).orElseGet(EditorBase::new);
+						Editor<T> editor = (Editor<T>) DEFAULT_FACTORY.buildEditor(type).orElseGet(EditorBase::new);
 						EditorView<T, Editor<T>> wrapper = new EditorView<>(editor);
-						wrapper.nameProperty().bind(Bindings.createIntegerBinding(
+						wrapper.titleProperty().bind(Bindings.createIntegerBinding(
 								() -> wrappers.indexOf(wrapper), wrappers).map("[%s]"::formatted));
 						wrappers.add(index, wrapper);
 					}

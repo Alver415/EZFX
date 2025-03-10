@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Type;
 import java.util.function.Function;
 
 public class ConstructorOption<T> extends BuilderOption<T> {
@@ -14,7 +15,7 @@ public class ConstructorOption<T> extends BuilderOption<T> {
 	private static final Logger log = LoggerFactory.getLogger(ConstructorOption.class);
 	private final Constructor<T> constructor;
 
-	public ConstructorOption(String name, Class<T> type, Constructor<T> constructor) {
+	public ConstructorOption(String name, Type type, Constructor<T> constructor) {
 		super(name, type);
 		this.constructor = constructor;
 	}

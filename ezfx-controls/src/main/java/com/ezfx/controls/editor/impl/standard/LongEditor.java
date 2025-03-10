@@ -33,17 +33,17 @@ public class LongEditor extends NumberEditor<Long> {
 	}
 
 	@Override
-	Converter<Number, Long> numberToValueConverter() {
+	protected Converter<Number, Long> numberToValueConverter() {
 		return Converters.NUMBER_TO_LONG;
 	}
 
 	@Override
-	Converter<String, Long> stringToValueConverter() {
+	protected Converter<String, Long> stringToValueConverter() {
 		return Converters.STRING_TO_LONG;
 	}
 
 	@Override
-	UnaryOperator<TextFormatter.Change> textFormatFilter() {
+	protected UnaryOperator<TextFormatter.Change> textFormatFilter() {
 		return TextFormatters.FILTER_LONG;
 	}
 }

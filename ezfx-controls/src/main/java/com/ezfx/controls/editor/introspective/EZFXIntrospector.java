@@ -22,6 +22,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -29,19 +30,31 @@ public class EZFXIntrospector extends StandardIntrospector {
 
 	public static final Introspector DEFAULT_INTROSPECTOR = CachedProxy.wrap(new EZFXIntrospector(), Introspector.class);
 
+
 	@Override
-	public <T> List<PropertyInfo> getPropertyInfo(Class<T> type) {
-		Stream<PropertyInfo> propertyInfoStream = super.getPropertyInfo(type).stream().map(propertyInfo -> {
+	public List<PropertyInfo> getDeclaredPropertyInfo(Type type) {
+		List<PropertyInfo> propertyInfo = super.getDeclaredPropertyInfo(type);
+		Stream<PropertyInfo> propertyInfoStream = recategorize(propertyInfo);
+		Comparator<PropertyInfo> comparator = Comparator.comparing(p -> p.getter().getReturnType().getSimpleName());
+		Comparator<PropertyInfo> byTypeThenName = comparator.thenComparing(PropertyInfo::displayName);
+		return propertyInfoStream.sorted(byTypeThenName).toList();
+	}
+
+	@Override
+	public List<PropertyInfo> getPropertyInfo(Type type) {
+		List<PropertyInfo> propertyInfo = super.getPropertyInfo(type);
+		Stream<PropertyInfo> propertyInfoStream = recategorize(propertyInfo);
+		Comparator<PropertyInfo> comparator = Comparator.comparing(p -> p.getter().getReturnType().getSimpleName());
+		Comparator<PropertyInfo> byTypeThenName = comparator.thenComparing(PropertyInfo::displayName);
+		return propertyInfoStream.sorted(byTypeThenName).toList();
+	}
+
+	private static Stream<PropertyInfo> recategorize(List<PropertyInfo> original) {
+		return original.stream().map(propertyInfo -> {
 			Class<?> clazz = propertyInfo.property().getDeclaringClass();
 			Category category = propertyInfo.category();
 			int order = propertyInfo.order();
 			if (Node.class.equals(clazz)) {
-				if (propertyInfo.name().contains("translate")) {
-					order = 0;
-				}
-				if (propertyInfo.name().contains("scale")) {
-					order = 0;
-				}
 				Class<?> propertyType = propertyInfo.getter().getReturnType();
 				boolean isEventHandler = propertyType.isAssignableFrom(EventHandler.class);
 				if (propertyInfo.name().startsWith("on") && isEventHandler) {
@@ -62,9 +75,6 @@ public class EZFXIntrospector extends StandardIntrospector {
 					propertyInfo.setter(),
 					propertyInfo.getter());
 		});
-		Comparator<PropertyInfo> comparator = Comparator.comparing(p -> p.getter().getReturnType().getSimpleName());
-		Comparator<PropertyInfo> byTypeThenName = comparator.thenComparing(PropertyInfo::displayName);
-		return propertyInfoStream.sorted(byTypeThenName).toList();
 	}
 
 

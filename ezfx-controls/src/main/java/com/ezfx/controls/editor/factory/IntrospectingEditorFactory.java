@@ -1,26 +1,23 @@
 package com.ezfx.controls.editor.factory;
 
 import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.introspective.IntrospectingEditor;
 import com.ezfx.controls.editor.introspective.IntrospectingPropertiesEditor;
-import javafx.beans.property.Property;
 
-import java.util.Objects;
+import java.lang.reflect.Type;
 import java.util.Optional;
 
 import static com.ezfx.controls.editor.introspective.EZFXIntrospector.DEFAULT_INTROSPECTOR;
 
 public class IntrospectingEditorFactory implements EditorFactory {
 
-	public <T> Optional<Editor<T>> buildEditor(Class<T> type, Property<T> property) {
-		Objects.requireNonNull(property);
+	public <T> Optional<Editor<T>> buildEditor(Type type) {
 		Editor<T> editor;
 		boolean hasProperties = !DEFAULT_INTROSPECTOR.getPropertyInfo(type).isEmpty();
 		if (hasProperties) {
-			editor = new IntrospectingPropertiesEditor<>(property);
+			editor = new IntrospectingPropertiesEditor<>();
 		} else {
-			editor = new IntrospectingEditor<>(property, type);
+			editor = new IntrospectingEditor<>(type);
 		}
 		return Optional.of(editor);
 	}

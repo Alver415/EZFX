@@ -23,10 +23,12 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Array;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static com.ezfx.base.utils.ComplexBinding.bindBidirectional;
 import static com.ezfx.base.utils.FXCollectors.toObservableArrayList;
 
 @SuppressWarnings("unchecked")
@@ -35,10 +37,11 @@ public class FunctionParameterEditor<T> extends IntrospectingEditor<T> implement
 	private static final Logger log = LoggerFactory.getLogger(FunctionParameterEditor.class);
 	private final ObjectBinding<T> valueBinding;
 
-	public FunctionParameterEditor(Class<T> type, Parameter[] parameters, Function<Object[], T> function) {
+	public FunctionParameterEditor(Type type, Parameter[] parameters, Function<Object[], T> function) {
 		this(new SimpleObjectProperty<>(), type, parameters, function);
 	}
-	public FunctionParameterEditor(Property<T> property, Class<T> type, Parameter[] parameters, Function<Object[], T> function) {
+
+	public FunctionParameterEditor(Property<T> property, Type type, Parameter[] parameters, Function<Object[], T> function) {
 		super(property, type);
 
 		setEditors(Arrays.stream(parameters)
@@ -57,7 +60,7 @@ public class FunctionParameterEditor<T> extends IntrospectingEditor<T> implement
 			try {
 				return function.apply(arguments);
 			} catch (Exception e) {
-				log.warn("Failed to build value of type: {}", type.getSimpleName(), e);
+				log.warn("Failed to build value of type: {}", type.getTypeName(), e);
 				return defaultValue.get();
 			}
 		}, properties);
@@ -83,9 +86,10 @@ public class FunctionParameterEditor<T> extends IntrospectingEditor<T> implement
 		String name = "%s (%s)".formatted(parameterName, parameterType);
 		R value = getIntrospector().getDefaultValueForType(type);
 		Property<R> property = new SimpleObjectProperty<>(this, name, value);
-		Editor<R> editor = getEditorFactory()
-				.buildEditor(type, property)
+		Editor<R> editor = (Editor<R>) getEditorFactory()
+				.buildEditor(type)
 				.orElseGet(EditorBase::new);
+		bindBidirectional(property, editor.valueProperty());
 
 		//TODO: Cleanup
 		handleList(parameter, editor);

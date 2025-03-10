@@ -1,10 +1,8 @@
 package com.ezfx.controls.editor.factory;
 
 import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.impl.javafx.*;
 import javafx.application.Application;
-import javafx.beans.property.Property;
 import javafx.geometry.Insets;
 import javafx.geometry.Point3D;
 import javafx.scene.Node;
@@ -17,48 +15,48 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 
-import java.util.Objects;
+import java.lang.reflect.Type;
 import java.util.Optional;
 
 public class EZFXEditorFactory implements EditorFactory {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> Optional<Editor<T>> buildEditor(Class<T> type, Property<T> property) {
-		Objects.requireNonNull(property);
+	public <T> Optional<Editor<T>> buildEditor(Type type) {
+		if (!(type instanceof Class<?> classType)) return Optional.empty();
 		Editor<T> editor = null;
 
-		if (Node.class.isAssignableFrom(type)) {
-			editor = (Editor<T>) new NodeEditor((Property<Node>) property);
-		} else if (Font.class.equals(type)) {
-			editor = (Editor<T>) new FontEditor((Property<Font>) property);
-		} else if (Background.class.equals(type)) {
-			editor = (Editor<T>) new BackgroundEditor((Property<Background>) property);
-		} else if (BackgroundFill.class.equals(type)) {
-			editor = (Editor<T>) new BackgroundFillEditor((Property<BackgroundFill>) property);
-		} else if (Insets.class.equals(type)) {
-			editor = (Editor<T>) new InsetsEditor((Property<Insets>) property);
-		} else if (CornerRadii.class.equals(type)) {
-			editor = (Editor<T>) new CornerRadiiEditor((Property<CornerRadii>) property);
-		} else if (BlendMode.class.equals(type)) {
-			editor = (Editor<T>) new BlendModeEditor((Property<BlendMode>) property);
-		} else if (Paint.class.equals(type)) {
-			editor = (Editor<T>) new PaintEditor((Property<Paint>) property);
-		} else if (Color.class.equals(type)) {
-			editor = (Editor<T>) new ColorEditor((Property<Color>) property);
-		} else if (Point3D.class.equals(type)) {
-			editor = (Editor<T>) new Point3DEditor((Property<Point3D>) property);
-		} else if (Image.class.equals(type)) {
-			editor = (Editor<T>) new ImageSelectionEditor((Property<Image>) property);
+		if (Node.class.isAssignableFrom(classType)) {
+			editor = (Editor<T>) new NodeEditor();
+		} else if (Font.class.equals(classType)) {
+			editor = (Editor<T>) new FontEditor();
+		} else if (Background.class.equals(classType)) {
+			editor = (Editor<T>) new BackgroundEditor();
+		} else if (BackgroundFill.class.equals(classType)) {
+			editor = (Editor<T>) new BackgroundFillEditor();
+		} else if (Insets.class.equals(classType)) {
+			editor = (Editor<T>) new InsetsEditor();
+		} else if (CornerRadii.class.equals(classType)) {
+			editor = (Editor<T>) new CornerRadiiEditor();
+		} else if (BlendMode.class.equals(classType)) {
+			editor = (Editor<T>) new BlendModeEditor();
+		} else if (Paint.class.equals(classType)) {
+			editor = (Editor<T>) new PaintEditor();
+		} else if (Color.class.equals(classType)) {
+			editor = (Editor<T>) new ColorEditor();
+		} else if (Point3D.class.equals(classType)) {
+			editor = (Editor<T>) new Point3DEditor();
+		} else if (Image.class.equals(classType)) {
+			editor = (Editor<T>) new ImageSelectionEditor();
 		}
 //		} else if (LinearGradient.class.equals(type)) {
-//			editor =  (Editor<T>) new LinearGradientEditor((Property<Color>) property);
+//			editor =  (Editor<T>) new LinearGradientEditor();
 //		} else if (RadialGradient.class.equals(type)) {
-//			editor =  (Editor<T>) new RadialGradientEditor((Property<Color>) property);
+//			editor =  (Editor<T>) new RadialGradientEditor();
 //		}
 		// TODO: Make the rest work with 'assignableFrom' instead of 'equals'
-		else if (Application.class.isAssignableFrom(type)) {
-			editor = (Editor<T>) new ApplicationEditor((Property<Application>) property);
+		else if (Application.class.isAssignableFrom(classType)) {
+			editor = (Editor<T>) new ApplicationEditor();
 		}
 		return Optional.ofNullable(editor);
 	}

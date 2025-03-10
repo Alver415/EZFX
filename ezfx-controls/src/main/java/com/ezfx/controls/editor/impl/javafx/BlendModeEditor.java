@@ -20,12 +20,12 @@ public class BlendModeEditor extends SelectionEditor<BlendMode> {
 	private static final ObservableList<BlendMode> BLEND_MODE_VALUES =
 			FXCollections.observableList(Arrays.asList(BlendMode.values()));
 
-	public BlendModeEditor(Property<BlendMode> property) {
-		this(property, BLEND_MODE_VALUES);
+	public BlendModeEditor() {
+		this(BLEND_MODE_VALUES);
 	}
 
-	public BlendModeEditor(Property<BlendMode> property, ObservableList<BlendMode> options) {
-		super(property, options);
+	public BlendModeEditor(ObservableList<BlendMode> options) {
+		super(options);
 	}
 
 	@Override

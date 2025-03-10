@@ -15,6 +15,10 @@ public class DoubleEditor extends NumberEditor<Double> {
 	public DoubleEditor() {
 		this(new SimpleObjectProperty<>());
 	}
+	public DoubleEditor(String title){
+		this();
+		setTitle(title);
+	}
 
 	public DoubleEditor(DoubleProperty property) {
 		this(property.asObject());
@@ -33,17 +37,17 @@ public class DoubleEditor extends NumberEditor<Double> {
 	}
 
 	@Override
-	Converter<Number, Double> numberToValueConverter() {
+	protected Converter<Number, Double> numberToValueConverter() {
 		return Converters.NUMBER_TO_DOUBLE;
 	}
 
 	@Override
-	Converter<String, Double> stringToValueConverter() {
+	protected Converter<String, Double> stringToValueConverter() {
 		return Converters.STRING_TO_DOUBLE;
 	}
 
 	@Override
-	UnaryOperator<TextFormatter.Change> textFormatFilter() {
+	protected UnaryOperator<TextFormatter.Change> textFormatFilter() {
 		return TextFormatters.FILTER_DOUBLE;
 	}
 }

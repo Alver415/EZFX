@@ -4,9 +4,13 @@ import com.ezfx.controls.editor.skin.MultiEditorSkin;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.scene.control.Skin;
 
+import java.util.Collection;
 import java.util.TreeMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Base class for editors which use multiple sub-editors to edit properties of an object.
@@ -25,6 +29,19 @@ public class PropertiesEditor<T> extends ObjectEditor<T> implements CategorizedM
 
 	public PropertiesEditor(Property<T> property) {
 		super(property);
+
+		categorizerProperty().subscribe(categorizer -> {
+			if (categorizer == null) {
+				categorizedEditorsProperty().unbind();
+				editorsProperty().unbind();
+				return;
+			}
+			categorizedEditorsProperty().bind(valueProperty().map(categorizer));
+			editorsProperty().bind(categorizedEditorsProperty().map(categorized ->
+					categorized.values().stream()
+							.flatMap(Collection::stream)
+							.collect(Collectors.toCollection(FXCollections::observableArrayList))));
+		});
 	}
 
 	@Override
@@ -45,5 +62,19 @@ public class PropertiesEditor<T> extends ObjectEditor<T> implements CategorizedM
 	@Override
 	public MapProperty<Category, ObservableList<Editor<?>>> categorizedEditorsProperty() {
 		return categorizedEditors;
+	}
+
+	private final Property<Function<T, ObservableMap<Category, ObservableList<Editor<?>>>>> categorizer = new SimpleObjectProperty<>(this, "categorizer");
+
+	public Property<Function<T, ObservableMap<Category, ObservableList<Editor<?>>>>> categorizerProperty() {
+		return this.categorizer;
+	}
+
+	public Function<T, ObservableMap<Category, ObservableList<Editor<?>>>> getCategorizer() {
+		return this.categorizerProperty().getValue();
+	}
+
+	public void setCategorizer(Function<T, ObservableMap<Category, ObservableList<Editor<?>>>> value) {
+		this.categorizerProperty().setValue(value);
 	}
 }

@@ -1,19 +1,22 @@
 package com.ezfx.controls.editor;
 
 import com.ezfx.base.observable.ObservableObjectArray;
+import com.ezfx.base.utils.TypeReference;
 import com.ezfx.controls.editor.introspective.IntrospectingEditor;
 import com.ezfx.controls.editor.skin.ArrayEditorSkin;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Skin;
 
+import java.lang.reflect.Type;
+
 public class ArrayEditor<T> extends IntrospectingEditor<ObservableObjectArray<T>> {
 
-	public ArrayEditor(Class<T> genericType, Property<ObservableObjectArray<T>> property) {
-		super(property, (Class<ObservableObjectArray<T>>) property.getValue().getClass());
+	public ArrayEditor(Class<T> genericType) {
+		super(new TypeReference<ObservableObjectArray<T>>(){}.getType());
 		setGenericType(genericType);
 	}
-	
+
 	private final Property<Class<T>> genericType = new SimpleObjectProperty<>(this, "genericType");
 
 	public Property<Class<T>> genericTypeProperty() {

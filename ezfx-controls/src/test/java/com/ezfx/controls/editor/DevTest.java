@@ -90,7 +90,8 @@ System.out.println();
 		Platform.startup(() -> {
 		});
 
-		new NodeEditor(new StackPane());
+		NodeEditor editor = new NodeEditor();
+		editor.setValue(new StackPane());
 	}
 
 

@@ -21,10 +21,7 @@ import org.fxmisc.easybind.monadic.MonadicBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,23 +39,19 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 	private final Binding<List<MethodOption<T>>> methodOptions;
 	private final Binding<List<? extends ConstructorOption<? extends T>>> constructorOptions;
 
-	public IntrospectingEditor(Class<T> type) {
+	public IntrospectingEditor(Type type) {
 		this(new SimpleObjectProperty<>(), type);
-	}
-
-	public IntrospectingEditor(T target) {
-		this(new SimpleObjectProperty<>(target), (Class<T>) target.getClass());
 	}
 
 	public IntrospectingEditor(
 			Property<T> property,
-			Class<T> type) {
+			Type type) {
 		this(property, type, DEFAULT_INTROSPECTOR, DEFAULT_FACTORY);
 	}
 
 	public IntrospectingEditor(
 			Property<T> property,
-			Class<T> type,
+			Type type,
 			Introspector introspector,
 			EditorFactory factory) {
 		super(property);
@@ -70,7 +63,7 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 				.map(fields -> fields.stream()
 						.sorted(Comparator.comparing(Field::getName))
 						.filter(field -> checkModifiers(field.getModifiers(), PUBLIC, STATIC, FINAL))
-						.filter(field -> field.getType().isAssignableFrom(type))
+						.filter(field -> field.getType().isAssignableFrom((Class<T>) type))
 						.map(this::build)
 						.toList());
 
@@ -78,7 +71,7 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 				.map(methods -> methods.stream()
 						.sorted(Comparator.comparing(Method::getParameterCount))
 						.filter(method -> checkModifiers(method.getModifiers(), PUBLIC, STATIC))
-						.filter(method -> method.getReturnType().isAssignableFrom(type))
+						.filter(method -> method.getReturnType().isAssignableFrom((Class<T>) type))
 						.map(this::build)
 						.toList());
 
@@ -87,7 +80,7 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 		constructorOptions = combine.map(constructors -> constructors.stream()
 				.sorted(Comparator.comparing(Constructor::getParameterCount))
 				.filter(constructor -> checkModifiers(constructor.getModifiers(), PUBLIC))
-				.filter(constructor -> type.isAssignableFrom(constructor.getDeclaringClass()))
+				.filter(constructor -> ((Class<T>)type).isAssignableFrom(constructor.getDeclaringClass()))
 				.map(this::build)
 				.toList());
 
@@ -122,7 +115,7 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 						}
 					}
 					EditorDialog<T> dialog = new EditorDialog<>(property, option.buildEditor());
-					dialog.setHeaderText(option.getType().getSimpleName());
+					dialog.setHeaderText(option.getType().getTypeName());
 					dialog.show();
 				}))
 				.collect(toObservableArrayList()));
@@ -147,7 +140,7 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 				.map(fields -> fields.stream()
 						.sorted(Comparator.comparing(Field::getName))
 						.filter(field -> checkModifiers(field.getModifiers(), PUBLIC, STATIC, FINAL))
-						.filter(field -> field.getType().isAssignableFrom(type))
+						.filter(field -> field.getType().isAssignableFrom((Class<T>) type))
 						.collect(Collectors.toMap(
 								Field::getName,
 								IntrospectingEditor::getStaticFieldValue,
@@ -203,17 +196,17 @@ public class IntrospectingEditor<T> extends ObjectEditor<T> implements Delegatin
 	// endregion Introspection
 
 
-	private final ObjectProperty<Class<T>> type = new SimpleObjectProperty<>(this, "type");
+	private final ObjectProperty<Type> type = new SimpleObjectProperty<>(this, "type");
 
-	public ObjectProperty<Class<T>> typeProperty() {
+	public ObjectProperty<Type> typeProperty() {
 		return this.type;
 	}
 
-	public Class<T> getType() {
+	public Type getType() {
 		return this.typeProperty().get();
 	}
 
-	public void setType(Class<T> value) {
+	public void setType(Type value) {
 		this.typeProperty().set(value);
 	}
 

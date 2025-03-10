@@ -33,17 +33,17 @@ public class FloatEditor extends NumberEditor<Float> {
 	}
 
 	@Override
-	Converter<Number, Float> numberToValueConverter() {
+	protected Converter<Number, Float> numberToValueConverter() {
 		return Converters.NUMBER_TO_FLOAT;
 	}
 
 	@Override
-	Converter<String, Float> stringToValueConverter() {
+	protected Converter<String, Float> stringToValueConverter() {
 		return Converters.STRING_TO_FLOAT;
 	}
 
 	@Override
-	UnaryOperator<TextFormatter.Change> textFormatFilter() {
+	protected UnaryOperator<TextFormatter.Change> textFormatFilter() {
 		return TextFormatters.FILTER_FLOAT;
 	}
 }

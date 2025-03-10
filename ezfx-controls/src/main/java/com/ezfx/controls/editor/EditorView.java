@@ -20,25 +20,10 @@ import org.controlsfx.control.action.ActionUtils;
 
 public class EditorView<T, E extends Editor<T>> extends Control {
 
-	public EditorView(String name) {
-		this(new SimpleStringProperty(name));
-	}
-
-	public EditorView(Property<String> name) {
-		this(name, null);
-	}
-
 	public EditorView(E editor) {
-		this(editor.valueProperty().getName(), editor);
-	}
-
-	public EditorView(String name, E editor) {
-		this(new SimpleStringProperty(name), editor);
-	}
-
-	public EditorView(Property<String> name, E editor) {
-		nameProperty().bind(name);
+		super();
 		setEditor(editor);
+		titleProperty().bind(editor.titleProperty());
 		setFocusTraversable(false);
 		ObservableValue<ObservableList<Action>> obs = editorProperty().map(e -> e instanceof EditorBase<?> eb ? eb.actionsProperty() : null);
 		actionsProperty().bind(obs);
@@ -49,18 +34,18 @@ public class EditorView<T, E extends Editor<T>> extends Control {
 		return new DefaultSkin<>(this);
 	}
 
-	private final StringProperty name = new SimpleStringProperty(this, "name");
+	private final StringProperty title = new SimpleStringProperty(this, "title");
 
-	public StringProperty nameProperty() {
-		return this.name;
+	public StringProperty titleProperty() {
+		return this.title;
 	}
 
-	public String getName() {
-		return this.nameProperty().get();
+	public String getTitle() {
+		return this.titleProperty().get();
 	}
 
-	public void setName(String value) {
-		this.nameProperty().set(value);
+	public void setTitle(String value) {
+		this.titleProperty().set(value);
 	}
 
 	private final ObjectProperty<E> editor = new SimpleObjectProperty<>(this, "editor");
@@ -125,7 +110,7 @@ public class EditorView<T, E extends Editor<T>> extends Control {
 			root.setBackground(Background.fill(Color.BLACK.interpolate(Color.TRANSPARENT, 0.95)));
 
 			// Bindings
-			title.textProperty().bind(wrapper.nameProperty());
+			title.textProperty().bind(wrapper.titleProperty());
 			wrapper.actionsProperty()
 					.map(ActionUtils::createContextMenu)
 					.subscribe(wrapper::setContextMenu);

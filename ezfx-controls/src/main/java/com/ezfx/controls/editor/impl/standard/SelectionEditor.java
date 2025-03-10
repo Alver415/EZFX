@@ -17,6 +17,10 @@ import java.util.List;
 
 public class SelectionEditor<T> extends ObjectEditor<T> {
 
+	public SelectionEditor() {
+		super(new SimpleObjectProperty<>());
+		setItems(items);
+	}
 	public SelectionEditor(ObservableList<T> items) {
 		super(new SimpleObjectProperty<>());
 		setItems(items);

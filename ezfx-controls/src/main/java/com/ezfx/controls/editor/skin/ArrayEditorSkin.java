@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.Subscription;
 
 import java.lang.reflect.Array;
+import java.util.Optional;
 
 import static com.ezfx.controls.editor.factory.IntrospectingEditorFactory.DEFAULT_FACTORY;
 
@@ -35,7 +36,8 @@ public class ArrayEditorSkin<T> extends EditorSkinBase<ArrayEditor<T>, Observabl
 
 		listEditor.valueProperty().subscribe(newValue -> {
 			subscription.unsubscribe();
-			subscription = newValue.subscribe(this::rebuild);
+			subscription = Optional.ofNullable(newValue).map(nv -> nv.subscribe(this::rebuild)).orElse(() ->
+			{});
 			rebuild();
 		});
 
@@ -76,9 +78,9 @@ public class ArrayEditorSkin<T> extends EditorSkinBase<ArrayEditor<T>, Observabl
 								valueProperty().setValue(newA);
 							}
 						});
-						Editor<T> editor = DEFAULT_FACTORY.buildEditor(type, property).orElseGet(EditorBase::new);
-						EditorView<T, Editor<T>> wrapper = new EditorView<>(editor);
-						wrapper.nameProperty().bind(Bindings.createIntegerBinding(
+						Editor<T> subEditor = (Editor<T>) DEFAULT_FACTORY.buildEditor(type).orElseGet(EditorBase::new);
+						EditorView<T, Editor<T>> wrapper = new EditorView<>(subEditor);
+						wrapper.titleProperty().bind(Bindings.createIntegerBinding(
 								() -> wrappers.indexOf(wrapper), wrappers).map("[%s]"::formatted));
 						wrappers.add(index, wrapper);
 					}

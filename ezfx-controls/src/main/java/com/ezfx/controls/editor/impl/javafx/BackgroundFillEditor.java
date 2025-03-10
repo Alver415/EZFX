@@ -17,9 +17,6 @@ import javafx.scene.paint.Paint;
 import java.util.List;
 
 public class BackgroundFillEditor extends ObjectEditor<BackgroundFill> {
-	public BackgroundFillEditor(Property<BackgroundFill> property) {
-		super(property);
-	}
 
 	@Override
 	protected Skin<?> createDefaultSkin() {

@@ -39,7 +39,7 @@ public class LayoutEditor extends ObjectEditor<Node> {
 		private final Text text = new Text("(layoutX, layoutY):");
 		private final HBox hBox = new HBox(4, text, xEditor, yEditor);
 
-		private Subscription subscription = () -> {};
+		private Subscription subscription = Subscription.EMPTY;
 
 		public DefaultSkin(EditorBase<Node> editor) {
 			super(editor);

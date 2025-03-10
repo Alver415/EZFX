@@ -10,4 +10,8 @@ public interface Editor<T> {
 	Property<T> valueProperty();
 	T getValue();
 	void setValue(T value);
+
+	Property<String> titleProperty();
+	String getTitle();
+	void setTitle(String title);
 }

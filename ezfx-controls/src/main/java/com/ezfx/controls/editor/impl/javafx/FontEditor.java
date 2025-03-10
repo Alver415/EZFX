@@ -1,9 +1,9 @@
 package com.ezfx.controls.editor.impl.javafx;
 
+import com.ezfx.controls.editor.EditorSkinBase;
 import com.ezfx.controls.editor.ObjectEditor;
 import com.ezfx.controls.editor.impl.standard.DoubleEditor;
 import com.ezfx.controls.editor.impl.standard.SelectionEditor;
-import com.ezfx.controls.editor.EditorSkinBase;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Label;
@@ -14,14 +14,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.function.Function;
 
 public class FontEditor extends ObjectEditor<Font> {
-	public FontEditor(Property<Font> property) {
-		super(property);
-	}
+
+	private static final Logger log = LoggerFactory.getLogger(FontEditor.class);
 
 	@Override
 	protected Skin<?> createDefaultSkin() {
@@ -43,14 +44,16 @@ public class FontEditor extends ObjectEditor<Font> {
 				availableNames.setAll(family);
 				family.stream().findFirst().ifPresent(name::set);
 			});
-			control.valueProperty().subscribe(font -> {
+			control.valueProperty().orElse(Font.getDefault()).subscribe(font -> {
 				family.set(font.getFamily());
 				name.set(font.getName());
 				size.set(font.getSize());
 			});
 
 			List.of(name, size).forEach(property -> property.subscribe(_ -> {
-				if (!valueProperty().isBound()) valueProperty().setValue(new Font(name.get(), size.get()));
+				if (!valueProperty().isBound()) {
+					valueProperty().setValue(new Font(name.get(), size.get()));
+				}
 			}));
 
 			SelectionEditor<String> familyEditor = new SelectionEditor<>(family, Font.getFamilies());

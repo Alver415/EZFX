@@ -110,8 +110,8 @@ public class ListEditorView<T> extends ListView<T> {
 			property.addListener((_, oldValue, newValue) -> {
 				if (!lock) editor.valueProperty().getValue().set(index, newValue);
 			});
-			Editor<T> editor = DEFAULT_FACTORY
-					.buildEditor(clazz, property)
+			Editor<T> editor = (Editor<T>) DEFAULT_FACTORY
+					.buildEditor(clazz)
 					.orElseGet(EditorBase::new);
 
 			editors.put(index, editor);

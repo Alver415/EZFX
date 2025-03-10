@@ -40,7 +40,7 @@ public abstract class EZFXApplication extends Application {
 
 	@Override
 	public void init() throws Exception {
-
+		setTitle(getClass().getSimpleName());
 //		try {
 //			Files.readAllLines(Path.of("ezfx-app/src/main/resources/settings.properties")).stream().forEach(string -> {
 //				int splitIndex = string.indexOf("=");

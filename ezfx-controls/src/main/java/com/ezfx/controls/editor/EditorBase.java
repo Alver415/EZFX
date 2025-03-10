@@ -1,10 +1,7 @@
 package com.ezfx.controls.editor;
 
 import com.ezfx.controls.editor.introspective.ActionIntrospector;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -17,37 +14,29 @@ import java.util.Optional;
 
 public class EditorBase<T> extends Control implements Editor<T> {
 
-	private final T initialValue;
 	private final Property<T> value;
 
 	public EditorBase() {
 		this(new SimpleObjectProperty<>());
 	}
 
-	public EditorBase(Property<T> value) {
+	protected EditorBase(Property<T> value) {
 		this.value = value;
 		setFocusTraversable(false);
-
-		// TODO: Find a way to make this reactive. Might not be possible
-		if (value.isBound()) setDisable(true);
-
-		initialValue = value.getValue();
-		setupActions();
 	}
 
-	@ActionProxy(id = "clear", text = "Clear", longText = "Set value to null", graphic = "font>FontAwesome|TIMES")
-	public void clear() {
-		setValue(null);
+	private final StringProperty title = new SimpleStringProperty(this, "title");
+
+	public StringProperty titleProperty() {
+		return this.title;
 	}
 
-	@ActionProxy(id = "reset", text = "Reset", longText = "Reset value to initial value", graphic = "font>FontAwesome|UNDO")
-	public void reset() {
-		setValue(initialValue);
+	public String getTitle() {
+		return this.titleProperty().getValue();
 	}
 
-	private void setupActions() {
-		ActionIntrospector.register(this);
-		getActions().addAll(ActionIntrospector.actions("reset", "clear"));
+	public void setTitle(String value) {
+		this.titleProperty().setValue(value);
 	}
 
 	@Override
