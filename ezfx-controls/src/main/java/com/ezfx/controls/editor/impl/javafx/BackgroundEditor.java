@@ -96,9 +96,9 @@ public class BackgroundEditor extends ObjectEditor<Background> {
 			backgroundImagesListEditor.setGenericType(BackgroundImage.class);
 
 			PropertiesEditor<Object> beanEditor = new PropertiesEditor<>();
-			beanEditor.editorsProperty()
-					.map(editors -> Map.of(Category.of("All"), editors))
-					.subscribe(beanEditor.categorizedEditorsProperty()::putAll);
+//			beanEditor.editorsProperty()
+//					.map(editors -> Map.of(Category.of("All"), editors))
+//					.subscribe(editors -> beanEditor.categorizedEditorsProperty().set(editors));
 			beanEditor.getEditors().setAll(
 					backgroundFillsListEditor,
 					backgroundImagesListEditor);

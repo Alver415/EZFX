@@ -4,15 +4,15 @@ import javafx.beans.property.MapProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 
-public interface CategorizedMultiEditor<T> extends MultiEditor<T> {
+public interface CategorizedMultiEditor<T, S extends Editor<T>> extends MultiEditor<T> {
 
-	MapProperty<Category, ObservableList<Editor<?>>> categorizedEditorsProperty();
+	MapProperty<Category, S> categorizedEditorsProperty();
 
-	default ObservableMap<Category, ObservableList<Editor<?>>> getCategorizedEditors() {
+	default ObservableMap<Category, S> getCategorizedEditors() {
 		return this.categorizedEditorsProperty().get();
 	}
 
-	default void setCategorizedEditors(ObservableMap<Category, ObservableList<Editor<?>>> value) {
+	default void setCategorizedEditors(ObservableMap<Category, S> value) {
 		this.categorizedEditorsProperty().set(value);
 	}
 

@@ -17,7 +17,7 @@ public interface MultiEditorSkin {
 		public VerticalEditorSkin(E editor) {
 			super(editor);
 
-			vBox = new VBox();
+			vBox = new VBox(2);
 			getChildren().setAll(vBox);
 
 			editor.editorsProperty()
@@ -34,7 +34,7 @@ public interface MultiEditorSkin {
 		public HorizontalEditorSkin(E editor) {
 			super(editor);
 
-			hBox = new HBox();
+			hBox = new HBox(2);
 			getChildren().setAll(hBox);
 
 			editor.editorsProperty()

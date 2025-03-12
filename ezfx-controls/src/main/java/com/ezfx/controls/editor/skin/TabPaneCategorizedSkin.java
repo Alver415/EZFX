@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TabPaneCategorizedSkin<E extends Control & Editor<T> & CategorizedMultiEditor<T>, T> extends EditorSkinBase<E, T> {
+public class TabPaneCategorizedSkin<E extends Control & Editor<T> & CategorizedMultiEditor<T, PropertiesEditor<T>>, T> extends EditorSkinBase<E, T> {
 
 	private final TabPane tabPane = new TabPane();
 	private final Map<Category, Tab> tabMap = new HashMap<>();
@@ -50,13 +50,13 @@ public class TabPaneCategorizedSkin<E extends Control & Editor<T> & CategorizedM
 		setChildren(tabPane);
 	}
 
-	private Tab getTab(Map.Entry<Category, ObservableList<Editor<?>>> entry) {
+	private Tab getTab(Map.Entry<Category, ? extends Editor<?>> entry) {
 		Category category = entry.getKey();
-		ObservableList<Editor<?>> editors = entry.getValue();
+		Editor<?> editor = entry.getValue();
 		return tabMap.computeIfAbsent(category, _ -> {
 			Tab newTab = new Tab(category.title());
 			VBox content = new VBox(4);
-			content.getChildren().setAll(editors.stream().map(EditorView::new).toList());
+			content.getChildren().setAll(editor.getNode());
 			content.setPadding(new Insets(8));
 			ScrollPane scrollPane = new ScrollPane(content);
 			scrollPane.setFitToWidth(true);

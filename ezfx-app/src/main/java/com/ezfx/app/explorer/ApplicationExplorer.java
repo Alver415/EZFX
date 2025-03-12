@@ -5,6 +5,7 @@ import com.ezfx.app.console.PolyglotView;
 import com.ezfx.base.utils.Nodes;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.EditorBase;
+import com.ezfx.controls.editor.impl.javafx.NodeEditor;
 import com.ezfx.controls.info.NodeInfoHelper;
 import com.ezfx.controls.popup.OverlayPopup;
 import com.ezfx.controls.tree.SceneGraphTreeControl;
@@ -94,6 +95,7 @@ public class ApplicationExplorer extends Control {
 		private final Map<Node, Editor<?>> cache = new ConcurrentHashMap<>(new LinkedHashMap<>(5, 0.75f, true));
 
 		private final ScrollPane scrollPane;
+		private final NodeEditor nodeEditor;
 		private final SceneGraphTreeControl treeControl;
 		private final PolyglotView polyglotView;
 
@@ -109,7 +111,8 @@ public class ApplicationExplorer extends Control {
 
 			polyglotView = new PolyglotView(control.getManagedContext());
 
-			scrollPane = new ScrollPane();
+			nodeEditor = new NodeEditor();
+			scrollPane = new ScrollPane(nodeEditor);
 			scrollPane.setFitToWidth(true);
 			scrollPane.setFitToHeight(true);
 
@@ -130,21 +133,7 @@ public class ApplicationExplorer extends Control {
 //			treeView.selectedItemProperty().subscribe(item ->
 //					polyglotView.getManagedContext().putPolyglotMember("selectedItem", item));
 
-			ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-			EventStreams.valuesOf(treeControl.selectedItemProperty())
-					.threadBridgeFromFx(executor)
-					.filter(Objects::nonNull)
-					.map(selected -> cache.computeIfAbsent(selected,
-							_ -> {
-								Object object = selected;
-								if (selected instanceof FakeNode<?> fakeNode) {
-									object = fakeNode.getActual();
-								}
-								return DEFAULT_FACTORY.buildEditor(object.getClass()).orElseGet(EditorBase::new);
-							}))
-					.threadBridgeToFx(executor)
-					.map(Editor::getNode)
-					.subscribe(scrollPane::setContent);
+			treeControl.selectedItemProperty().subscribe(nodeEditor::setValue);
 
 
 			SplitPane top = SplitPanes.horizontal(left, right);

@@ -4,6 +4,7 @@ import com.ezfx.base.utils.Converter;
 import com.ezfx.base.utils.Converters;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.Editors;
+import com.ezfx.controls.editor.PropertiesEditor;
 import com.ezfx.controls.editor.factory.EditorFactory;
 import com.ezfx.controls.editor.impl.standard.DoubleEditor;
 import com.ezfx.controls.editor.introspective.ClassBasedEditor;
@@ -43,11 +44,22 @@ public class NodeEditor extends ClassHierarchyEditor<Node> {
 		});
 	}
 
+	@Override
+	@SuppressWarnings("unchecked")
+	protected <C extends Node> PropertiesEditor<C> buildCategoryEditor(Class<C> clazz) {
+		if (clazz.equals(Node.class)) {
+			return (PropertiesEditor<C>) new NodeClassEditor();
+		} else if (clazz.equals(Region.class)) {
+			return (PropertiesEditor<C>) new RegionClassEditor();
+		}
+		return new ClassBasedEditor<>(clazz);
+	}
+
 	private static final Converter<Double, Number> DOUBLE_TO_NUMBER = Converters.NUMBER_TO_DOUBLE.inverted();
 
 	public static class NodeClassEditor extends ClassBasedEditor<Node> {
 
-		private final Predicate<Editor<?>> filter = editor ->
+		private static final Predicate<Editor<?>> FILTER = editor ->
 				editor.getTitle().startsWith("on") ||
 						editor.getTitle().startsWith("accessible") ||
 						List.of("layoutx", "layouty", "rotate", "rotationaxis",
@@ -76,7 +88,7 @@ public class NodeEditor extends ClassHierarchyEditor<Node> {
 					key(new Point3DEditor("axis"), Node::rotationAxisProperty)));
 
 			ObservableList<Editor<?>> editors = getEditors();
-			editors.removeIf(filter);
+			editors.removeIf(FILTER);
 
 			editors.addFirst(rotationEditor);
 			editors.addFirst(scaleEditor);

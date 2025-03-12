@@ -12,12 +12,14 @@ import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.ezfx.base.utils.EZFX.toObservableArrayList;
+
 /**
  * Base class for editors which use multiple sub-editors to edit properties of an object.
  * <p>
  * For example, a ColorEditor might have 3 sub-editors, one for each of Red, Green, Blue.
  */
-public class PropertiesEditor<T> extends ObjectEditor<T> implements CategorizedMultiEditor<T> {
+public class PropertiesEditor<T> extends ObjectEditor<T> implements CategorizedMultiEditor<T, PropertiesEditor<T>> {
 
 	public PropertiesEditor() {
 		this(new SimpleObjectProperty<>());
@@ -38,9 +40,7 @@ public class PropertiesEditor<T> extends ObjectEditor<T> implements CategorizedM
 			}
 			categorizedEditorsProperty().bind(valueProperty().map(categorizer));
 			editorsProperty().bind(categorizedEditorsProperty().map(categorized ->
-					categorized.values().stream()
-							.flatMap(Collection::stream)
-							.collect(Collectors.toCollection(FXCollections::observableArrayList))));
+					categorized.values().stream().collect(toObservableArrayList())));
 		});
 	}
 
@@ -56,25 +56,25 @@ public class PropertiesEditor<T> extends ObjectEditor<T> implements CategorizedM
 		return this.editors;
 	}
 
-	private final MapProperty<Category, ObservableList<Editor<?>>> categorizedEditors = new SimpleMapProperty<>(
+	private final MapProperty<Category, PropertiesEditor<T>> categorizedEditors = new SimpleMapProperty<>(
 			this, "categorizedEditors", FXCollections.observableMap(new TreeMap<>()));
 
 	@Override
-	public MapProperty<Category, ObservableList<Editor<?>>> categorizedEditorsProperty() {
+	public MapProperty<Category, PropertiesEditor<T>> categorizedEditorsProperty() {
 		return categorizedEditors;
 	}
 
-	private final Property<Function<T, ObservableMap<Category, ObservableList<Editor<?>>>>> categorizer = new SimpleObjectProperty<>(this, "categorizer");
+	private final Property<Function<T, ObservableMap<Category, PropertiesEditor<T>>>> categorizer = new SimpleObjectProperty<>(this, "categorizer");
 
-	public Property<Function<T, ObservableMap<Category, ObservableList<Editor<?>>>>> categorizerProperty() {
+	public Property<Function<T, ObservableMap<Category, PropertiesEditor<T>>>> categorizerProperty() {
 		return this.categorizer;
 	}
 
-	public Function<T, ObservableMap<Category, ObservableList<Editor<?>>>> getCategorizer() {
+	public Function<T, ObservableMap<Category, PropertiesEditor<T>>> getCategorizer() {
 		return this.categorizerProperty().getValue();
 	}
 
-	public void setCategorizer(Function<T, ObservableMap<Category, ObservableList<Editor<?>>>> value) {
+	public void setCategorizer(Function<T, ObservableMap<Category, PropertiesEditor<T>>> value) {
 		this.categorizerProperty().setValue(value);
 	}
 }

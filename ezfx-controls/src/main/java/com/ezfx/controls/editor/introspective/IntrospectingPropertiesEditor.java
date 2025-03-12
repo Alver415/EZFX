@@ -53,12 +53,12 @@ public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {
 			subscription = Subscription.EMPTY;
 			Class<?> type = value.getClass();
 			List<PropertyInfo> propertyInfoList = getIntrospector().getPropertyInfo(type);
-			ObservableMap<Category, ObservableList<Editor<?>>> categorized = FXCollections.observableMap(new TreeMap<>());
+			ObservableMap<Category, PropertiesEditor<T>> categorized = FXCollections.observableMap(new TreeMap<>());
 			for (PropertyInfo propertyInfo : propertyInfoList) {
 				Editor<?> subEditor = getEditor(propertyInfo);
 				Category category = propertyInfo.category();
-				ObservableList<Editor<?>> list = categorized.computeIfAbsent(category, _ -> FXCollections.observableArrayList());
-				list.add(subEditor);
+				PropertiesEditor<?> list = categorized.computeIfAbsent(category, _ -> new PropertiesEditor<>());
+				list.getEditors().add(subEditor);
 			}
 			return categorized;
 		}));

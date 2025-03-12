@@ -5,13 +5,18 @@ import com.ezfx.base.exception.UncheckedSupplier;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.util.Duration;
 import javafx.util.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -143,6 +148,19 @@ public interface EZFX {
 	static <T> Collector<T, ?, ObservableList<T>> toObservableArrayList() {
 		return Collectors.toCollection(FXCollections::observableArrayList);
 	}
+
+	static <K extends Comparable<K>, U> Supplier<ObservableMap<K, U>> observableMapSupplier(Supplier<Map<K, U>> mapSupplier) {
+		return () -> FXCollections.observableMap(mapSupplier.get());
+	}
+
+	static <K extends Comparable<K>, U> Supplier<ObservableMap<K, U>> observableTreeMapSupplier() {
+		return observableMapSupplier(TreeMap::new);
+	}
+
+	static <A> BinaryOperator<A> mergeFunction() {
+		return (a, b) -> a;
+	}
+
 	// endregion Streams
 
 }
