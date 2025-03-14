@@ -1,9 +1,9 @@
 package com.ezfx.controls.item;
 
 import javafx.beans.property.Property;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-
-import java.util.List;
+import javafx.scene.image.Image;
 
 public interface FXItem<T, C extends FXItem<?, ?>> {
 
@@ -11,9 +11,13 @@ public interface FXItem<T, C extends FXItem<?, ?>> {
 
 	ObservableList<? extends C> getChildren();
 
-	String getId();
+	ObservableValue<Image> getThumbnailIcon();
 
-	List<String> getStyleClass();
+	ObservableValue<String> getPrimaryInfo();
+
+	ObservableValue<String> getSecondaryInfo();
+
+	ObservableValue<String> getTertiaryInfo();
 
 	Property<Boolean> visibleProperty();
 

@@ -1,6 +1,7 @@
 package com.ezfx.controls.item;
 
 import com.ezfx.controls.tree.TreeControl;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeView;
@@ -9,7 +10,7 @@ import javafx.util.Callback;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class FXItemTreeControl extends TreeControl<FXItem<?,?>> {
+public class FXItemTreeControl extends TreeControl<FXItem<?, ?>> {
 
 	public FXItemTreeControl() {
 		setChildrenProvider(CHILDREN_PROVIDER);
@@ -26,18 +27,24 @@ public class FXItemTreeControl extends TreeControl<FXItem<?,?>> {
 	public static final BiFunction<String, FXItem<?, ?>, Boolean> FILTER_FUNCTION = (filterText, item) -> {
 		if (filterText == null || filterText.isEmpty()) return true;
 		filterText = filterText.toLowerCase();
+
+		Function<ObservableValue<String>, String> prep = obs -> obs.map(String::toLowerCase).orElse("").getValue();
+		String primaryInfo = prep.apply(item.getPrimaryInfo());
+		String secondaryInfo = prep.apply(item.getSecondaryInfo());
+		String tertiaryInfo = prep.apply(item.getTertiaryInfo());
+
 		if (filterText.startsWith("#")) {
-			if (item.getId() != null && item.getId().toLowerCase().contains(filterText.substring(1))) {
+			if (secondaryInfo.contains(filterText.substring(1))) {
 				return true;
 			}
 		} else if (filterText.startsWith(".")) {
-			for (String styleClass : item.getStyleClass()) {
+			for (String styleClass : tertiaryInfo.split("\\.")) {
 				if (styleClass.toLowerCase().contains(filterText.substring(1))) {
 					return true;
 				}
 			}
 		} else {
-			if (item.getClass().getSimpleName().toLowerCase().contains(filterText)) {
+			if (primaryInfo.contains(filterText)) {
 				return true;
 			}
 		}

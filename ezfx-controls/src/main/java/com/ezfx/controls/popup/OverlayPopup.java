@@ -17,6 +17,7 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.transform.Transform;
 import javafx.stage.Window;
 
 public class OverlayPopup extends PopupControl {
@@ -75,7 +76,6 @@ public class OverlayPopup extends PopupControl {
 		}
 
 		private void updateBounds(Bounds screenBounds) {
-			if (true) return;
 			control.setX(screenBounds.getMinX());
 			control.setY(screenBounds.getMinY());
 			control.setWidth(screenBounds.getWidth());

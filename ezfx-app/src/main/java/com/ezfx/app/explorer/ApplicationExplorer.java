@@ -2,22 +2,24 @@ package com.ezfx.app.explorer;
 
 import com.ezfx.app.console.ManagedContext;
 import com.ezfx.app.console.PolyglotView;
-import com.ezfx.base.utils.CachedProxy;
 import com.ezfx.base.utils.Nodes;
 import com.ezfx.controls.editor.FXItemEditor;
 import com.ezfx.controls.item.FXItem;
 import com.ezfx.controls.item.FXItemFactory;
-import com.ezfx.controls.item.FXItemFactoryImpl;
 import com.ezfx.controls.item.FXItemTreeControl;
+import com.ezfx.controls.popup.OverlayPopup;
 import com.ezfx.controls.utils.SplitPanes;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.*;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 
 import static com.ezfx.base.utils.ScreenBounds.CACHED;
 
@@ -75,11 +77,11 @@ public class ApplicationExplorer extends Control {
 	public static class DefaultSkin extends SkinBase<ApplicationExplorer> {
 
 		private final ScrollPane scrollPane;
-		private final FXItemEditor editor;
+		private final FXItemEditor<FXItem<?, ?>> editor;
 		private final FXItemTreeControl treeControl;
 		private final PolyglotView polyglotView;
 
-//		private final OverlayPopup overlayPopup;
+		private final OverlayPopup overlayPopup;
 		private final ObservableValue<FXItem<?, ?>> target;
 
 		protected DefaultSkin(ApplicationExplorer control) {
@@ -99,17 +101,17 @@ public class ApplicationExplorer extends Control {
 			StackPane right = new StackPane(scrollPane);
 			StackPane bottom = new StackPane(polyglotView);
 
-			target = Bindings.createObjectBinding(
-					() -> treeControl.getHoveredItem() != null ?
-							treeControl.getHoveredItem() :
+			target = Bindings.createObjectBinding(() ->
+//							treeControl.getHoveredItem() != null ?
+//							treeControl.getHoveredItem() :
 							treeControl.getSelectedItem(),
 					treeControl.hoveredItemProperty(), treeControl.selectedItemProperty());
 
-//			overlayPopup = new OverlayPopup(getNode().getScene().getWindow());
-//			overlayPopup.targetProperty().bind(target);
-//			overlayPopup.boundsProperty().bind(getBounds(target));
-//			overlayPopup.setBackground(Background.fill(Color.BLUE.interpolate(Color.TRANSPARENT, 0.75)));
-//			target.map(this::showPopup).subscribe(overlayPopup::setVisible);
+			overlayPopup = new OverlayPopup(getNode().getScene().getWindow());
+			overlayPopup.targetProperty().bind(target);
+			overlayPopup.boundsProperty().bind(target.map(FXItem::get).flatMap(CACHED::of));
+			overlayPopup.setBackground(Background.fill(Color.BLUE.interpolate(Color.TRANSPARENT, 0.75)));
+			target.map(this::showPopup).subscribe(overlayPopup::setVisible);
 
 //			treeView.selectedItemProperty().subscribe(item ->
 //					polyglotView.getManagedContext().putPolyglotMember("selectedItem", item));
@@ -123,12 +125,8 @@ public class ApplicationExplorer extends Control {
 			));
 		}
 
-		private ObservableValue<Bounds> getBounds(ObservableValue<FXItem<?, ?>> target) {
-			return target.map(FXItem::get).flatMap(CACHED::of);
-		}
-
 		private boolean showPopup(FXItem<?, ?> item) {
-			if (true) return false;
+			if (true) return true;
 			Object object = item.get();
 			if (object instanceof Node node) {
 				boolean nonNull = node != null;

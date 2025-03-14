@@ -4,16 +4,19 @@ import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.SubScene;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
+@SuppressWarnings("unchecked")
 public class FXItemFactoryImpl implements FXItemFactory {
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public <T> FXItem<T, ?> create(T object){
+	public <T> FXItem<T, ?> create(T object) {
 		if (object instanceof Parent parent) {
 			return (FXItem<T, ?>) new FXParentItem<>(this, parent);
+		} else if (object instanceof SubScene subScene) {
+			return (FXItem<T, ?>) new FXSubSceneItem<>(this, subScene);
 		} else if (object instanceof Node node) {
 			return (FXItem<T, ?>) new FXNodeItem<>(this, node);
 		} else if (object instanceof Stage stage) {
@@ -36,7 +39,7 @@ public class FXItemFactoryImpl implements FXItemFactory {
 
 	@Override
 	public <W extends Window> FXWindowItem<W> create(W window) {
-		if (window instanceof Stage stage){
+		if (window instanceof Stage stage) {
 			return (FXWindowItem<W>) new FXStageItem<>(this, stage);
 		}
 		return new FXWindowItem<>(this, window);
@@ -54,8 +57,10 @@ public class FXItemFactoryImpl implements FXItemFactory {
 
 	@Override
 	public <N extends Node> FXNodeItem<N> create(N node) {
-		if (node instanceof Parent parent){
+		if (node instanceof Parent parent) {
 			return (FXNodeItem<N>) new FXParentItem<>(this, parent);
+		} else if (node instanceof SubScene subScene) {
+			return (FXNodeItem<N>) new FXSubSceneItem<>(this, subScene);
 		}
 		return new FXNodeItem<>(this, node);
 	}

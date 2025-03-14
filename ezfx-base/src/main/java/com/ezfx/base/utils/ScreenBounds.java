@@ -1,5 +1,7 @@
 package com.ezfx.base.utils;
 
+import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -12,8 +14,13 @@ import javafx.scene.Scene;
 import javafx.scene.transform.Transform;
 import javafx.stage.Screen;
 import javafx.stage.Window;
+import javafx.util.Duration;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+
+import static com.ezfx.base.utils.EZFX.runRepeatedlyFX;
 
 public class ScreenBounds implements IScreenBounds{
 
@@ -87,13 +94,11 @@ public class ScreenBounds implements IScreenBounds{
 	public ObservableValue<Bounds> ofNode(Node node) {
 		Property<Bounds> bounds = new SimpleObjectProperty<>();
 		Runnable update = () -> bounds.setValue(node.localToScreen(node.getLayoutBounds()));
-		ChangeListener<Bounds> l1 = (_, _, _) -> update.run();
-		ChangeListener<Transform> l2 = (_, _, _) -> update.run();
-		node.boundsInLocalProperty().addListener(l1);
-		node.boundsInParentProperty().addListener(l1);
-		node.localToSceneTransformProperty().addListener(l2);
-		node.localToParentTransformProperty().addListener(l2);
-		node.sceneProperty().flatMap(this::ofScene).addListener(l1);
+		node.boundsInLocalProperty().addListener((_, _, _) -> update.run());
+		node.boundsInParentProperty().addListener((_, _, _) -> update.run());
+		node.localToSceneTransformProperty().addListener((_, _, _) -> update.run());
+		node.localToParentTransformProperty().addListener((_, _, _) -> update.run());
+		node.sceneProperty().flatMap(this::ofScene).addListener((_, _, _) -> update.run());
 		update.run();
 		return bounds;
 	}
