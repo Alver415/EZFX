@@ -3,7 +3,7 @@ package com.ezfx.controls.editor.factory;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.FXItemEditor;
 import com.ezfx.controls.editor.impl.javafx.*;
-import com.ezfx.controls.info.FXItem;
+import com.ezfx.controls.item.FXItem;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Point3D;

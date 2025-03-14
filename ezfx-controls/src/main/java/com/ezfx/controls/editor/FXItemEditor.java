@@ -3,7 +3,9 @@ package com.ezfx.controls.editor;
 import com.ezfx.controls.editor.impl.javafx.ApplicationEditor;
 import com.ezfx.controls.editor.impl.javafx.NodeEditor;
 import com.ezfx.controls.editor.introspective.IntrospectingPropertiesEditor;
-import com.ezfx.controls.info.FXItem;
+import com.ezfx.controls.item.FXApplicationItem;
+import com.ezfx.controls.item.FXItem;
+import com.ezfx.controls.item.FXNodeItem;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
@@ -32,11 +34,11 @@ public class FXItemEditor<T extends FXItem<?, ?>> extends ObjectEditor<T> {
 			super(editor);
 			Label notAvailableLabel = new Label("Not Available");
 			editor.valueProperty().map(item -> switch (item) {
-						case FXItem.FXApplicationItem<?> applicationItem -> {
+						case FXApplicationItem<?> applicationItem -> {
 							editor.applicationEditor.setValue(applicationItem.get());
 							yield editor.applicationEditor;
 						}
-						case FXItem.FXNodeItem<?> nodeItem -> {
+						case FXNodeItem<?> nodeItem -> {
 							editor.nodeEditor.setValue(nodeItem.get());
 							yield editor.nodeEditor;
 						}

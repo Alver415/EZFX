@@ -1,7 +1,7 @@
 package com.ezfx.controls.popup;
 
-import com.ezfx.controls.info.FXItem;
-import com.ezfx.controls.info.FXItemInfo;
+import com.ezfx.controls.item.FXItem;
+import com.ezfx.controls.item.FXItemInfo;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;

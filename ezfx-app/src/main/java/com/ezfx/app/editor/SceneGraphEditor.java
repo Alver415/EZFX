@@ -1,13 +1,15 @@
 package com.ezfx.app.editor;
 
+import com.ezfx.base.utils.CachedProxy;
 import com.ezfx.base.utils.ScreenBounds;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.EditorSkinBase;
 import com.ezfx.controls.editor.FXItemEditor;
 import com.ezfx.controls.editor.ObjectEditor;
-import com.ezfx.controls.editor.impl.javafx.NodeEditor;
-import com.ezfx.controls.info.FXItem;
-import com.ezfx.controls.tree.FXTreeControl;
+import com.ezfx.controls.item.FXItem;
+import com.ezfx.controls.item.FXItemFactory;
+import com.ezfx.controls.item.FXItemFactoryImpl;
+import com.ezfx.controls.item.FXItemTreeControl;
 import com.ezfx.controls.viewport.Viewport;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
@@ -56,7 +58,7 @@ public class SceneGraphEditor extends ObjectEditor<Node> {
 
 	public static class DefaultSkin extends EditorSkinBase<SceneGraphEditor, Node> {
 
-		private final FXTreeControl treeControl;
+		private final FXItemTreeControl treeControl;
 		private final Viewport viewport;
 		private final Canvas overlay;
 		private final StackPane editorWrapper;
@@ -67,7 +69,7 @@ public class SceneGraphEditor extends ObjectEditor<Node> {
 
 		protected DefaultSkin(SceneGraphEditor control) {
 			super(control);
-			treeControl = new FXTreeControl();
+			treeControl = new FXItemTreeControl();
 			viewport = new Viewport();
 			overlay = new Canvas();
 			overlay.setMouseTransparent(true);
@@ -112,7 +114,7 @@ public class SceneGraphEditor extends ObjectEditor<Node> {
 					});
 
 
-			treeControl.rootProperty().bind(control.valueProperty().map(FXItem::create));
+			treeControl.rootProperty().bind(control.valueProperty().map(FXItemFactory.CACHED::create));
 			viewport.contentProperty().bind(control.valueProperty()
 					.map(t -> t instanceof Parent p ? p : new StackPane(t)).orElse(new StackPane()));
 

@@ -1,8 +1,7 @@
-package com.ezfx.controls.tree;
+package com.ezfx.controls.item;
 
 
-import com.ezfx.controls.info.FXItem;
-import com.ezfx.controls.info.FXItemInfo;
+import com.ezfx.controls.tree.FilterableTreeItem;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -17,7 +16,7 @@ import javafx.scene.layout.HBox;
 
 import java.util.Optional;
 
-public class FXTreeCell extends TreeCell<FXItem<?, ?>> {
+public class FXItemTreeCell extends TreeCell<FXItem<?, ?>> {
 	public static final PseudoClass FILTERED = PseudoClass.getPseudoClass("filtered");
 	private final FXItemInfo itemInfo;
 
@@ -25,7 +24,7 @@ public class FXTreeCell extends TreeCell<FXItem<?, ?>> {
 	private final CheckBox visibleCheckBox;
 	private final BorderPane borderPane;
 
-	public FXTreeCell() {
+	public FXItemTreeCell() {
 		setContentDisplay(ContentDisplay.LEFT);
 
 		// Build Structure

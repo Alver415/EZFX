@@ -13,7 +13,7 @@ open module ezfx.controls {
 	exports com.ezfx.controls.editor.factory;
 	exports com.ezfx.controls.editor.code;
 	exports com.ezfx.controls.popup;
-	exports com.ezfx.controls.info;
+	exports com.ezfx.controls.item;
 	exports com.ezfx.controls.editor.impl.filesystem;
 
 

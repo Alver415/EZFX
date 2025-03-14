@@ -2,11 +2,13 @@ package com.ezfx.app.explorer;
 
 import com.ezfx.app.console.ManagedContext;
 import com.ezfx.app.console.PolyglotView;
+import com.ezfx.base.utils.CachedProxy;
 import com.ezfx.base.utils.Nodes;
 import com.ezfx.controls.editor.FXItemEditor;
-import com.ezfx.controls.editor.introspective.DelegatingEditor;
-import com.ezfx.controls.info.FXItem;
-import com.ezfx.controls.tree.FXTreeControl;
+import com.ezfx.controls.item.FXItem;
+import com.ezfx.controls.item.FXItemFactory;
+import com.ezfx.controls.item.FXItemFactoryImpl;
+import com.ezfx.controls.item.FXItemTreeControl;
 import com.ezfx.controls.utils.SplitPanes;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -74,7 +76,7 @@ public class ApplicationExplorer extends Control {
 
 		private final ScrollPane scrollPane;
 		private final FXItemEditor editor;
-		private final FXTreeControl treeControl;
+		private final FXItemTreeControl treeControl;
 		private final PolyglotView polyglotView;
 
 //		private final OverlayPopup overlayPopup;
@@ -83,8 +85,8 @@ public class ApplicationExplorer extends Control {
 		protected DefaultSkin(ApplicationExplorer control) {
 			super(control);
 
-			treeControl = new FXTreeControl();
-			treeControl.setRoot(FXItem.create(control.getApplication()));
+			treeControl = new FXItemTreeControl();
+			treeControl.setRoot(FXItemFactory.CACHED.create(control.getApplication()));
 
 			polyglotView = new PolyglotView(control.getManagedContext());
 

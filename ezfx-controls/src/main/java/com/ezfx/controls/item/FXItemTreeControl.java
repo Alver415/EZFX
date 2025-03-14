@@ -1,6 +1,6 @@
-package com.ezfx.controls.tree;
+package com.ezfx.controls.item;
 
-import com.ezfx.controls.info.FXItem;
+import com.ezfx.controls.tree.TreeControl;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeView;
@@ -9,16 +9,16 @@ import javafx.util.Callback;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class FXTreeControl extends TreeControl<FXItem<?,?>> {
+public class FXItemTreeControl extends TreeControl<FXItem<?,?>> {
 
-	public FXTreeControl() {
+	public FXItemTreeControl() {
 		setChildrenProvider(CHILDREN_PROVIDER);
 		setFilterFunction(FILTER_FUNCTION);
 		setCellFactory(CELL_FACTORY);
 	}
 
 	public static final Callback<TreeView<FXItem<?, ?>>, TreeCell<FXItem<?, ?>>> CELL_FACTORY =
-			_ -> new FXTreeCell();
+			_ -> new FXItemTreeCell();
 
 	public static final Function<FXItem<?, ?>, ObservableList<FXItem<?, ?>>> CHILDREN_PROVIDER =
 			item -> (ObservableList<FXItem<?, ?>>) item.getChildren();

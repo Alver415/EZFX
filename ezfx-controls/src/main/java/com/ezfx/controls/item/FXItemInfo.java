@@ -1,4 +1,4 @@
-package com.ezfx.controls.info;
+package com.ezfx.controls.item;
 
 import com.ezfx.base.utils.CachedProxy;
 import com.ezfx.base.utils.ObservableConstant;
