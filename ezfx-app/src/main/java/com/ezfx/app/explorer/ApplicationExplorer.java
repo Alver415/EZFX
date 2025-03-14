@@ -3,41 +3,21 @@ package com.ezfx.app.explorer;
 import com.ezfx.app.console.ManagedContext;
 import com.ezfx.app.console.PolyglotView;
 import com.ezfx.base.utils.Nodes;
-import com.ezfx.controls.editor.Editor;
-import com.ezfx.controls.editor.EditorBase;
-import com.ezfx.controls.editor.impl.javafx.NodeEditor;
-import com.ezfx.controls.info.NodeInfoHelper;
-import com.ezfx.controls.popup.OverlayPopup;
-import com.ezfx.controls.tree.SceneGraphTreeControl;
+import com.ezfx.controls.editor.FXItemEditor;
+import com.ezfx.controls.editor.introspective.DelegatingEditor;
+import com.ezfx.controls.info.FXItem;
+import com.ezfx.controls.tree.FXTreeControl;
 import com.ezfx.controls.utils.SplitPanes;
 import javafx.application.Application;
-import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import org.reactfx.EventStreams;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static com.ezfx.base.utils.ObservableConstant.constant;
 import static com.ezfx.base.utils.ScreenBounds.CACHED;
-import static com.ezfx.controls.editor.factory.EditorFactory.DEFAULT_FACTORY;
 
 public class ApplicationExplorer extends Control {
 
@@ -92,27 +72,24 @@ public class ApplicationExplorer extends Control {
 
 	public static class DefaultSkin extends SkinBase<ApplicationExplorer> {
 
-		private final Map<Node, Editor<?>> cache = new ConcurrentHashMap<>(new LinkedHashMap<>(5, 0.75f, true));
-
 		private final ScrollPane scrollPane;
-		private final NodeEditor nodeEditor;
-		private final SceneGraphTreeControl treeControl;
+		private final FXItemEditor editor;
+		private final FXTreeControl treeControl;
 		private final PolyglotView polyglotView;
 
-		private final OverlayPopup overlayPopup;
-		private final ObservableValue<Node> target;
+//		private final OverlayPopup overlayPopup;
+		private final ObservableValue<FXItem<?, ?>> target;
 
 		protected DefaultSkin(ApplicationExplorer control) {
 			super(control);
 
-			treeControl = new SceneGraphTreeControl();
-			treeControl.setRoot(new FakeNode.Application(control.getApplication()));
-			treeControl.setChildrenProvider(FakeNode.CHILDREN_PROVIDER);
+			treeControl = new FXTreeControl();
+			treeControl.setRoot(FXItem.create(control.getApplication()));
 
 			polyglotView = new PolyglotView(control.getManagedContext());
 
-			nodeEditor = new NodeEditor();
-			scrollPane = new ScrollPane(nodeEditor);
+			editor = new FXItemEditor<>();
+			scrollPane = new ScrollPane(editor);
 			scrollPane.setFitToWidth(true);
 			scrollPane.setFitToHeight(true);
 
@@ -121,19 +98,21 @@ public class ApplicationExplorer extends Control {
 			StackPane bottom = new StackPane(polyglotView);
 
 			target = Bindings.createObjectBinding(
-					() -> treeControl.getHoveredItem() != null ? treeControl.getHoveredItem() : treeControl.getSelectedItem(),
+					() -> treeControl.getHoveredItem() != null ?
+							treeControl.getHoveredItem() :
+							treeControl.getSelectedItem(),
 					treeControl.hoveredItemProperty(), treeControl.selectedItemProperty());
 
-			overlayPopup = new OverlayPopup(getNode().getScene().getWindow());
-			overlayPopup.targetProperty().bind(target);
-			overlayPopup.boundsProperty().bind(getBounds(target));
-			overlayPopup.setBackground(Background.fill(Color.BLUE.interpolate(Color.TRANSPARENT, 0.75)));
-			target.map(this::showPopup).subscribe(overlayPopup::setVisible);
+//			overlayPopup = new OverlayPopup(getNode().getScene().getWindow());
+//			overlayPopup.targetProperty().bind(target);
+//			overlayPopup.boundsProperty().bind(getBounds(target));
+//			overlayPopup.setBackground(Background.fill(Color.BLUE.interpolate(Color.TRANSPARENT, 0.75)));
+//			target.map(this::showPopup).subscribe(overlayPopup::setVisible);
 
 //			treeView.selectedItemProperty().subscribe(item ->
 //					polyglotView.getManagedContext().putPolyglotMember("selectedItem", item));
 
-			treeControl.selectedItemProperty().subscribe(nodeEditor::setValue);
+			treeControl.selectedItemProperty().subscribe(editor::setValue);
 
 
 			SplitPane top = SplitPanes.horizontal(left, right);
@@ -142,128 +121,26 @@ public class ApplicationExplorer extends Control {
 			));
 		}
 
-		private ObservableValue<Bounds> getBounds(ObservableValue<Node> target) {
-			return target.flatMap(node -> {
-				if (node instanceof FakeNode<?> fakeNode) {
-					return CACHED.of(fakeNode.getActual());
-				} else {
-					return CACHED.ofNode(node);
-				}
-			});
+		private ObservableValue<Bounds> getBounds(ObservableValue<FXItem<?, ?>> target) {
+			return target.map(FXItem::get).flatMap(CACHED::of);
 		}
 
-		private boolean showPopup(Node t) {
-			boolean nonNull = t != null;
-			// Make sure we don't draw the popup over the ApplicationExplorer itself while we're using it
-			boolean isAncestor = t == getNode() ||
-					Nodes.isAncestor(t, getNode()) ||
-					t instanceof FakeNode.Scene scene && scene.getActual() == getNode().getScene() ||
-					t instanceof FakeNode.Window window && window.getActual() == getNode().getScene().getWindow()||
-					t instanceof FakeNode.Stage stage && stage.getActual() == getNode().getScene().getWindow();
-			boolean shouldeBeVisible = nonNull && !isAncestor;
-			return shouldeBeVisible;
-		}
-	}
-
-	/**
-	 * This is a hacky workaround to allow Application, Windows, Stages, and Scenes work in a TreeView<Node>, specifically SceneGraphTreeControl.
-	 * This allows you to wrap those types in a Region, then map their properties to a natural counterpart.
-	 * @param <T>
-	 */
-	private static class FakeNode<T> extends Region {
-
-		private final T actual;
-
-		protected FakeNode(T actual) {
-			this.actual = actual;
-		}
-
-		public T getActual() {
-			return actual;
-		}
-
-		protected final ReadOnlyListWrapper<Node> children = new ReadOnlyListWrapper<>(this, "children", FXCollections.observableArrayList());
-
-		public ReadOnlyListProperty<Node> childrenProperty() {
-			return this.children.getReadOnlyProperty();
-		}
-
-		public ObservableList<Node> getChildren() {
-			return this.childrenProperty().getValue();
-		}
-
-		private static final Function<Node, ObservableList<Node>> CHILDREN_PROVIDER = node -> {
-			if (node instanceof FakeNode<?> fakeNode)
-				return fakeNode.getChildren();
-			return SceneGraphTreeControl.CHILDREN_PROVIDER.apply(node);
-		};
-
-		/* === IMPLEMENTATIONS === */
-
-		private static class Application extends FakeNode<javafx.application.Application> {
-			public Application(javafx.application.Application actual) {
-				super(actual);
-				visibleProperty().bind(constant(true));
-				getProperties().put("NAME_OVERRIDE", constant(NodeInfoHelper.CACHING.typeName(actual)));
-
-				InvalidationListener listener = _ -> {
-					Set<javafx.stage.Stage> stages = javafx.stage.Window.getWindows().stream()
-							.filter(a -> a instanceof javafx.stage.Stage)
-							.map(stage -> (javafx.stage.Stage) stage)
-							.collect(Collectors.toSet());
-					stagesProperty().addAll(stages);
-				};
-				javafx.stage.Window.getWindows().addListener(listener);
-				stagesProperty().subscribe(set -> children.setAll(set.stream().map(Stage::new).collect(Collectors.toSet())));
-				listener.invalidated(null);
+		private boolean showPopup(FXItem<?, ?> item) {
+			if (true) return false;
+			Object object = item.get();
+			if (object instanceof Node node) {
+				boolean nonNull = node != null;
+				// Make sure we don't draw the popup over the ApplicationExplorer itself while we're using it
+				boolean isAncestor = node == getNode() ||
+						Nodes.isAncestor(node, getNode())
+//					||
+//					node instanceof FakeNode.Scene scene && scene.getActual() == getNode().getScene() ||
+//					node instanceof FakeNode.Window window && window.getActual() == getNode().getScene().getWindow()||
+//					node instanceof FakeNode.Stage stage && stage.getActual() == getNode().getScene().getWindow()
+						;
+				return nonNull && !isAncestor;
 			}
-
-			private final SetProperty<javafx.stage.Stage> stages = new SimpleSetProperty<>(this, "stages", FXCollections.observableSet(new HashSet<>()));
-
-			public SetProperty<javafx.stage.Stage> stagesProperty() {
-				return this.stages;
-			}
-
-			public ObservableSet<javafx.stage.Stage> getStages() {
-				return this.stagesProperty().getValue();
-			}
-
-			public void setStages(ObservableSet<javafx.stage.Stage> value) {
-				this.stagesProperty().setValue(value);
-			}
-		}
-
-		private static class Window extends FakeNode<javafx.stage.Window> {
-			public Window(javafx.stage.Window actual) {
-				super(actual);
-				actual.sceneProperty().map(Scene::new).subscribe(scene -> children.setAll(scene));
-			}
-		}
-
-		private static class Stage extends FakeNode<javafx.stage.Stage> {
-			public Stage(javafx.stage.Stage actual) {
-				super(actual);
-				actual.sceneProperty().map(Scene::new).subscribe(scene -> children.setAll(scene));
-				getProperties().put("NAME_OVERRIDE", actual.titleProperty());
-				visibleProperty().subscribe(visible -> {
-					if (visible) actual.show();
-					else actual.hide();
-				});
-				actual.showingProperty().subscribe(showing -> {
-					visibleProperty().set(showing);
-				});
-			}
-		}
-
-		private static class Scene extends FakeNode<javafx.scene.Scene> {
-			public Scene(javafx.scene.Scene actual) {
-				super(actual);
-				visibleProperty().bind(constant(true));
-				actual.rootProperty().subscribe(root -> children.setAll(root));
-				idProperty().bind(actual.userAgentStylesheetProperty());
-				actual.getStylesheets().addListener((ListChangeListener<? super String>) _ ->
-						getStyleClass().setAll(actual.getStylesheets()));
-			}
+			return true;
 		}
 	}
 }

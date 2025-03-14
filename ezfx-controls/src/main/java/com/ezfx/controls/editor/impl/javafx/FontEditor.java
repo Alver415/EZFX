@@ -22,8 +22,6 @@ import java.util.function.Function;
 
 public class FontEditor extends ObjectEditor<Font> {
 
-	private static final Logger log = LoggerFactory.getLogger(FontEditor.class);
-
 	@Override
 	protected Skin<?> createDefaultSkin() {
 		return new DefaultSkin(this);

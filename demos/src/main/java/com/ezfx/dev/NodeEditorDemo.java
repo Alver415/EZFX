@@ -2,7 +2,6 @@ package com.ezfx.dev;
 
 import com.ezfx.app.EZFXApplication;
 import com.ezfx.controls.editor.impl.javafx.NodeEditor;
-import com.ezfx.controls.editor.introspective.ClassBasedEditor;
 import com.ezfx.controls.icons.SVGs;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;

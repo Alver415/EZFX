@@ -12,6 +12,7 @@ import javafx.scene.control.Skin;
 
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,7 +22,7 @@ import static com.ezfx.base.utils.EZFX.observableTreeMapSupplier;
 
 public class ClassHierarchyEditor<T> extends PropertiesEditor<T> {
 
-	private final Map<Class<?>, PropertiesEditor<?>> cache = new HashMap<>();
+	private final Map<Class<?>, PropertiesEditor<?>> cache = new ConcurrentHashMap<>();
 
 	public ClassHierarchyEditor() {
 		super();
@@ -35,7 +36,10 @@ public class ClassHierarchyEditor<T> extends PropertiesEditor<T> {
 					valueFunction,
 					mergeFunction(),
 					observableTreeMapSupplier()));
+
+			// Bind each subEditor's value to this editor's value.
 			map.values().forEach(subEditor -> subEditor.setValue(value));
+
 			return map;
 		});
 	}
@@ -45,12 +49,12 @@ public class ClassHierarchyEditor<T> extends PropertiesEditor<T> {
 	}
 
 	@SuppressWarnings("unchecked")
-	private  <C extends T> PropertiesEditor<C> getCategoryEditor(Class<?> clazz) {
+	private <C extends T> PropertiesEditor<C> getCategoryEditor(Class<?> clazz) {
 		return (PropertiesEditor<C>) cache.computeIfAbsent(clazz, _ -> buildCategoryEditor((Class<C>) clazz));
 	}
 
 	protected <C extends T> PropertiesEditor<C> buildCategoryEditor(Class<C> clazz) {
-		return new ClassBasedEditor<>(clazz);
+		return new ClassPropertiesEditor<>(clazz);
 	}
 
 	@Override
@@ -71,24 +75,7 @@ public class ClassHierarchyEditor<T> extends PropertiesEditor<T> {
 				.ifPresent(getCategoryEditor(clazz)::setValue);
 	}
 
-
-	private final Property<EditorFactory> editorFactory;
-
-	{
-		EditorFactory factory = new EditorFactory() {
-			@Override
-			public <E> Optional<Editor<E>> buildEditor(Type type) {
-				if (type instanceof Class<?> clazz) {
-					//noinspection unchecked
-					return Optional.of((Editor<E>) new ClassBasedEditor<>(clazz));
-				} else {
-					return Optional.empty();
-				}
-			}
-		};
-
-		editorFactory = new SimpleObjectProperty<>(this, "editorFactory", factory);
-	}
+	private final Property<EditorFactory> editorFactory = new SimpleObjectProperty<>(this, "editorFactory", DEFAULT_EDITOR_FACTORY);
 
 	public Property<EditorFactory> editorFactoryProperty() {
 		return this.editorFactory;
@@ -101,4 +88,17 @@ public class ClassHierarchyEditor<T> extends PropertiesEditor<T> {
 	public void setEditorFactory(EditorFactory value) {
 		this.editorFactoryProperty().setValue(value);
 	}
+
+	private static final EditorFactory DEFAULT_EDITOR_FACTORY = new EditorFactory() {
+		@Override
+		public <E> Optional<Editor<E>> buildEditor(Type type) {
+			if (type instanceof Class<?> clazz) {
+				//noinspection unchecked
+				return Optional.of((Editor<E>) new ClassPropertiesEditor<>(clazz));
+			} else {
+				return Optional.empty();
+			}
+		}
+	};
+
 }

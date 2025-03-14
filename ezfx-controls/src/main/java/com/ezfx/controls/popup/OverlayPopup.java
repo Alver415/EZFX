@@ -1,7 +1,7 @@
 package com.ezfx.controls.popup;
 
-import com.ezfx.controls.info.NodeInfo;
-import javafx.beans.binding.Bindings;
+import com.ezfx.controls.info.FXItem;
+import com.ezfx.controls.info.FXItemInfo;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.PopupControl;
 import javafx.scene.control.Skin;
@@ -18,8 +17,6 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 import javafx.stage.Window;
 
 public class OverlayPopup extends PopupControl {
@@ -38,13 +35,13 @@ public class OverlayPopup extends PopupControl {
 
 		private static final Bounds DEFAULT_BOUNDING_BOX = new BoundingBox(0,0,0,0);
 		private final Pane pane;
-		private final NodeInfo info;
+		private final FXItemInfo info;
 		private final Label coordinates;
 
 		protected OverlayPopupSkin(OverlayPopup control) {
 			super(control);
 			this.pane = new Pane();
-			this.info = new NodeInfo();
+			this.info = new FXItemInfo();
 			this.coordinates = new Label();
 
 			pane.backgroundProperty().bind(control.backgroundProperty());
@@ -78,6 +75,7 @@ public class OverlayPopup extends PopupControl {
 		}
 
 		private void updateBounds(Bounds screenBounds) {
+			if (true) return;
 			control.setX(screenBounds.getMinX());
 			control.setY(screenBounds.getMinY());
 			control.setWidth(screenBounds.getWidth());
@@ -116,17 +114,17 @@ public class OverlayPopup extends PopupControl {
 		this.titleProperty().setValue(value);
 	}
 
-	private final Property<Node> target = new SimpleObjectProperty<>(this, "target");
+	private final Property<FXItem<?, ?>> target = new SimpleObjectProperty<>(this, "target");
 
-	public Property<Node> targetProperty() {
+	public Property<FXItem<?, ?>> targetProperty() {
 		return this.target;
 	}
 
-	public Node getTarget() {
+	public FXItem<?, ?> getTarget() {
 		return this.targetProperty().getValue();
 	}
 
-	public void setTarget(Node value) {
+	public void setTarget(FXItem<?, ?> value) {
 		this.targetProperty().setValue(value);
 	}
 

@@ -18,14 +18,14 @@ import java.util.*;
 
 import static com.ezfx.base.utils.ComplexBinding.bindBidirectional;
 
-public class ClassBasedEditor<T> extends PropertiesEditor<T> {
+public class ClassPropertiesEditor<T> extends PropertiesEditor<T> {
 
-	private static final Logger log = LoggerFactory.getLogger(ClassBasedEditor.class);
+	private static final Logger log = LoggerFactory.getLogger(ClassPropertiesEditor.class);
 
 	private final Map<PropertyInfo, Editor<?>> subEditorCache = new HashMap<>();
 	private Subscription bindingSubscriptions = Subscription.EMPTY;
 
-	public ClassBasedEditor(Class<T> clazz) {
+	public ClassPropertiesEditor(Class<T> clazz) {
 		//Build all subEditors for this specific subclass (not super classes)
 		List<Editor<Object>> subEditors = EZFXIntrospector.DEFAULT_INTROSPECTOR
 				.getDeclaredPropertyInfo(clazz)

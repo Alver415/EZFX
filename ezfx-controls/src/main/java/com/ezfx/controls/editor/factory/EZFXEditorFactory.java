@@ -1,7 +1,9 @@
 package com.ezfx.controls.editor.factory;
 
 import com.ezfx.controls.editor.Editor;
+import com.ezfx.controls.editor.FXItemEditor;
 import com.ezfx.controls.editor.impl.javafx.*;
+import com.ezfx.controls.info.FXItem;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Point3D;
@@ -26,7 +28,9 @@ public class EZFXEditorFactory implements EditorFactory {
 		if (!(type instanceof Class<?> classType)) return Optional.empty();
 		Editor<T> editor = null;
 
-		if (Node.class.isAssignableFrom(classType)) {
+		if (FXItem.class.isAssignableFrom(classType)) {
+			editor = (Editor<T>) new FXItemEditor();
+		} else if (Node.class.isAssignableFrom(classType)) {
 			editor = (Editor<T>) new NodeEditor();
 		} else if (Font.class.equals(classType)) {
 			editor = (Editor<T>) new FontEditor();

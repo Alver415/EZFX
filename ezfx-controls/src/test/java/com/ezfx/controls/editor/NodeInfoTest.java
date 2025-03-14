@@ -1,7 +1,5 @@
 package com.ezfx.controls.editor;
 
-import com.ezfx.controls.info.INodeInfoHelper;
-import com.ezfx.controls.info.NodeInfoHelper;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;

@@ -1,11 +1,13 @@
 package com.ezfx.app.editor;
 
 import com.ezfx.base.utils.ScreenBounds;
-import com.ezfx.controls.editor.EditorBase;
+import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.EditorSkinBase;
+import com.ezfx.controls.editor.FXItemEditor;
 import com.ezfx.controls.editor.ObjectEditor;
 import com.ezfx.controls.editor.impl.javafx.NodeEditor;
-import com.ezfx.controls.tree.SceneGraphTreeControl;
+import com.ezfx.controls.info.FXItem;
+import com.ezfx.controls.tree.FXTreeControl;
 import com.ezfx.controls.viewport.Viewport;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
@@ -38,34 +40,34 @@ public class SceneGraphEditor extends ObjectEditor<Node> {
 		return new DefaultSkin(this);
 	}
 
-	private final Property<Node> target = new SimpleObjectProperty<>(this, "target");
+	private final Property<FXItem<?, ?>> target = new SimpleObjectProperty<>(this, "target");
 
-	public Property<Node> targetProperty() {
+	public Property<FXItem<?, ?>> targetProperty() {
 		return this.target;
 	}
 
-	public Node getTarget() {
+	public FXItem<?, ?> getTarget() {
 		return this.targetProperty().getValue();
 	}
 
-	public void setTarget(Node value) {
+	public void setTarget(FXItem<?, ?> value) {
 		this.targetProperty().setValue(value);
 	}
 
 	public static class DefaultSkin extends EditorSkinBase<SceneGraphEditor, Node> {
 
-		private final SceneGraphTreeControl treeControl;
+		private final FXTreeControl treeControl;
 		private final Viewport viewport;
 		private final Canvas overlay;
 		private final StackPane editorWrapper;
-		private final NodeEditor nodeEditor;
-		private final ObservableValue<Node> target;
+		private final Editor<FXItem<?, ?>> targetEditor;
+		private final ObservableValue<FXItem<?, ?>> target;
 
 		protected BorderPane borderPane = new BorderPane();
 
 		protected DefaultSkin(SceneGraphEditor control) {
 			super(control);
-			treeControl = new SceneGraphTreeControl();
+			treeControl = new FXTreeControl();
 			viewport = new Viewport();
 			overlay = new Canvas();
 			overlay.setMouseTransparent(true);
@@ -80,9 +82,9 @@ public class SceneGraphEditor extends ObjectEditor<Node> {
 			left.setPrefWidth(450);
 			borderPane.setLeft(left);
 
-			nodeEditor = new NodeEditor();
-			bindBidirectional(nodeEditor.valueProperty(), control.targetProperty());
-			editorWrapper = new StackPane(nodeEditor);
+			targetEditor = new FXItemEditor();
+			bindBidirectional(targetEditor.valueProperty(), control.targetProperty());
+			editorWrapper = new StackPane(targetEditor.getNode());
 			ScrollPane right = new ScrollPane(editorWrapper);
 			right.setFitToWidth(true);
 			right.setFitToHeight(true);
@@ -90,7 +92,9 @@ public class SceneGraphEditor extends ObjectEditor<Node> {
 			borderPane.setRight(right);
 
 			target = Bindings.createObjectBinding(
-					() -> treeControl.getHoveredItem() != null ? treeControl.getHoveredItem() : treeControl.getSelectedItem(),
+					() -> treeControl.getHoveredItem() != null ?
+							treeControl.getHoveredItem() :
+							treeControl.getSelectedItem(),
 					treeControl.selectedItemProperty(), treeControl.hoveredItemProperty());
 
 			overlay.widthProperty().bind(viewport.widthProperty());
@@ -108,11 +112,11 @@ public class SceneGraphEditor extends ObjectEditor<Node> {
 					});
 
 
-			treeControl.rootProperty().bind(control.valueProperty());
+			treeControl.rootProperty().bind(control.valueProperty().map(FXItem::create));
 			viewport.contentProperty().bind(control.valueProperty()
 					.map(t -> t instanceof Parent p ? p : new StackPane(t)).orElse(new StackPane()));
 
-			treeControl.selectedItemProperty().subscribe(nodeEditor::setValue);
+			treeControl.selectedItemProperty().subscribe(targetEditor::setValue);
 		}
 	}
 }

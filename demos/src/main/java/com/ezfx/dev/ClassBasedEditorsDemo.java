@@ -1,11 +1,8 @@
 package com.ezfx.dev;
 
 import com.ezfx.app.EZFXApplication;
-import com.ezfx.app.stage.DecoratedStage;
-import com.ezfx.controls.editor.impl.standard.*;
-import com.ezfx.controls.editor.introspective.ClassBasedEditor;
+import com.ezfx.controls.editor.introspective.ClassPropertiesEditor;
 import com.ezfx.controls.icons.SVGs;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -28,7 +25,7 @@ public class ClassBasedEditorsDemo extends EZFXApplication {
 	}
 
 	private static Scene buildScene() {
-		ClassBasedEditor<Region> editor = new ClassBasedEditor<>(Region.class);
+		ClassPropertiesEditor<Region> editor = new ClassPropertiesEditor<>(Region.class);
 		Button exampleA = new Button("Example A");
 		exampleA.setOnAction(_ -> editor.setValue(exampleA));
 		Button exampleB = new Button("Example B");

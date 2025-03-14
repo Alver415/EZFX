@@ -6,6 +6,7 @@ import javafx.beans.value.ObservableValue;
 
 public class ObservableConstant<T> implements ObservableValue<T> {
 
+	public static final ObservableValue<Object> NONE = new ObservableConstant<>(null);
 	public static final ObservableValue<Boolean> TRUE = new ObservableConstant<>(true);
 	public static final ObservableValue<Boolean> FALSE = new ObservableConstant<>(false);
 
@@ -17,6 +18,11 @@ public class ObservableConstant<T> implements ObservableValue<T> {
 
 	public static <T> ObservableConstant<T> constant(T value) {
 		return CACHE.of(value);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> ObservableValue<T> none() {
+		return (ObservableValue<T>) NONE;
 	}
 
 	@Override

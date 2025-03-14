@@ -55,7 +55,7 @@ public class PathEditor extends EditorBase<Path> {
 			super.install();
 			bindBidirectional(textField.promptTextProperty(), editor.promptTextProperty());
 			bindBidirectional(textField.textProperty(), editor.valueProperty(),
-					Converter.of(Path::of, Path::toString));
+					Converter.of(Path::of, String::valueOf));
 		}
 	}
 

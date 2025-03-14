@@ -8,6 +8,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.VBox;
+import org.reactfx.util.Try;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +35,7 @@ public class TabPaneCategorizedSkin<E extends Control & Editor<T> & CategorizedM
 				.map(categorizedEditors -> categorizedEditors.entrySet().stream().map(this::getTab).toList())
 				.orElse(List.of())
 				.subscribe((oldTabs, newTabs) -> {
-					// Try to stay on the closes relevant tab.
+//					 Try to stay on the closes relevant tab.
 					int i = Math.min(tabPane.getSelectionModel().getSelectedIndex(), newTabs.size() - 1);
 					while (i >= 0 && i < newTabs.size() && i < oldTabs.size()){
 						Tab oldTab = oldTabs.get(i);

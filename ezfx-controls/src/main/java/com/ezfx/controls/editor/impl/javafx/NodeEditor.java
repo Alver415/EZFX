@@ -5,19 +5,16 @@ import com.ezfx.base.utils.Converters;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.Editors;
 import com.ezfx.controls.editor.PropertiesEditor;
-import com.ezfx.controls.editor.factory.EditorFactory;
 import com.ezfx.controls.editor.impl.standard.DoubleEditor;
-import com.ezfx.controls.editor.introspective.ClassBasedEditor;
 import com.ezfx.controls.editor.introspective.ClassHierarchyEditor;
+import com.ezfx.controls.editor.introspective.ClassPropertiesEditor;
 import javafx.beans.property.Property;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.layout.Region;
 
-import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 import static com.ezfx.base.utils.ComplexBinding.bindBidirectional;
@@ -25,24 +22,6 @@ import static com.ezfx.base.utils.Properties.convert;
 import static com.ezfx.controls.editor.Editors.key;
 
 public class NodeEditor extends ClassHierarchyEditor<Node> {
-
-	public NodeEditor() {
-		setEditorFactory(new EditorFactory() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public <T> Optional<Editor<T>> buildEditor(Type type) {
-				if (type.equals(Node.class)) {
-					return Optional.of((Editor<T>) new NodeClassEditor());
-				} else if (type.equals(Region.class)) {
-					return Optional.of((Editor<T>) new RegionClassEditor());
-				} else if (type instanceof Class<?> clazz) {
-					return Optional.of((Editor<T>) new ClassBasedEditor<>(clazz));
-				} else {
-					return Optional.empty();
-				}
-			}
-		});
-	}
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -52,12 +31,12 @@ public class NodeEditor extends ClassHierarchyEditor<Node> {
 		} else if (clazz.equals(Region.class)) {
 			return (PropertiesEditor<C>) new RegionClassEditor();
 		}
-		return new ClassBasedEditor<>(clazz);
+		return new ClassPropertiesEditor<>(clazz);
 	}
 
 	private static final Converter<Double, Number> DOUBLE_TO_NUMBER = Converters.NUMBER_TO_DOUBLE.inverted();
 
-	public static class NodeClassEditor extends ClassBasedEditor<Node> {
+	public static class NodeClassEditor extends ClassPropertiesEditor<Node> {
 
 		private static final Predicate<Editor<?>> FILTER = editor ->
 				editor.getTitle().startsWith("on") ||
@@ -100,7 +79,7 @@ public class NodeEditor extends ClassHierarchyEditor<Node> {
 		}
 	}
 
-	public static class RegionClassEditor extends ClassBasedEditor<Region> {
+	public static class RegionClassEditor extends ClassPropertiesEditor<Region> {
 
 		private final Predicate<Editor<?>> filter = editor ->
 				List.of("prefwidth", "minwidth", "maxwidth", "prefheight", "minheight", "maxheight")
