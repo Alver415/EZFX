@@ -13,11 +13,6 @@ import javafx.stage.Stage;
 
 public class StyleEditorDemo extends Application {
 
-
-	public static void main(String... args) {
-		Application.launch(StyleEditorDemo.class);
-	}
-
 	@Override
 	public void start(Stage stage) {
 		Screens.setScreen(stage, 1);

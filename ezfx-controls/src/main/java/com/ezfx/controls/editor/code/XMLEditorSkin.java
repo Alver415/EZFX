@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 import static com.ezfx.base.utils.EZFX.runFX;
 import static com.ezfx.base.utils.EZFX.runOnVirtualThread;
 
-public class XMLEditorSkin extends EditorSkinBase<EditorBase<String>, String> {
+public class XMLEditorSkin extends CodeEditorSkin {
 	private static final String STYLE_SHEET = Resources.css(XMLEditorSkin.class, "XMLEditorSkin.css");
 
 	private static final Pattern XML_TAG = Pattern.compile(
@@ -35,24 +35,13 @@ public class XMLEditorSkin extends EditorSkinBase<EditorBase<String>, String> {
 	private static final int GROUP_EQUAL_SYMBOL = 2;
 	private static final int GROUP_ATTRIBUTE_VALUE = 3;
 
-	private final VirtualizedScrollPane<CodeArea> scrollPane;
-	private final CodeArea codeArea;
 
 	public XMLEditorSkin(EditorBase<String> editor) {
-		super(editor);
-		codeArea = new CodeArea();
-		codeArea.getStylesheets().add(STYLE_SHEET);
-		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
-		codeArea.textProperty().addListener((_, _, newText) -> runOnVirtualThread(() -> {
-			StyleSpans<Collection<String>> styleSpans = computeHighlighting(newText);
-			runFX(() -> codeArea.setStyleSpans(0, styleSpans));
-		}));
-
-		scrollPane = new VirtualizedScrollPane<>(codeArea);
-		getChildren().setAll(scrollPane);
+		super(editor, STYLE_SHEET);
 	}
 
-	private static StyleSpans<Collection<String>> computeHighlighting(String text) {
+	@Override
+	protected StyleSpans<Collection<String>> computeHighlighting(String text) {
 		Matcher matcher = XML_TAG.matcher(text);
 		int lastKwEnd = 0;
 		StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();

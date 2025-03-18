@@ -22,7 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class JavaEditorSkin extends EditorSkinBase<EditorBase<String>, String> {
+public class JavaEditorSkin extends CodeEditorSkin {
 	private static final String STYLE_SHEET = Resources.css(JavaEditorSkin.class, "JavaEditorSkin.css");
 
 	private static final String[] KEYWORDS = new String[]{
@@ -51,51 +51,12 @@ public class JavaEditorSkin extends EditorSkinBase<EditorBase<String>, String> {
 					.formatted(KEYWORD_PATTERN, PAREN_PATTERN, BRACE_PATTERN, BRACKET_PATTERN, SEMICOLON_PATTERN, STRING_PATTERN, COMMENT_PATTERN));
 	private static final Logger log = LoggerFactory.getLogger(JavaEditorSkin.class);
 
-	private final CodeArea codeArea;
-	private final ExecutorService executor = Executors.newSingleThreadExecutor();
-
 	public JavaEditorSkin(EditorBase<String> editor) {
-		super(editor);
-		codeArea = new CodeArea();
-		codeArea.getStylesheets().add(STYLE_SHEET);
-		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
-
-		Subscription cleanupWhenDone = codeArea.multiPlainChanges()
-				.successionEnds(Duration.ofMillis(500))
-				.retainLatestUntilLater(executor)
-				.supplyTask(this::computeHighlightingAsync)
-				.awaitLatest(codeArea.multiPlainChanges())
-				.filterMap(t -> {
-					if (t.isSuccess()) {
-						return Optional.of(t.get());
-					} else {
-						log.warn(t.getFailure().getMessage(), t.getFailure());
-						return Optional.empty();
-					}
-				})
-				.subscribe(this::applyHighlighting);
-
-		VirtualizedScrollPane<CodeArea> scrollPane = new VirtualizedScrollPane<>(codeArea);
-		getChildren().setAll(scrollPane);
+		super(editor, STYLE_SHEET);
 	}
 
-	private Task<StyleSpans<Collection<String>>> computeHighlightingAsync() {
-		String text = codeArea.getText();
-		Task<StyleSpans<Collection<String>>> task = new Task<>() {
-			@Override
-			protected StyleSpans<Collection<String>> call() {
-				return computeHighlighting(text);
-			}
-		};
-		executor.execute(task);
-		return task;
-	}
-
-	private void applyHighlighting(StyleSpans<Collection<String>> highlighting) {
-		codeArea.setStyleSpans(0, highlighting);
-	}
-
-	private static StyleSpans<Collection<String>> computeHighlighting(String text) {
+	@Override
+	protected StyleSpans<Collection<String>> computeHighlighting(String text) {
 		Matcher matcher = PATTERN.matcher(text);
 		int lastKwEnd = 0;
 		StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();

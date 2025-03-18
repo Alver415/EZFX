@@ -27,9 +27,15 @@ public class CodeEditorSkin extends EditorSkinBase<EditorBase<String>, String> {
 
 	private VirtualizedScrollPane<CodeArea> scrollPane;
 	private CodeArea codeArea;
+	private String styleSheet;
 
 	public CodeEditorSkin(EditorBase<String> editor) {
 		super(editor);
+	}
+
+	public CodeEditorSkin(EditorBase<String> editor, String styleSheet) {
+		super(editor);
+		this.styleSheet = styleSheet;
 	}
 
 	@Override
@@ -37,10 +43,11 @@ public class CodeEditorSkin extends EditorSkinBase<EditorBase<String>, String> {
 		super.install();
 		codeArea = new CodeArea();
 		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+		if (styleSheet != null) codeArea.getStylesheets().add(styleSheet);
 		scrollPane = new VirtualizedScrollPane<>(codeArea);
 
 		highlightingSubscription = codeArea.multiPlainChanges()
-				.successionEnds(Duration.ofMillis(500))
+				.successionEnds(Duration.ofMillis(1))
 				.retainLatestUntilLater(executor)
 				.supplyTask(() -> {
 					String text = codeArea.getText();
@@ -62,7 +69,10 @@ public class CodeEditorSkin extends EditorSkinBase<EditorBase<String>, String> {
 						return Optional.empty();
 					}
 				})
-				.subscribe(highlighting -> codeArea.setStyleSpans(0, highlighting));
+				.subscribe(highlighting -> {
+					codeArea.setStyleSpans(0, highlighting);
+					codeArea.layoutChildren();
+				});
 
 		//Binding
 		codeArea.replaceText(Optional.ofNullable(getValue()).orElse(""));

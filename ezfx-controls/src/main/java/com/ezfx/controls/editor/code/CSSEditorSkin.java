@@ -18,7 +18,7 @@ public class CSSEditorSkin extends CodeEditorSkin {
 			""", Pattern.DOTALL);
 
 	public CSSEditorSkin(EditorBase<String> editor) {
-		super(editor);
+		super(editor, STYLE_SHEET);
 	}
 
 	@Override
@@ -43,17 +43,5 @@ public class CSSEditorSkin extends CodeEditorSkin {
 		}
 		spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
 		return spansBuilder.create();
-	}
-
-	@Override
-	public void install() {
-		super.install();
-		getStylesheets().add(STYLE_SHEET);
-	}
-
-	@Override
-	public void dispose() {
-		super.dispose();
-		getStylesheets().remove(STYLE_SHEET);
 	}
 }
