@@ -6,6 +6,8 @@ import com.ezfx.base.utils.ScreenBounds;
 import com.ezfx.controls.item.FXItemFactory;
 import com.ezfx.controls.item.FXItemInfo;
 import javafx.animation.TranslateTransition;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.geometry.Rectangle2D;
@@ -73,11 +75,17 @@ public class BoundsTestingApplication extends EZFXApplication {
 		second.setWidth(400);
 		second.setHeight(600);
 		FXItemInfo item = new FXItemInfo();
-		item.setId("testtesttesttesttesttesttesttesttest");
+		item.setId("exmapleId");
 		item.getStyleClass().addAll("first", "second", "third");
 		item.setSubject(FXItemFactory.CACHED.create(item));
 		second.setScene(new Scene(new VBox(new Button("test"), new Slider(), item)));
 		second.show();
+
+		StringProperty string = new SimpleStringProperty();
+		string.subscribe(s -> System.out.println(s));
+		string.subscribe((a, b) -> System.out.printf("%s -> %s%n", a, b));
+		string.set("test A");
+		string.set("test B");
 
 	}
 

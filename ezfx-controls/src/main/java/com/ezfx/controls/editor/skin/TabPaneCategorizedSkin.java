@@ -1,14 +1,13 @@
 package com.ezfx.controls.editor.skin;
 
 import com.ezfx.controls.editor.*;
-import javafx.collections.ObservableList;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.control.Control;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.VBox;
-import org.reactfx.util.Try;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,25 +29,31 @@ public class TabPaneCategorizedSkin<E extends Control & Editor<T> & CategorizedM
 				-fx-close-tab-animation: NONE;
 				-fx-open-tab-animation: NONE;
 				""");
-
-		control.categorizedEditorsProperty()
-				.map(categorizedEditors -> categorizedEditors.entrySet().stream().map(this::getTab).toList())
-				.orElse(List.of())
-				.subscribe((oldTabs, newTabs) -> {
-//					 Try to stay on the closes relevant tab.
-					int i = Math.min(tabPane.getSelectionModel().getSelectedIndex(), newTabs.size() - 1);
-					while (i >= 0 && i < newTabs.size() && i < oldTabs.size()){
-						Tab oldTab = oldTabs.get(i);
-						Tab newTab = newTabs.get(i);
-						if (oldTab == newTab){
-							break;
-						}
-						i--;
-					}
-					tabPane.getTabs().setAll(newTabs);
-					tabPane.getSelectionModel().select(i);
-				});
 		setChildren(tabPane);
+
+		ObservableValue<List<Tab>> tabs = control.categorizedEditorsProperty()
+				.map(categorizedEditors -> categorizedEditors.entrySet().stream().map(this::getTab).toList())
+				.orElse(List.of());
+		tabs.subscribe(this::updateTabs);
+		updateTabs(null, tabs.getValue());
+	}
+
+	private void updateTabs(List<Tab> oldTabs, List<Tab> newTabs) {
+		int selectedIndex = tabPane.getSelectionModel().getSelectedIndex();
+		tabPane.getTabs().setAll(newTabs);
+		if (oldTabs != null) {
+			// Try to stay on the closes relevant tab.
+			int i = Math.min(selectedIndex, newTabs.size() - 1);
+			while (i >= 0 && i < newTabs.size() && i < oldTabs.size()) {
+				Tab oldTab = oldTabs.get(i);
+				Tab newTab = newTabs.get(i);
+				if (oldTab == newTab) {
+					break;
+				}
+				i--;
+			}
+			tabPane.getSelectionModel().select(i);
+		}
 	}
 
 	private Tab getTab(Map.Entry<Category, ? extends Editor<?>> entry) {

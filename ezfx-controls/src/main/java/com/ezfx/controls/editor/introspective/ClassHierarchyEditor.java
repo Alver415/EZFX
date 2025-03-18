@@ -7,6 +7,7 @@ import com.ezfx.controls.editor.factory.EditorFactory;
 import com.ezfx.controls.editor.skin.TabPaneCategorizedSkin;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.scene.control.Skin;
 
@@ -31,15 +32,16 @@ public class ClassHierarchyEditor<T> extends PropertiesEditor<T> {
 			List<Class<?>> classesInHierarchy = getClassesInHierarchy(value.getClass());
 			Function<Class<?>, Category> keyFunction = this::getCategory;
 			Function<Class<?>, PropertiesEditor<T>> valueFunction = this::getCategoryEditor;
-			ObservableMap<Category, PropertiesEditor<T>> map = classesInHierarchy.stream().collect(Collectors.toMap(
-					keyFunction,
-					valueFunction,
-					mergeFunction(),
-					observableTreeMapSupplier()));
-
-			// Bind each subEditor's value to this editor's value.
-			map.values().forEach(subEditor -> subEditor.setValue(value));
-
+			ObservableMap<Category, PropertiesEditor<T>> map = FXCollections.observableMap(new TreeMap<>());
+			for (Class<?> clazz : classesInHierarchy){
+				Category key = keyFunction.apply(clazz);
+				PropertiesEditor<T> val = valueFunction.apply(clazz);
+				val.setValue(value);
+				if (val.getEditors().isEmpty()){
+					continue;
+				}
+				map.put(key, val);
+			}
 			return map;
 		});
 	}
@@ -67,38 +69,4 @@ public class ClassHierarchyEditor<T> extends PropertiesEditor<T> {
 				baseClass.getSuperclass(), Objects::nonNull, Class::getSuperclass);
 		return Stream.concat(Stream.of(baseClass), stream).toList();
 	}
-
-	private void updateSubEditor(Class<T> clazz) {
-		Optional.ofNullable(getValue())
-				.filter(clazz::isInstance)
-				.map(clazz::cast)
-				.ifPresent(getCategoryEditor(clazz)::setValue);
-	}
-
-	private final Property<EditorFactory> editorFactory = new SimpleObjectProperty<>(this, "editorFactory", DEFAULT_EDITOR_FACTORY);
-
-	public Property<EditorFactory> editorFactoryProperty() {
-		return this.editorFactory;
-	}
-
-	public EditorFactory getEditorFactory() {
-		return this.editorFactoryProperty().getValue();
-	}
-
-	public void setEditorFactory(EditorFactory value) {
-		this.editorFactoryProperty().setValue(value);
-	}
-
-	private static final EditorFactory DEFAULT_EDITOR_FACTORY = new EditorFactory() {
-		@Override
-		public <E> Optional<Editor<E>> buildEditor(Type type) {
-			if (type instanceof Class<?> clazz) {
-				//noinspection unchecked
-				return Optional.of((Editor<E>) new ClassPropertiesEditor<>(clazz));
-			} else {
-				return Optional.empty();
-			}
-		}
-	};
-
 }
