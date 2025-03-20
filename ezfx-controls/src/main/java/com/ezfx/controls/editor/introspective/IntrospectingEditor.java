@@ -1,5 +1,6 @@
 package com.ezfx.controls.editor.introspective;
 
+import com.ezfx.base.introspector.Introspector;
 import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.factory.EditorFactory;
 import com.ezfx.controls.editor.ObjectEditor;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 
 import static com.ezfx.base.utils.EZFX.toObservableArrayList;
 import static com.ezfx.controls.editor.factory.IntrospectingEditorFactory.DEFAULT_FACTORY;
-import static com.ezfx.controls.editor.introspective.EZFXIntrospector.DEFAULT_INTROSPECTOR;
+import static com.ezfx.base.introspector.EZFXIntrospector.DEFAULT_INTROSPECTOR;
 import static java.lang.reflect.Modifier.*;
 
 @SuppressWarnings("unchecked")

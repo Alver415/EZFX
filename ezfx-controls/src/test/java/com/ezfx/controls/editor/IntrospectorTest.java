@@ -1,7 +1,7 @@
 package com.ezfx.controls.editor;
 
-import com.ezfx.controls.editor.introspective.Introspector;
-import com.ezfx.controls.editor.introspective.EZFXIntrospector;
+import com.ezfx.base.introspector.Introspector;
+import com.ezfx.base.introspector.EZFXIntrospector;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

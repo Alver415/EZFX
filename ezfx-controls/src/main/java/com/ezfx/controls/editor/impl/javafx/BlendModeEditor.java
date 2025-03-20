@@ -1,7 +1,6 @@
 package com.ezfx.controls.editor.impl.javafx;
 
 import com.ezfx.controls.editor.impl.standard.SelectionEditor;
-import javafx.beans.property.Property;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
@@ -12,8 +11,11 @@ import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.ColorInput;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 
 import java.util.Arrays;
+
+import static com.ezfx.base.utils.EZFX.runLaterFX;
 
 public class BlendModeEditor extends SelectionEditor<BlendMode> {
 

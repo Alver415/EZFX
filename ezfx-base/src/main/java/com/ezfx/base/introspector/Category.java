@@ -1,4 +1,4 @@
-package com.ezfx.controls.editor;
+package com.ezfx.base.introspector;
 
 import java.util.Comparator;
 

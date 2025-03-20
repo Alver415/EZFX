@@ -1,5 +1,8 @@
 package com.ezfx.controls.editor.introspective;
 
+import com.ezfx.base.introspector.Category;
+import com.ezfx.base.introspector.Introspector;
+import com.ezfx.base.introspector.PropertyInfo;
 import com.ezfx.controls.editor.*;
 import com.ezfx.controls.editor.factory.EditorFactory;
 import com.ezfx.controls.editor.skin.TabPaneCategorizedSkin;
@@ -22,7 +25,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static com.ezfx.controls.editor.factory.IntrospectingEditorFactory.DEFAULT_FACTORY;
-import static com.ezfx.controls.editor.introspective.EZFXIntrospector.DEFAULT_INTROSPECTOR;
+import static com.ezfx.base.introspector.EZFXIntrospector.DEFAULT_INTROSPECTOR;
 
 @SuppressWarnings("unchecked")
 public class IntrospectingPropertiesEditor<T> extends PropertiesEditor<T> {

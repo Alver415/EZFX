@@ -1,25 +1,16 @@
 package com.ezfx.controls.editor.introspective;
 
-import com.ezfx.controls.editor.Category;
-import com.ezfx.controls.editor.Editor;
+import com.ezfx.base.introspector.Category;
 import com.ezfx.controls.editor.PropertiesEditor;
-import com.ezfx.controls.editor.factory.EditorFactory;
 import com.ezfx.controls.editor.skin.TabPaneCategorizedSkin;
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.scene.control.Skin;
 
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static com.ezfx.base.utils.EZFX.mergeFunction;
-import static com.ezfx.base.utils.EZFX.observableTreeMapSupplier;
 
 public class ClassHierarchyEditor<T> extends PropertiesEditor<T> {
 

@@ -3,6 +3,7 @@ package com.ezfx.controls.editor.impl.javafx;
 import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.EditorSkinBase;
 import com.ezfx.controls.editor.ObjectEditor;
+import com.ezfx.controls.editor.introspective.ClassHierarchyEditor;
 import com.ezfx.controls.editor.introspective.IntrospectingPropertiesEditor;
 import com.ezfx.controls.icons.Icons;
 import com.ezfx.controls.misc.ProgressView;
@@ -58,12 +59,12 @@ public class ApplicationEditor extends ObjectEditor<Application> {
 			Button forceClose = new Button("FORCE CLOSE");
 			forceClose.setOnAction(_ -> forceClose());
 
-			IntrospectingPropertiesEditor<Application> subEditor = new IntrospectingPropertiesEditor<>(editor.valueProperty());
+			ClassHierarchyEditor<Application> subEditor = new ClassHierarchyEditor<>();
+			subEditor.valueProperty().bind(editor.valueProperty());
 
 			HBox frameRateBox = new HBox(4, frameRateLabel, frameRateBar);
 			HBox frameIntervalBox = new HBox(4, frameIntervalLabel, frameIntervalBar);
 			VBox vBox = new VBox(8, spinner, frameRateBox, frameIntervalBox, subEditor, forceClose);
-
 
 			StackPane stackPane = new StackPane(vBox);
 			stackPane.setPadding(new Insets(8));

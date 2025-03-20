@@ -36,7 +36,7 @@ public interface Resources {
 	static Image image(Class<?> clazz, String resource) {
 		InputStream resourceStream = clazz.getResourceAsStream(resource);
 		if (resourceStream == null) {
-			log.warn("Failed to find resource: %s %s".formatted(clazz, resource));
+			log.debug("Failed to find resource: %s %s".formatted(clazz, resource));
 			return null;
 		}
 		return new Image(resourceStream);

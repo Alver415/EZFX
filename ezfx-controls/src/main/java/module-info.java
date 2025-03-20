@@ -15,6 +15,7 @@ open module ezfx.controls {
 	exports com.ezfx.controls.popup;
 	exports com.ezfx.controls.item;
 	exports com.ezfx.controls.editor.impl.filesystem;
+	exports com.ezfx.controls;
 
 
 	// EZFX

@@ -138,12 +138,13 @@ public class SceneGraphEditor extends ObjectEditor<Node> {
 
 
 			fxmlEditor.setSkin(new XMLEditorSkin(fxmlEditor));
-			fxmlTab.setOnSelectionChanged(_ -> {
-				String fxml = new FXMLSaver().serialize(
-						editor.getValue() instanceof Node node ? node : null);
-				fxmlEditor.setValue(fxml);
-			});
 
+			FXMLSaver saver = new FXMLSaver();
+			treeControl.selectedItemProperty().map(FXItem::get).addListener((_, _, newValue) -> {
+				if (newValue instanceof Node node){
+					fxmlEditor.setValue(saver.serialize(node));
+				}
+			});
 		}
 	}
 }

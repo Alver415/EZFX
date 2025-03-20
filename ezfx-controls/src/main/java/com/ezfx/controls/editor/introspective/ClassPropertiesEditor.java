@@ -1,5 +1,7 @@
 package com.ezfx.controls.editor.introspective;
 
+import com.ezfx.base.introspector.EZFXIntrospector;
+import com.ezfx.base.introspector.PropertyInfo;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.EditorBase;
 import com.ezfx.controls.editor.ListEditor;
@@ -46,7 +48,14 @@ public class ClassPropertiesEditor<T> extends PropertiesEditor<T> {
 		if (value == null) return;
 		Property<A> valueProperty = getProperty(propertyInfo, value);
 		Property<A> editorProperty = editor.valueProperty();
-		bindingSubscriptions = bindingSubscriptions.and(bindBidirectional(editorProperty, valueProperty));
+		if (valueProperty.isBound()){
+			editorProperty.bind(valueProperty);
+			editor.getNode().setDisable(true);
+			bindingSubscriptions = bindingSubscriptions.and(editorProperty::unbind);
+			bindingSubscriptions = bindingSubscriptions.and(() -> editor.getNode().setDisable(false));
+		} else {
+			bindingSubscriptions = bindingSubscriptions.and(bindBidirectional(editorProperty, valueProperty));
+		}
 	}
 
 	private <R> Property<R> getProperty(PropertyInfo propertyInfo, Object value) {

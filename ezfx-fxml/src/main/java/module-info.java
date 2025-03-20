@@ -1,8 +1,12 @@
 open module ezfx.fxml {
 	exports com.ezfx.fxml;
 
+	// EZFX
+	requires transitive ezfx.base;
+
 	// JavaFX
 	requires transitive javafx.base;
+	requires transitive javafx.controls;
 	requires transitive javafx.fxml;
 	requires transitive javafx.graphics;
 

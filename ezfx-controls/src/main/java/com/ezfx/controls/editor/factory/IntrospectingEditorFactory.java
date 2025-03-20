@@ -7,7 +7,7 @@ import com.ezfx.controls.editor.introspective.IntrospectingPropertiesEditor;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
-import static com.ezfx.controls.editor.introspective.EZFXIntrospector.DEFAULT_INTROSPECTOR;
+import static com.ezfx.base.introspector.EZFXIntrospector.DEFAULT_INTROSPECTOR;
 
 public class IntrospectingEditorFactory implements EditorFactory {
 

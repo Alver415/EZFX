@@ -1,7 +1,7 @@
 package com.ezfx.controls.editor;
 
+import com.ezfx.base.introspector.Category;
 import javafx.beans.property.MapProperty;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 
 public interface CategorizedMultiEditor<T, S extends Editor<T>> extends MultiEditor<T> {

@@ -1,5 +1,6 @@
 package com.ezfx.controls.editor.introspective;
 
+import com.ezfx.base.introspector.Introspector;
 import com.ezfx.base.observable.ObservableObjectArrayImpl;
 import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.EditorBase;

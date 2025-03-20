@@ -29,7 +29,7 @@ public class EZFXEditorFactory implements EditorFactory {
 		Editor<T> editor = null;
 
 		if (FXItem.class.isAssignableFrom(classType)) {
-			editor = (Editor<T>) new FXItemEditor();
+			editor = (Editor<T>) new FXItemEditor<>();
 		} else if (Node.class.isAssignableFrom(classType)) {
 			editor = (Editor<T>) new NodeEditor();
 		} else if (Font.class.equals(classType)) {

@@ -1,6 +1,5 @@
 package com.ezfx.controls.editor;
 
-import com.ezfx.controls.editor.introspective.ActionIntrospector;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -8,7 +7,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import org.controlsfx.control.action.Action;
-import org.controlsfx.control.action.ActionProxy;
 
 import java.util.Optional;
 

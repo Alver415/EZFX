@@ -96,7 +96,7 @@ public class ActionIntrospector {
 			int modifiers = method.getModifiers();
 			boolean isPublic = Modifier.isPublic(modifiers);
 			boolean isStatic = Modifier.isStatic(modifiers);
-			if (!isPublic || isStatic){
+			if (!isPublic || isStatic) {
 				continue;
 			}
 

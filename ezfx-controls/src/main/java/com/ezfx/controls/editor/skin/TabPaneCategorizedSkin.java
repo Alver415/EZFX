@@ -1,5 +1,6 @@
 package com.ezfx.controls.editor.skin;
 
+import com.ezfx.base.introspector.Category;
 import com.ezfx.controls.editor.*;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;

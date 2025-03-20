@@ -11,32 +11,25 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 public abstract class EZFXApplication extends Application {
 
 	private static final Logger log = LoggerFactory.getLogger(EZFXApplication.class);
+	private ObservableValue<String> userAgentStylesheet;
 
 	@Override
 	public void init() throws Exception {
@@ -63,7 +56,7 @@ public abstract class EZFXApplication extends Application {
 			window.removeEventFilter(KeyEvent.KEY_PRESSED, handleDevToolsAction);
 			window.addEventHandler(KeyEvent.KEY_PRESSED, handleDevToolsAction);
 
-			if (window instanceof Stage stage){
+			if (window instanceof Stage stage) {
 				if (stage.getTitle() == null && getTitle() != null) {
 					stage.setTitle(getTitle());
 				}
@@ -71,10 +64,10 @@ public abstract class EZFXApplication extends Application {
 
 		}));
 
-		themeProperty()
+		userAgentStylesheet = themeProperty()
 				.map(ApplicationTheme::getTheme)
-				.map(Theme::getUserAgentStylesheet)
-				.subscribe(Application::setUserAgentStylesheet);
+				.map(Theme::getUserAgentStylesheet);
+		userAgentStylesheet.subscribe(Application::setUserAgentStylesheet);
 	}
 
 	@Override

@@ -1,6 +1,4 @@
-package com.ezfx.controls.editor.introspective;
-
-import com.ezfx.controls.editor.Category;
+package com.ezfx.base.introspector;
 
 import java.lang.reflect.Method;
 

@@ -14,6 +14,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -40,8 +41,7 @@ public class FXMLEditorApplication extends EZFXApplication {
 	}
 
 	@Override
-	public void start(Stage primaryStage) throws Exception {
-		Stage stage = new DecoratedStage();
+	public void start(Stage stage) throws Exception {
 		SceneGraphEditor sceneEditor = new SceneGraphEditor();
 
 		content = pathProperty().map(fileSystem::get)

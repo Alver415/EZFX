@@ -1,6 +1,5 @@
 package com.ezfx.base.utils;
 
-import javafx.scene.paint.Color;
 import javafx.util.StringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,7 @@ public interface Converters {
 	//endregion Numbers
 
 
-	static <T> StringConverter<T> asStringConverter(Converter<String, T> converter){
+	static <T> StringConverter<T> asStringConverter(Converter<String, T> converter) {
 		return new StringConverter<>() {
 			@Override
 			public String toString(T object) {
@@ -53,8 +52,8 @@ public interface Converters {
 
 	private static <A, B> Converter<A, B> create(Function<A, B> to, Function<B, A> from) {
 		return Converter.of(wrap(to), wrap(from));
-
 	}
+
 	private static <T, R> Function<T, R> wrap(Function<T, R> function) {
 		return t -> {
 			try {

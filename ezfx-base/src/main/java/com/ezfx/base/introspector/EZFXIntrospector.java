@@ -1,8 +1,7 @@
-package com.ezfx.controls.editor.introspective;
+package com.ezfx.base.introspector;
 
 import com.ezfx.base.utils.CachedProxy;
 import com.ezfx.base.utils.EZFXCollections;
-import com.ezfx.controls.editor.Category;
 import javafx.beans.NamedArg;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.MapProperty;
@@ -23,7 +22,10 @@ import javafx.scene.paint.Color;
 
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class EZFXIntrospector extends StandardIntrospector {
@@ -49,6 +51,7 @@ public class EZFXIntrospector extends StandardIntrospector {
 		return propertyInfoStream.sorted(byTypeThenName).toList();
 	}
 
+	// TODO: Remove this custom logic. Move to wherever its needed, but not here.
 	private static Stream<PropertyInfo> recategorize(List<PropertyInfo> original) {
 		return original.stream().map(propertyInfo -> {
 			Class<?> clazz = propertyInfo.property().getDeclaringClass();

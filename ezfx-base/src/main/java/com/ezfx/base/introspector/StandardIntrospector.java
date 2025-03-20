@@ -1,7 +1,5 @@
-package com.ezfx.controls.editor.introspective;
+package com.ezfx.base.introspector;
 
-import com.ezfx.controls.editor.Category;
-import com.ezfx.controls.editor.PropertyMetadata;
 import javafx.beans.property.Property;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -18,6 +16,7 @@ public class StandardIntrospector implements Introspector {
 
 	private static final Logger log = LoggerFactory.getLogger(StandardIntrospector.class);
 
+	//TODO: Initialize off of application thread, ideally in parallel during startup.
 	private static final Reflections reflections = new Reflections(new ConfigurationBuilder()
 			.forPackages("com") // TODO: Scan all packages instead of just 'com'
 			.addScanners(Scanners.values()));
@@ -51,27 +50,26 @@ public class StandardIntrospector implements Introspector {
 			boolean endsWithProperty = methodName.endsWith("Property");
 			boolean assignableFromProperty = Property.class.isAssignableFrom(method.getReturnType());
 			if (endsWithProperty && assignableFromProperty) {
-				String rootName = methodName
-						.substring(0, methodName.length() - "Property".length())
-						.toLowerCase();
-				propertyMethods.put(rootName, method);
+				String rootName = methodName.substring(0, methodName.length() - "Property".length());
+				propertyMethods.put(Introspector.decapitalize(rootName), method);
 			}
 			boolean startsWithSet = methodName.startsWith("set");
 			boolean singleParameter = method.getParameterCount() == 1;
 			if (startsWithSet && singleParameter) {
-				String rootName = methodName.substring("set".length()).toLowerCase();
-				setMethods.put(rootName, method);
+				String rootName = methodName.substring("set".length());
+				setMethods.put(Introspector.decapitalize(rootName), method);
 			}
 			boolean startsWithGet = methodName.startsWith("get");
 			boolean startsWithIs = methodName.startsWith("is");
 			boolean hasReturnType = method.getReturnType() != Void.class;
-			if (hasReturnType) {
+			boolean zeroParameters = method.getParameterCount() == 0;
+			if (hasReturnType && zeroParameters) {
 				if (startsWithGet) {
-					String rootName = methodName.substring("get".length()).toLowerCase();
-					getMethods.put(rootName, method);
+					String rootName = methodName.substring("get".length());
+					getMethods.put(Introspector.decapitalize(rootName), method);
 				} else if (startsWithIs) {
-					String rootName = methodName.substring("is".length()).toLowerCase();
-					getMethods.put(rootName, method);
+					String rootName = methodName.substring("is".length());
+					getMethods.put(Introspector.decapitalize(rootName), method);
 				}
 			}
 		}

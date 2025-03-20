@@ -1,16 +1,14 @@
 package com.ezfx.controls.editor;
 
+import com.ezfx.base.introspector.Category;
 import com.ezfx.controls.editor.skin.MultiEditorSkin;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.scene.control.Skin;
 
-import java.util.Collection;
 import java.util.TreeMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.ezfx.base.utils.EZFX.toObservableArrayList;
 

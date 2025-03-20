@@ -52,7 +52,7 @@ public class NodeEditor extends ClassHierarchyEditor<Node> {
 					key(new DoubleEditor("x"), node -> convert(node.layoutXProperty(), DOUBLE_TO_NUMBER)),
 					key(new DoubleEditor("y"), node -> convert(node.layoutYProperty(), DOUBLE_TO_NUMBER))));
 
-			Editor<Node> translateEditor1 = Editors.group(valueProperty(), "Translate", List.of(
+			Editor<Node> translateEditor1 = Editors.group(valueProperty(), "Translation", List.of(
 					key(new DoubleEditor("x"), node -> convert(node.translateXProperty(), DOUBLE_TO_NUMBER)),
 					key(new DoubleEditor("y"), node -> convert(node.translateYProperty(), DOUBLE_TO_NUMBER)),
 					key(new DoubleEditor("z"), node -> convert(node.translateZProperty(), DOUBLE_TO_NUMBER))));

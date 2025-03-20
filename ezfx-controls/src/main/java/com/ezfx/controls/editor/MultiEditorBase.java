@@ -2,7 +2,7 @@ package com.ezfx.controls.editor;
 
 import com.ezfx.controls.editor.factory.EditorFactory;
 import com.ezfx.controls.editor.factory.IntrospectingEditorFactory;
-import com.ezfx.controls.editor.introspective.Introspector;
+import com.ezfx.base.introspector.Introspector;
 import com.ezfx.controls.editor.skin.MultiEditorSkin;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;

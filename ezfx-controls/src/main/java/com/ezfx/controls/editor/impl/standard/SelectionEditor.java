@@ -103,18 +103,22 @@ public class SelectionEditor<T> extends ObjectEditor<T> {
 	}
 
 	public static class DefaultSkin<T> extends EditorSkinBase<SelectionEditor<T>, T> {
+		private final ComboBox<T> comboBox = new ComboBox<>();
 
 		public DefaultSkin(SelectionEditor<T> control) {
 			super(control);
-			ComboBox<T> comboBox = new ComboBox<>();
-			comboBox.converterProperty().bindBidirectional(control.converterProperty());
-			comboBox.itemsProperty().bindBidirectional(control.itemsProperty());
-			comboBox.cellFactoryProperty().bindBidirectional(control.cellFactoryProperty());
-			comboBox.buttonCellProperty().bindBidirectional(control.buttonCellProperty());
-			comboBox.valueProperty().bindBidirectional(control.valueProperty());
+			install();
+			getChildren().setAll(new HBox(comboBox));
+		}
 
-			HBox hBox = new HBox(comboBox);
-			getChildren().setAll(hBox);
+		@Override
+		public void install() {
+			super.install();
+			comboBox.converterProperty().bindBidirectional(editor.converterProperty());
+			comboBox.itemsProperty().bindBidirectional(editor.itemsProperty());
+			comboBox.cellFactoryProperty().bindBidirectional(editor.cellFactoryProperty());
+			comboBox.buttonCellProperty().bindBidirectional(editor.buttonCellProperty());
+			comboBox.valueProperty().bindBidirectional(editor.valueProperty());
 		}
 	}
 }

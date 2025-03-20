@@ -1,205 +1,265 @@
 package com.ezfx.fxml;
 
+import com.ezfx.base.introspector.EZFXIntrospector;
+import com.ezfx.base.introspector.PropertyInfo;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
+import javafx.geometry.Insets;
+import javafx.geometry.Point3D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
+import javafx.scene.control.skin.LabelSkin;
 import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import java.beans.BeanInfo;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
+import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.concurrent.ConcurrentHashMap;
 
 class FXMLSerializer extends StdSerializer<Node> {
 
 	private static final Logger log = LoggerFactory.getLogger(FXMLSerializer.class);
+	private static final Map<Class<?>, Object> DEFAULT_OBJECTS = new ConcurrentHashMap<>();
+	private static final Map<Class<?>, Map<String, Object>> DEFAULT_PROPERTY_VALUES = new ConcurrentHashMap<>();
 
-	protected ToXmlGenerator xml;
+	static {
+		// com.sun.javafx.scene.control.LabeledText;
+		Label label = new Label();
+		label.setSkin(new LabelSkin(label));
+		Node labelText = label.getChildrenUnmodifiable().getFirst();
+		DEFAULT_OBJECTS.putIfAbsent(labelText.getClass(), labelText);
+	}
+
 	FXMLSerializer() {
 		super(Node.class);
 	}
-	FXMLSerializer(Class<Node> t) {
-		super(t);
-	}
 
 	@Override
-	public void serialize(Node node, JsonGenerator generator, SerializerProvider provider) {
+	public void serialize(Node node, JsonGenerator jsonGenerator, SerializerProvider provider) throws IOException {
+		Serializer generator = new Serializer(node, (ToXmlGenerator) jsonGenerator, provider);
 		try {
-			xml = (ToXmlGenerator) generator;
-
-			recursiveVisitChildren(node, v -> classes.add(v.getClass()));
-			writeStartDocument();
-			writeImports();
-			serializeRoot(node);
+			generator.run();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected void serializeRoot(Object object) throws Exception {
-		xml.setNextName(createType(object));
-		xml.writeStartObject();
+	private static class Serializer {
+		private final Node node;
+		private final ToXmlGenerator actualGenerator;
+		private final SerializerProvider provider;
+		private ToXmlGenerator generator;
 
-		xml.setNextIsAttribute(true);
-		xml.writeStringField("xmlns", "http://javafx.com/javafx");
-		xml.writeStringField("xmlns:fx", "http://javafx.com/javafx");
+		private final Set<Class<?>> classes = new HashSet<>();
 
-		serializeObjectInternal(object);
+		public Serializer(Node node, ToXmlGenerator generator, SerializerProvider provider) {
+			this.node = node;
+			this.actualGenerator = generator;
+			this.provider = provider;
+		}
 
-		xml.writeEndObject();
-	}
-	protected void serializeObjectInternal(Object object) throws Exception {
-		Map<String, Object> childElements = new LinkedHashMap<>();
+		public void run() throws Exception {
+			//TODO: Clean up this dry run. Shouldn't need to execute the entire serialization twice.
+			//Dry run against dummy generator to discover list of classes needed for import.
+			this.generator = (ToXmlGenerator) actualGenerator.getCodec().getFactory().createGenerator(new StringWriter());
+			serializeRoot(node);
+			this.generator = actualGenerator;
 
-		xml.setNextIsAttribute(true);
-		BeanInfo beanInfo = Introspector.getBeanInfo(object.getClass(), Object.class);
-		for (PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors()) {
-			String name = propertyDescriptor.getName();
-			//Ignore if not readable and writable.
-			if (propertyDescriptor.getWriteMethod() == null || propertyDescriptor.getReadMethod() == null) {
-				log.debug("Skipping attribute {} because it is not both readable and writable", name);
-				continue;
+			//Start Document
+			generator.getStaxWriter().writeStartDocument();
+			generator.writeRaw(System.lineSeparator());
+			generator.writeRaw(System.lineSeparator());
+
+			//Imports
+			List<String> packages = classes.stream()
+					.map(Class::getName)
+					.distinct()
+					.sorted()
+					.toList();
+			for (String packageName : packages) {
+				generator.writeRaw("<?import %s?>".formatted(packageName));
+				generator.writeRaw(System.lineSeparator());
 			}
-			//Ignore if null.
-			Object value = propertyDescriptor.getReadMethod().invoke(object);
-			if (value == null) {
-				log.debug("Skipping attribute {} because null value.", name);
-				continue;
-			}
+			generator.writeRaw(System.lineSeparator());
 
-			Class<?> type = value.getClass();
-			if (isSimpleType(type) || type.isEnum()) {
-				//Ignore if same as default value.
-				Object defaultValue = getDefaultValue(object, propertyDescriptor);
-				if (defaultValue != null && Objects.equals(value, defaultValue)) {
-					log.debug("Skipping attribute {} because the value is the same as the default value: {}", name, value);
+			serializeRoot(node);
+		}
+
+		protected void serializeRoot(Object object) throws Exception {
+			generator.setNextName(createType(object.getClass()));
+			generator.writeStartObject();
+
+			generator.setNextIsAttribute(true);
+			generator.writeStringField("xmlns", "http://javafx.com/javafx");
+			generator.writeStringField("xmlns:fx", "http://javafx.com/javafx");
+
+			serializeObjectInternal(object);
+
+			generator.writeEndObject();
+		}
+
+		protected void serializeObjectInternal(Object object) throws Exception {
+			Map<String, Object> childElements = new LinkedHashMap<>();
+
+			generator.setNextIsAttribute(true);
+			Class<?> clazz = object.getClass();
+			for (PropertyInfo propertyInfo : EZFXIntrospector.DEFAULT_INTROSPECTOR.getPropertyInfo(clazz)) {
+				String name = propertyInfo.name();
+				//Ignore if not readable and writable.
+				if (propertyInfo.setter() == null || propertyInfo.getter() == null) {
+					log.debug("Skipping attribute {} because it is not both readable and writable", name);
+					continue;
+				}
+				//Ignore if null.
+				Method getter = propertyInfo.getter();
+				if (!getter.canAccess(object)) {
+					log.debug("Skipping attribute {} because can't access.", name);
+					continue;
+				}
+				Object value = getter.invoke(object);
+				if (value == null) {
+					log.debug("Skipping attribute {} because null value.", name);
 					continue;
 				}
 
-				//Write simple string field.
-				xml.writeStringField(name, String.valueOf(value));
-			} else if (Node.class.isAssignableFrom(type)) {
-				//Track complex elements.
-				childElements.put(name, value);
-			}  else if (Image.class.isAssignableFrom(type) && value instanceof Image image) {
-				startWrappedElement(name);
-				xml.setNextName(createType(image));
-				xml.writeStartObject();
-				xml.setNextIsAttribute(true);
-				xml.writeStringField("url", image.getUrl());
-				xml.writeEndObject();
-				endWrappedElement();
-			} else {
-				log.warn("Failed to serialize attribute {}. Unimplemented type: {}", name, type);
-			}
-		}
+				Class<?> type = value.getClass();
+				if (isSimpleType(type) || type.isEnum()) {
+					//Ignore if same as default value.
+					Object defaultValue = getDefaultValue(object, propertyInfo);
+					if (defaultValue != null && Objects.equals(value, defaultValue)) {
+						log.debug("Skipping attribute {} because the value is the same as the default value: {}", name, value);
+						continue;
+					}
 
-		if (object instanceof Pane parent) {
-			Method getChildrenMethod = parent.getClass().getMethod("getChildren");
+					//Write simple string field.
+					generator.writeStringField(name, String.valueOf(value));
+				} else if (Node.class.isAssignableFrom(type)) {
+					//Track complex elements.
+					childElements.put(name, value);
+				} else if (Image.class.isAssignableFrom(type) && value instanceof Image image) {
+					startWrappedElement(name);
+					generator.setNextName(createType(image.getClass()));
+					generator.writeStartObject();
+					generator.setNextIsAttribute(true);
+					generator.writeStringField("url", image.getUrl());
+					generator.writeEndObject();
+					endWrappedElement();
+				} else if (Color.class.isAssignableFrom(type) ||
+						Font.class.isAssignableFrom(type) ||
+						Point3D.class.isAssignableFrom(type) ||
+						Insets.class.isAssignableFrom(type) ||
+						Background.class.isAssignableFrom(type) ||
+						Border.class.isAssignableFrom(type) ||
+						Insets.class.isAssignableFrom(type)) {
+					// TODO: Actually implement all the listed serialization
+					//Ignore if same as default value.
+					Object defaultValue = getDefaultValue(object, propertyInfo);
+					if (defaultValue != null && Objects.equals(value, defaultValue)) {
+						log.debug("Skipping child element {} because the value is the same as the default value: {}", name, value);
+						continue;
+					}
 
-			if (Arrays.stream(getChildrenMethod.getAnnotations()).anyMatch(annotation -> annotation instanceof FXMLIgnore)) {
-				log.debug("Skipping getChildren because FXMLIgnore annotation");
-			} else if (!Modifier.isPublic(getChildrenMethod.getModifiers())) {
-				log.debug("Skipping getChildren because method is not public");
-			} else {
-				startWrappedElement("children");
-				for (Node child : parent.getChildrenUnmodifiable()) {
-					serializeObject(child);
+					//Track complex elements.
+					childElements.put(name, value);
+				} else if ("eventDispatcher".equals(name)) {
+					//TODO: Cleanup
+					log.debug("Failed to serialize attribute {}.{} because of unimplemented type: {}", clazz.getSimpleName(), name, type);
+				} else {
+					log.warn("Failed to serialize attribute {}.{} because of unimplemented type: {}", clazz.getSimpleName(), name, type);
 				}
+			}
+			if (object instanceof Node node) {
+				Parent parent = node.getParent();
+				if (parent != null) {
+					Class<? extends Parent> parentClass = parent.getClass();
+					Method[] methods = parentClass.getMethods();
+					for (Method method : methods) {
+						if (method.getName().startsWith("get")) {
+							String propertyName = Character.toLowerCase(method.getName().charAt(3)) + method.getName().substring(4);
+							if (Modifier.isStatic(method.getModifiers())) {
+								Parameter[] parameters = method.getParameters();
+								if (parameters.length == 1) {
+									if (parameters[0].getType() == Node.class) {
+										Object value = method.invoke(null, object);
+										if (value != null) {
+											generator.writeStringField(parentClass.getSimpleName() + "." + propertyName, String.valueOf(value));
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			for (Map.Entry<String, Object> entry : childElements.entrySet()) {
+				startWrappedElement(entry.getKey());
+				serializeObject(entry.getValue());
 				endWrappedElement();
 			}
-		}
-		for (Map.Entry<String, Object> entry : childElements.entrySet()) {
-			startWrappedElement(entry.getKey());
-			serializeObject(entry.getValue());
-			endWrappedElement();
-		}
 
-	}
+			if (object instanceof Pane parent) {
+				Method getChildrenMethod = parent.getClass().getMethod("getChildrenUnmodifiable");
 
-	Map<Class<?>, Map<String, Object>> defaultValuesMap = new HashMap<>();
-	protected Object getDefaultValue(Object object, PropertyDescriptor propertyDescriptor) {
-		if (!defaultValuesMap.containsKey(object.getClass())) {
-			defaultValuesMap.put(object.getClass(), new HashMap<>());
-		}
-		Map<String, Object> values = defaultValuesMap.get(object.getClass());
-		if (!values.containsKey(propertyDescriptor.getName())) {
-			try {
-				Object value = Arrays.stream(object.getClass().getDeclaredConstructors())
-						.filter(constructor -> constructor.getParameterCount() == 0)
-						.map(constructor -> readDefaultValue(propertyDescriptor, constructor))
-						.findFirst().orElseGet(() -> null);
-				values.put(propertyDescriptor.getName(), value);
-			} catch (Exception e) {
-				values.put(propertyDescriptor.getName(), null);
+				if (Arrays.stream(getChildrenMethod.getAnnotations()).anyMatch(annotation -> annotation instanceof FXMLIgnore)) {
+					log.debug("Skipping getChildren because FXMLIgnore annotation");
+				} else if (!Modifier.isPublic(getChildrenMethod.getModifiers())) {
+					log.debug("Skipping getChildren because method is not public");
+				} else if (parent instanceof BorderPane borderPane) {
+					log.debug("Skipping getChildren because BorderPane uses top/right/bottom/left/center");
+				} else {
+					startWrappedElement("children");
+					for (Node child : parent.getChildrenUnmodifiable()) {
+						if (!childElements.containsValue(child)) {
+							serializeObject(child);
+						}
+					}
+					endWrappedElement();
+				}
 			}
 		}
-		return values.get(propertyDescriptor.getName());
-	}
-	protected static Object readDefaultValue(PropertyDescriptor p, Constructor<?> c) {
-		try {
-			return p.getReadMethod().invoke(c.newInstance());
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+
+		protected void startWrappedElement(String name) throws IOException {
+			generator.writeFieldName(name);
+			generator.writeStartObject();
+			generator.writeFieldName(name);
+			generator.writeStartArray();
+		}
+
+		protected void endWrappedElement() throws IOException {
+			generator.writeEndArray();
+			generator.writeEndObject();
+		}
+
+		protected void serializeObject(Object object) throws Exception {
+			generator.setNextName(createType(object.getClass()));
+			generator.writeStartObject();
+			serializeObjectInternal(object);
+			generator.writeEndObject();
+		}
+
+		protected QName createType(Class<?> clazz) {
+			classes.add(clazz);
+			return new QName(clazz.getSimpleName());
 		}
 	}
-	protected void startWrappedElement(String name) throws IOException {
-		xml.writeFieldName(name);
-		xml.writeStartObject();
-		xml.writeFieldName(name);
-		xml.writeStartArray();
-	}
-	protected void endWrappedElement() throws IOException {
-		xml.writeEndArray();
-		xml.writeEndObject();
-	}
-	protected void serializeObject(Object object) throws Exception {
-		xml.setNextName(createType(object));
-		xml.writeStartObject();
-		serializeObjectInternal(object);
-		xml.writeEndObject();
-	}
 
-	protected void writeImports() throws Exception {
-		xml.writeRaw("<?import " + Image.class.getName() + "?>\r\n");
-		xml.writeRaw("<?import " + WritableImage.class.getName() + "?>\r\n");
-		for (Class<?> clazz : classes) {
-			writeImport(clazz.getName());
-		}
-	}
-	protected void writeImport(String text) throws Exception {
-		xml.writeRaw("<?import " + text + "?>");
-		xml.writeRaw(System.lineSeparator());
-	}
-
-	protected final Set<Class<?>> classes = new HashSet<>();
-	protected QName createType(Object object) {
-		Class<? extends Object> toImport = object.getClass();
-		classes.add(toImport);
-		return new QName(toImport.getSimpleName());
-	}
-
-	protected void recursiveVisitChildren(Object object, Consumer<Object> visitor) {
-		visitor.accept(object);
-		if (object instanceof Parent) {
-			((Parent) object).getChildrenUnmodifiable()
-					.forEach(n -> recursiveVisitChildren(n, visitor));
-		}
-	}
 	protected static boolean isSimpleType(Class<?> type) {
 		return SIMPLE_TYPES.contains(type);
 	}
@@ -215,9 +275,38 @@ class FXMLSerializer extends StdSerializer<Node> {
 			Byte.class,
 			Boolean.class);
 
-	protected void writeStartDocument() throws XMLStreamException, IOException {
-		xml.getStaxWriter().writeStartDocument();
-		xml.writeRaw(System.lineSeparator());
-		xml.writeRaw(System.lineSeparator());
+	private static Object getDefaultValue(Object object, PropertyInfo propertyInfo) {
+		try {
+			return DEFAULT_PROPERTY_VALUES.computeIfAbsent(object.getClass(), _ -> new ConcurrentHashMap<>())
+					.computeIfAbsent(propertyInfo.name(), _ -> getDefaultPropertyValue(object.getClass(), propertyInfo));
+		} catch (Exception e) {
+			log.debug("Failed to get default value: %s".formatted(propertyInfo), e);
+			return null;
+		}
 	}
+
+	private static Object getDefaultPropertyValue(Class<?> clazz, PropertyInfo propertyInfo) {
+		try {
+			Object defaultInstance = getDefaultInstance(clazz);
+			return propertyInfo.getter().invoke(defaultInstance);
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static Object getDefaultInstance(Class<?> clazz) {
+		return DEFAULT_OBJECTS.computeIfAbsent(clazz, _ -> createDefaultInstance(clazz));
+	}
+
+	private static Object createDefaultInstance(Class<?> clazz) {
+		try {
+			return clazz.getConstructor().newInstance();
+		} catch (InstantiationException |
+		         IllegalAccessException |
+		         InvocationTargetException |
+		         NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 }
