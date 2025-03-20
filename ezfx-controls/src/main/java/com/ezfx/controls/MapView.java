@@ -72,10 +72,5 @@ public class MapView<K, V> extends Control {
 				}
 			});
 		}
-
-		@Override
-		public void dispose() {
-			super.dispose();
-		}
 	}
 }

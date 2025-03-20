@@ -62,20 +62,14 @@ public class FXMLEditorApplication extends EZFXApplication {
 		});
 
 		MenuItem save = new MenuItem("Save");
-		save.setOnAction(_ -> {
-			FXMLSaver saver = new FXMLSaver();
-			saver.save(getPath().toFile(), sceneEditor.getValue());
-		});
+		save.setOnAction(_ -> FXMLSaver.save(getPath().toFile(), sceneEditor.getValue()));
 
 		MenuItem saveAs = new MenuItem("Save As...");
 		saveAs.setOnAction(_ -> {
 			FileChooser fileChooser = new FileChooser();
 			fileChooser.setInitialDirectory(Path.of(System.getProperty("user.dir")).toFile());
 			Optional.ofNullable(fileChooser.showOpenDialog(stage))
-					.ifPresent(file -> {
-						FXMLSaver saver = new FXMLSaver();
-						saver.save(file, sceneEditor.getValue());
-					});
+					.ifPresent(file -> FXMLSaver.save(file, sceneEditor.getValue()));
 		});
 
 		fileMenu.getItems().setAll(open, save, saveAs);

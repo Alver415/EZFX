@@ -19,7 +19,10 @@ public class FXMLSaver {
 		mapper.registerModule(fxmlModule);
 	}
 
-	public void save(File file, Node node) {
+	private FXMLSaver(){
+	}
+
+	public static void save(File file, Node node) {
 		try {
 			mapper.writeValue(file, node);
 		} catch (IOException e) {
@@ -27,7 +30,7 @@ public class FXMLSaver {
 		}
 	}
 
-	public String serialize(Node node) {
+	public static String serialize(Node node) {
 		try {
 			return mapper.writeValueAsString(node);
 		} catch (IOException e) {

@@ -4,6 +4,7 @@ import com.ezfx.app.EZFXApplication;
 import com.ezfx.base.utils.BidirectionalContentBindings;
 import com.ezfx.base.utils.Converter;
 import com.ezfx.controls.MapView;
+import com.ezfx.controls.SetView;
 import com.ezfx.controls.editor.impl.javafx.ColorEditor;
 import com.ezfx.controls.utils.SplitPanes;
 import javafx.scene.Node;
@@ -147,19 +148,17 @@ public class BidirectionalBindingsDemo extends EZFXApplication {
 				},
 				Object::toString);
 
-		ListView<String> stringList = new ListView<>();
+		SetView<String> stringList = new SetView<>();
 		TextField stringInput = new TextField();
 		stringInput.setOnAction(_ -> {
-			stringList.getItems().add(stringInput.getText());
+			stringList.getSet().add(stringInput.getText());
 			stringInput.setText(null);
 		});
 		stringList.setCellFactory(_ -> new ListCell<>() {
-			private final Rectangle rectangle = new Rectangle(16, 16);
-
 			{
 				setOnMouseClicked(event -> {
 					if (event.getClickCount() == 2) {
-						stringList.getItems().remove(getIndex());
+						stringList.getSet().remove(getItem());
 					}
 				});
 			}
@@ -175,16 +174,16 @@ public class BidirectionalBindingsDemo extends EZFXApplication {
 			}
 		});
 
-		ListView<Color> colorList = new ListView<>();
+		SetView<Color> colorList = new SetView<>();
 		ColorEditor colorEditor = new ColorEditor();
-		colorEditor.valueProperty().subscribe(color -> colorList.getItems().add(color));
+		colorEditor.valueProperty().subscribe(color -> colorList.getSet().add(color));
 		colorList.setCellFactory(_ -> new ListCell<>() {
 			private final Rectangle rectangle = new Rectangle(16, 16);
 
 			{
 				setOnMouseClicked(event -> {
 					if (event.getClickCount() == 2) {
-						colorList.getItems().remove(getIndex());
+						colorList.getSet().remove(getItem());
 					}
 				});
 			}
@@ -204,24 +203,18 @@ public class BidirectionalBindingsDemo extends EZFXApplication {
 				new VBox(4, stringInput, stringList),
 				new VBox(4, colorEditor, colorList));
 
-		stringList.getItems().add(Color.RED.toString());
-		stringList.getItems().add(Color.GREEN.toString());
-		stringList.getItems().add(Color.BLUE.toString());
+		stringList.getSet().add(Color.RED.toString());
+		stringList.getSet().add(Color.GREEN.toString());
+		stringList.getSet().add(Color.BLUE.toString());
 
-		colorList.getItems().add(Color.CYAN);
-		colorList.getItems().add(Color.YELLOW);
-		colorList.getItems().add(Color.MAGENTA);
+		colorList.getSet().add(Color.CYAN);
+		colorList.getSet().add(Color.YELLOW);
+		colorList.getSet().add(Color.MAGENTA);
 
 		BidirectionalContentBindings.bind(
-				colorList.getItems(),
-				stringList.getItems(),
+				colorList.getSet(),
+				stringList.getSet(),
 				converter.inverted());
-
-		stringList.getSelectionModel().selectedIndexProperty().addListener(
-				(_, _, selected) -> colorList.getSelectionModel().select(selected.intValue()));
-
-		colorList.getSelectionModel().selectedIndexProperty().addListener(
-				(_, _, selected) -> stringList.getSelectionModel().select(selected.intValue()));
 
 		return splitPane;
 	}

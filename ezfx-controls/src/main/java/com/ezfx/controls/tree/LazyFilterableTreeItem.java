@@ -8,9 +8,9 @@ import java.util.function.Function;
 
 public class LazyFilterableTreeItem<T> extends FilterableTreeItem<T> {
 
-	private final Function<T, ObservableList<T>> childrenProvider;
+	private final Function<T, ObservableList<? extends T>> childrenProvider;
 
-	public LazyFilterableTreeItem(T rootNode, Function<T, ObservableList<T>> childrenProvider) {
+	public LazyFilterableTreeItem(T rootNode, Function<T, ObservableList<? extends T>> childrenProvider) {
 		super(rootNode);
 		this.childrenProvider = childrenProvider;
 	}
@@ -25,7 +25,7 @@ public class LazyFilterableTreeItem<T> extends FilterableTreeItem<T> {
 
 	private void initializeSourceChildren() {
 		sourceChildren.clear();
-		ObservableList<T> childrenNodes = childrenProvider.apply(getValue());
+		ObservableList<? extends T> childrenNodes = childrenProvider.apply(getValue());
 		for (T child : childrenNodes) {
 			LazyFilterableTreeItem<T> childItem = new LazyFilterableTreeItem<>(child, childrenProvider);
 			sourceChildren.add(childItem);

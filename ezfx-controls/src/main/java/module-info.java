@@ -1,4 +1,5 @@
 open module ezfx.controls {
+	exports com.ezfx.controls;
 	exports com.ezfx.controls.console;
 	exports com.ezfx.controls.utils;
 	exports com.ezfx.controls.viewport;
@@ -9,14 +10,12 @@ open module ezfx.controls {
 	exports com.ezfx.controls.editor.introspective;
 	exports com.ezfx.controls.editor.impl.standard;
 	exports com.ezfx.controls.editor.impl.javafx;
+	exports com.ezfx.controls.editor.impl.filesystem;
 	exports com.ezfx.controls.editor.skin;
 	exports com.ezfx.controls.editor.factory;
 	exports com.ezfx.controls.editor.code;
 	exports com.ezfx.controls.popup;
 	exports com.ezfx.controls.item;
-	exports com.ezfx.controls.editor.impl.filesystem;
-	exports com.ezfx.controls;
-
 
 	// EZFX
 	requires transitive ezfx.base;
@@ -25,6 +24,9 @@ open module ezfx.controls {
 	requires transitive javafx.base;
 	requires transitive javafx.controls;
 	requires transitive javafx.graphics;
+	requires transitive javafx.media;
+	requires transitive javafx.swing;
+	requires transitive javafx.web;
 
 	// ReactFX
 	requires reactfx;

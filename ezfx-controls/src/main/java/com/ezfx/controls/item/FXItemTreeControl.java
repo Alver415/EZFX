@@ -21,8 +21,8 @@ public class FXItemTreeControl extends TreeControl<FXItem<?, ?>> {
 	public static final Callback<TreeView<FXItem<?, ?>>, TreeCell<FXItem<?, ?>>> CELL_FACTORY =
 			_ -> new FXItemTreeCell();
 
-	public static final Function<FXItem<?, ?>, ObservableList<FXItem<?, ?>>> CHILDREN_PROVIDER =
-			item -> (ObservableList<FXItem<?, ?>>) item.getChildren();
+	public static final Function<FXItem<?, ?>, ObservableList<? extends FXItem<?, ?>>> CHILDREN_PROVIDER =
+			FXItem::getChildren;
 
 	public static final BiFunction<String, FXItem<?, ?>, Boolean> FILTER_FUNCTION = (filterText, item) -> {
 		if (filterText == null || filterText.isEmpty()) return true;

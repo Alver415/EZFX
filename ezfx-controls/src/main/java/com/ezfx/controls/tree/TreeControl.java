@@ -46,7 +46,7 @@ public class TreeControl<T> extends Control {
 					hoveredItem.set(cell.getItem());
 				});
 				cell.setOnMouseExited(_ -> {
-					if (cell.getItem() == null || hoveredItem.getValue() == cell.getItem()){
+					if (cell.getItem() == null || hoveredItem.getValue() == cell.getItem()) {
 						hoveredItem.set(null);
 					}
 				});
@@ -105,17 +105,17 @@ public class TreeControl<T> extends Control {
 	}
 
 	// region Functional Properties
-	private final Property<Function<T, ObservableList<T>>> childrenProvider = new SimpleObjectProperty<>(this, "childrenProvider");
+	private final Property<Function<T, ObservableList<? extends T>>> childrenProvider = new SimpleObjectProperty<>(this, "childrenProvider");
 
-	public Property<Function<T, ObservableList<T>>> childrenProviderProperty() {
+	public Property<Function<T, ObservableList<? extends T>>> childrenProviderProperty() {
 		return this.childrenProvider;
 	}
 
-	public Function<T, ObservableList<T>> getChildrenProvider() {
+	public Function<T, ObservableList<? extends T>> getChildrenProvider() {
 		return this.childrenProviderProperty().getValue();
 	}
 
-	public void setChildrenProvider(Function<T, ObservableList<T>> value) {
+	public void setChildrenProvider(Function<T, ObservableList<? extends T>> value) {
 		this.childrenProviderProperty().setValue(value);
 	}
 

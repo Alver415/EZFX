@@ -1,7 +1,6 @@
 package com.ezfx.app.editor;
 
 import com.ezfx.base.utils.ScreenBounds;
-import com.ezfx.controls.editor.Editor;
 import com.ezfx.controls.editor.EditorSkinBase;
 import com.ezfx.controls.editor.FXItemEditor;
 import com.ezfx.controls.editor.ObjectEditor;
@@ -10,6 +9,7 @@ import com.ezfx.controls.editor.code.XMLEditorSkin;
 import com.ezfx.controls.item.FXItem;
 import com.ezfx.controls.item.FXItemFactory;
 import com.ezfx.controls.item.FXItemTreeControl;
+import com.ezfx.controls.item.FXNodeItem;
 import com.ezfx.controls.viewport.Viewport;
 import com.ezfx.fxml.FXMLSaver;
 import javafx.beans.binding.Bindings;
@@ -21,14 +21,11 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Skin;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import static com.ezfx.base.utils.ComplexBinding.bindBidirectional;
@@ -64,8 +61,7 @@ public class SceneGraphEditor extends ObjectEditor<Node> {
 		private final CodeEditor fxmlEditor;
 		private final Viewport viewport;
 		private final Canvas overlay;
-		private final StackPane editorWrapper;
-		private final Editor<FXItem<?, ?>> targetEditor;
+		private final FXItemEditor<FXItem<?, ?>> targetEditor;
 		private final ObservableValue<FXItem<?, ?>> targetBinding;
 
 		protected BorderPane borderPane = new BorderPane();
@@ -79,36 +75,33 @@ public class SceneGraphEditor extends ObjectEditor<Node> {
 			overlay.setMouseTransparent(true);
 			overlay.setOpacity(0.5);
 
-			getChildren().setAll(borderPane);
 
-			TabPane tabPane = new TabPane();
+			// Left
+			treeControl.setPrefWidth(450);
+			borderPane.setLeft(treeControl);
+
+			// Center
 			Tab fxmlTab = new Tab("FXML");
 			fxmlTab.setClosable(false);
 			fxmlTab.setContent(fxmlEditor);
+			fxmlEditor.setSkin(new XMLEditorSkin(fxmlEditor));
 
 			Tab sceneTab = new Tab("Scene");
 			sceneTab.setClosable(false);
 			sceneTab.setContent(new StackPane(viewport, overlay));
 
-
+			TabPane tabPane = new TabPane();
 			tabPane.getTabs().setAll(sceneTab, fxmlTab);
-
 			borderPane.setCenter(tabPane);
 
-			VBox left = new VBox(treeControl);
-			VBox.setVgrow(treeControl, Priority.ALWAYS);
-			left.setPrefWidth(450);
-			borderPane.setLeft(left);
-
+			// Right
 			targetEditor = new FXItemEditor<>();
-			bindBidirectional(targetEditor.valueProperty(), control.targetProperty());
-			editorWrapper = new StackPane(targetEditor.getNode());
-			ScrollPane right = new ScrollPane(editorWrapper);
-			right.setFitToWidth(true);
-			right.setFitToHeight(true);
-			right.setPrefWidth(450);
-			borderPane.setRight(right);
+			targetEditor.setPrefWidth(450);
+			borderPane.setRight(targetEditor);
 
+			getChildren().setAll(borderPane);
+
+			bindBidirectional(targetEditor.valueProperty(), control.targetProperty());
 			targetBinding = Bindings.createObjectBinding(
 					() -> treeControl.getHoveredItem() != null ?
 							treeControl.getHoveredItem() :
@@ -132,19 +125,14 @@ public class SceneGraphEditor extends ObjectEditor<Node> {
 
 			treeControl.rootProperty().bind(control.valueProperty().map(FXItemFactory.CACHED::create));
 			viewport.contentProperty().bind(control.valueProperty()
-					.map(t -> t instanceof Parent p ? p : new StackPane(t)).orElse(new StackPane()));
+					.map(t -> t instanceof Parent p ? p : new StackPane(t))
+					.orElse(new StackPane()));
 
 			treeControl.selectedItemProperty().subscribe(targetEditor::setValue);
 
-
-			fxmlEditor.setSkin(new XMLEditorSkin(fxmlEditor));
-
-			FXMLSaver saver = new FXMLSaver();
-			treeControl.selectedItemProperty().map(FXItem::get).addListener((_, _, newValue) -> {
-				if (newValue instanceof Node node){
-					fxmlEditor.setValue(saver.serialize(node));
-				}
-			});
+			treeControl.selectedItemProperty()
+					.map(item -> item instanceof FXNodeItem<?> nodeItem ? nodeItem.get() : null)
+					.subscribe(node -> fxmlEditor.setValue(FXMLSaver.serialize(node)));
 		}
 	}
 }

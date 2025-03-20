@@ -2,6 +2,7 @@ package com.ezfx.fxml;
 
 import com.ezfx.base.introspector.EZFXIntrospector;
 import com.ezfx.base.introspector.PropertyInfo;
+import com.ezfx.base.utils.Colors;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -31,6 +32,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 class FXMLSerializer extends StdSerializer<Node> {
 
@@ -149,6 +151,16 @@ class FXMLSerializer extends StdSerializer<Node> {
 
 					//Write simple string field.
 					generator.writeStringField(name, String.valueOf(value));
+				}if (isStringConvertibleType(type)) {
+					//Ignore if same as default value.
+					Object defaultValue = getDefaultValue(object, propertyInfo);
+					if (defaultValue != null && Objects.equals(value, defaultValue)) {
+						log.debug("Skipping attribute {} because the value is the same as the default value: {}", name, value);
+						continue;
+					}
+
+					//Write simple string field.
+					generator.writeStringField(name, convert(value));
 				} else if (Node.class.isAssignableFrom(type)) {
 					//Track complex elements.
 					childElements.put(name, value);
@@ -160,7 +172,9 @@ class FXMLSerializer extends StdSerializer<Node> {
 					generator.writeStringField("url", image.getUrl());
 					generator.writeEndObject();
 					endWrappedElement();
-				} else if (Color.class.isAssignableFrom(type) ||
+				} else if (Color.class.isAssignableFrom(type)) {
+
+				} else if (
 						Font.class.isAssignableFrom(type) ||
 						Point3D.class.isAssignableFrom(type) ||
 						Insets.class.isAssignableFrom(type) ||
@@ -184,6 +198,8 @@ class FXMLSerializer extends StdSerializer<Node> {
 					log.warn("Failed to serialize attribute {}.{} because of unimplemented type: {}", clazz.getSimpleName(), name, type);
 				}
 			}
+
+			// Handle static parent properties (example: GridPane.getRow() and GridPane.getColumn())
 			if (object instanceof Node node) {
 				Parent parent = node.getParent();
 				if (parent != null) {
@@ -259,6 +275,19 @@ class FXMLSerializer extends StdSerializer<Node> {
 			return new QName(clazz.getSimpleName());
 		}
 	}
+
+	protected static boolean isStringConvertibleType(Class<?> type) {
+		return CONVERTERS.containsKey(type);
+	}
+	protected static <T> String convert(T object){
+		//noinspection unchecked
+		Function<T, String> converter = (Function<T, String>) CONVERTERS.get(object.getClass());
+		return converter.apply(object);
+	}
+
+	protected static final Map<Class<?>, Function<?, String>> CONVERTERS = Map.of(
+			Color.class, (Function<Color, String>) Colors::toWeb
+	);
 
 	protected static boolean isSimpleType(Class<?> type) {
 		return SIMPLE_TYPES.contains(type);
